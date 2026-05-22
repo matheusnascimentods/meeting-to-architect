@@ -1,0 +1,19 @@
+.mermaid-container {
+  padding: 16px;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.m2a-mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.mermaid-error {
+  padding: 40px;
+  text-align: center;
+  color: #6E6E73;
+  font-size: 14px;
+}
