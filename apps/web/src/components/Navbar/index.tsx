@@ -1,7 +1,7 @@
 import { Button, IconButton, ActionMenu, Box, Text, ActionList } from "@primer/react";
 import { ArrowLeftIcon, PlusIcon, PersonIcon, SignOutIcon } from "@primer/octicons-react";
 import "./styles.css";
-import { User } from "../../lib/mockUsers";
+import { User } from "../../types/auth";
 
 interface NavbarProps {
   showBack?: boolean;
@@ -51,7 +51,7 @@ export function Navbar({ showBack, onBack, showNewButton, onNewClick, user, onLo
                 }}
               >
                 <Text sx={{ color: 'accent.fg', fontWeight: 'bold', fontSize: 0 }}>
-                  {user.name[0]}
+                  {user.name?.[0] || '?'}
                 </Text>
               </Box>
             </ActionMenu.Anchor>

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Box, Text, FormControl, TextInput, Button, IconButton } from '@primer/react';
 import { ArrowLeftIcon } from '@primer/octicons-react';
-import { MOCK_USERS, User } from '../../lib/mockUsers';
+import { authService } from '../../services/auth.service';
+import { User } from '../../types/auth';
 
 export type AuthState = 'auth-email' | 'auth-login' | 'auth-signup' | 'app';
 
@@ -31,15 +32,18 @@ export function AuthFlow({ onAuthenticated }: AuthFlowProps) {
     }
 
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setLoading(false);
-
-    const user = MOCK_USERS.find((u) => u.email === email);
-    if (user) {
-      setCurrentUser(user);
-      setStep('login');
-    } else {
-      setStep('signup');
+    try {
+      const { exists, user } = await authService.checkEmail(email);
+      if (exists) {
+        setCurrentUser(user);
+        setStep('login');
+      } else {
+        setStep('signup');
+      }
+    } catch (error) {
+      setEmailError('Something went wrong. Try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,13 +56,18 @@ export function AuthFlow({ onAuthenticated }: AuthFlowProps) {
     }
 
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setLoading(false);
-
-    if (currentUser && currentUser.password === password) {
-      onAuthenticated(currentUser);
-    } else {
-      setPasswordError('Incorrect password. Try again.');
+    try {
+      const data = await authService.login(email, password);
+      localStorage.setItem('token', data.access_token || data.token);
+      onAuthenticated(data.user || { email, name: currentUser?.name || '' });
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        setPasswordError('Incorrect password. Try again.');
+      } else {
+        setPasswordError('Something went wrong. Try again.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -85,12 +94,19 @@ export function AuthFlow({ onAuthenticated }: AuthFlowProps) {
     if (hasError) return;
 
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setLoading(false);
-
-    const newUser: User = { email, password, name };
-    MOCK_USERS.push(newUser);
-    onAuthenticated(newUser);
+    try {
+      const data = await authService.register(email, password, name);
+      localStorage.setItem('token', data.access_token || data.token);
+      onAuthenticated(data.user || { email, name });
+    } catch (error: any) {
+      if (error.response?.status === 409) {
+        setPasswordError('An account with this email already exists.');
+      } else {
+        setPasswordError('Something went wrong. Try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const renderEmailStep = () => (
@@ -166,7 +182,7 @@ export function AuthFlow({ onAuthenticated }: AuthFlowProps) {
             mt: 2,
           }}
         >
-          <Text sx={{ color: 'accent.fg', fontWeight: 'bold' }}>{currentUser?.name[0]}</Text>
+          <Text sx={{ color: 'accent.fg', fontWeight: 'bold' }}>{currentUser?.name?.[0] || '?'}</Text>
         </Box>
         <Text sx={{ fontWeight: 'bold', fontSize: 2 }}>{currentUser?.name}</Text>
         <Text sx={{ color: 'fg.muted', fontSize: 1, mb: 4 }}>{currentUser?.email}</Text>

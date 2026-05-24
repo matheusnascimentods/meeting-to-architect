@@ -7,6 +7,6 @@
   ],
   "scripts": {
     "dev:web": "bun run --cwd apps/web dev",
-    "dev:api": "bun run --cwd apps/api start:dev"
+    "dev:api": "bun run --cwd apps/api/m2a-api --watch src/main.ts"
   }
 }

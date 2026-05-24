@@ -1,8 +1,0 @@
-{
-  "name": "@m2a/api",
-  "version": "0.0.1",
-  "private": true,
-  "scripts": {
-    "start:dev": "echo 'NestJS not installed yet'"
-  }
-}

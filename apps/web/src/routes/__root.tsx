@@ -8,7 +8,7 @@ import {
 import { ThemeProvider, BaseStyles } from "@primer/react";
 import { useState, createContext, useContext } from "react";
 import { AuthFlow } from "../components/Auth";
-import { User } from "../lib/mockUsers";
+import { User } from "../types/auth";
 
 interface AuthContextType {
   user: User | null;
@@ -82,7 +82,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-export const Route = createRootRouteWithContext<{ 
+export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
 }>()({
   component: RootComponent,
