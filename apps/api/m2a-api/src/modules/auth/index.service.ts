@@ -27,7 +27,7 @@ export class AuthService {
 
         return {
             message: 'Login successful',
-            token: this.createToken({ sub: data.id, email: data.email }),
+            token: await this.createToken({ sub: data.id, email: data.email }),
         };
     }
 

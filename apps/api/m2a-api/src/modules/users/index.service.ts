@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { SupabaseService } from '../supabase/index.service';
 import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
 import { User } from './index.schema';
 import { AuthService } from '../auth/index.service';
 
@@ -40,7 +39,7 @@ export class UsersService {
 
     return {
       message: 'User was created successfully',
-      token: this.authService.createToken({ sub: data.id, email: data.email }),
+      token: await this.authService.createToken({ sub: data.id, email: data.email }),
     };
   }
 
