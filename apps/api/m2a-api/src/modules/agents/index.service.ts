@@ -1,139 +1,95 @@
-import { Agent, InMemorySessionService, Runner, Gemini } from "@google/adk";
-import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { readFileSync } from "fs";
-import { join } from "path";
+import { Agent, InMemorySessionService, Runner, Gemini } from '@google/adk';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { z } from 'zod';
+
+const DiagramResponseSchema = z.object({
+    title: z.string(),
+    description: z.string(),
+    mermaidCode: z.string(),
+});
+
+type DiagramResponse = z.infer<typeof DiagramResponseSchema>;
 
 @Injectable()
 export class AgentService {
-    private transcriptAnalyzer: Agent
-    private diagramGenerator: Agent
+    private architectureAgent: Agent;
 
     constructor(private readonly configService: ConfigService) {
         const apiKey = this.configService.get<string>('GOOGLE_API_KEY');
 
-        this.transcriptAnalyzer = new Agent({
-            name: "transcript-analyzer",
-            description: "Extracts technical context from meeting transcripts",
+        this.architectureAgent = new Agent({
+            name: 'architecture-architect',
+            description:
+                'Analyzes transcripts and generates Mermaid diagrams with titles and descriptions',
             model: new Gemini({
-                model: "gemini-2.5-flash",
-                apiKey
+                model: 'gemini-3.5-flash',
+                apiKey,
             }),
-            instruction: this.loadPrompt('transcript-analyzer', 'prompt.md')
-        })
-
-        this.diagramGenerator = new Agent({
-            name: "diagram-generator",
-            description: "Generates Mermaid diagrams from structured context",
-            model: new Gemini({
-                model: "gemini-2.5-flash",
-                apiKey
-            }),
-            instruction: this.loadPrompt('diagram-generator', 'prompt.md')
-        })
+            instruction: this.loadPrompt('unified-architect.md'),
+        });
     }
 
     async generateDiagram(
         transcript: string,
         diagramType: 'sequence' | 'class' | 'c4',
-    ): Promise<string> {
-        const context = await this.analyzeTranscript(transcript)
-        const mermaidCode = await this.runDiagramGenerator(context, diagramType)
-        return mermaidCode
-    }
-
-    private async analyzeTranscript(transcript: string): Promise<string> {
-        const sessionService = new InMemorySessionService()
-        const runner = new Runner({
-            agent: this.transcriptAnalyzer,
-            appName: 'm2a',
-            sessionService
-        })
-
-        const session = await sessionService.createSession({
-            appName: 'm2a',
-            userId: 'system',
-        })
-
-        const result = runner.runAsync({
-            userId: 'system',
-            sessionId: session.id,
-            newMessage: {
-                role: 'user',
-                parts: [{ text: transcript }],
-            },
-        })
-
-        let text = ''
-        for await (const event of result) {
-            console.log('ADK event:', JSON.stringify(event, null, 2))
-            if (event.content?.parts) {
-                for (const part of event.content.parts) {
-                    if (part.text) {
-                        text += part.text
-                    }
-                }
-            }
-        }
-
-        if (!text) {
-            throw new Error('No text generated')
-        }
-
-        return text;
-    }
-
-    private async runDiagramGenerator(
-        context: string,
-        diagramType: 'sequence' | 'class' | 'c4',
-    ): Promise<string> {
-        const typePrompt = this.loadPrompt('diagram-generator', `${diagramType}.md`)
-        this.diagramGenerator.instruction = typePrompt
-
-        const sessionService = new InMemorySessionService()
-        const runner = new Runner({
-            agent: this.diagramGenerator,
-            appName: 'm2a',
-            sessionService
-        })
-
-        const session = await sessionService.createSession({
-            appName: 'm2a',
-            userId: 'system',
-        })
-
-        const result = runner.runAsync({
-            userId: 'system',
-            sessionId: session.id,
-            newMessage: {
-                role: 'user',
-                parts: [{ text: context }],
-            },
-        })
-
-        let text = ''
-        for await (const event of result) {
-            console.log('ADK event:', JSON.stringify(event, null, 2))
-            if (event.content?.parts) {
-                for (const part of event.content.parts) {
-                    if (part.text) {
-                        text += part.text
-                    }
-                }
-            }
-        }
-
-        if (!text) {
-            throw new Error('No text generated')
-        }
-
-        return text;
-    }
-
-    private loadPrompt(agent: string, filename: string): string {
-        return readFileSync(
-            join(__dirname, "prompts", agent, filename),
-            "utf-8"
+    ): Promise<DiagramResponse> {
+        const promptTemplate = this.loadPrompt('unified-architect.md');
+        this.architectureAgent.instruction = promptTemplate.replace(
+            '{{diagramType}}',
+            diagramType,
         );
+
+        const sessionService = new InMemorySessionService();
+        const runner = new Runner({
+            agent: this.architectureAgent,
+            appName: 'm2a',
+            sessionService,
+        });
+
+        const session = await sessionService.createSession({
+            appName: 'm2a',
+            userId: 'system',
+        });
+
+        const result = runner.runAsync({
+            userId: 'system',
+            sessionId: session.id,
+            newMessage: {
+                role: 'user',
+                parts: [{ text: `Transcript: \n${transcript}` }],
+            },
+        });
+
+        let text = '';
+        for await (const event of result) {
+            if (event.content?.parts) {
+                for (const part of event.content.parts) {
+                    if (part.text) {
+                        text += part.text;
+                    }
+                }
+            }
+        }
+
+        if (!text) {
+            throw new Error('No response generated from the agent');
+        }
+
+        try {
+            const parsed: unknown = JSON.parse(text);
+            return DiagramResponseSchema.parse(parsed);
+        } catch (error) {
+            console.error('Failed to parse agent response:', text);
+            const errorMessage =
+                error instanceof Error ? error.message : String(error);
+            throw new Error(`Invalid response format from agent: ${errorMessage}`);
+        }
+    }
+
+    private loadPrompt(filename: string): string {
+        return readFileSync(join(__dirname, 'prompts', filename), 'utf-8');
     }
 }

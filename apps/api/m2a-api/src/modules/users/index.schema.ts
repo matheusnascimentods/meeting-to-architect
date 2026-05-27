@@ -6,11 +6,6 @@ export const createUserSchema = z.object({
   name: z.string().min(2),
 });
 
-export const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-});
-
 export const userSchema = z.object({
   id: z.string().uuid(),
   email: z.string().email(),
@@ -20,5 +15,4 @@ export const userSchema = z.object({
 });
 
 export type CreateUserDto = z.infer<typeof createUserSchema>;
-export type LoginDto = z.infer<typeof loginSchema>;
 export type User = z.infer<typeof userSchema>;

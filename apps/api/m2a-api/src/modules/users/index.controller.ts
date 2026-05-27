@@ -1,19 +1,16 @@
 import { Controller, Get, Param, Post, Body } from '@nestjs/common';
 import { UsersService } from './index.service';
-import type { CreateUserDto, LoginDto } from './index.schema';
+import type { CreateUserDto } from './index.schema';
+import { SkipAuth } from '../auth/index.decorator';
 
 @Controller('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
+  @SkipAuth()
   @Post()
   async create(@Body() body: CreateUserDto) {
     return this.usersService.create(body.email, body.password, body.name);
-  }
-
-  @Post('login')
-  async login(@Body() body: LoginDto) {
-    return this.usersService.login(body.email, body.password);
   }
 
   @Get(':id')

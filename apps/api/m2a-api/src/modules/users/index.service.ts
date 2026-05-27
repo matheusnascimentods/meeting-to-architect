@@ -2,18 +2,18 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { SupabaseService } from '../supabase/index.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { User } from './index.schema';
+import { AuthService } from '../auth/index.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly supabase: SupabaseService,
-    private readonly jwtService: JwtService,
+    private readonly authService: AuthService,
   ) { }
 
   async create(email: string, password: string, name: string) {
@@ -38,27 +38,9 @@ export class UsersService {
     if (error || !data)
       throw new Error(error?.message || 'Error creating user');
 
-    const token = this.jwtService.sign({ sub: data.id, email: data.email });
-
     return {
       message: 'User was created successfully',
-      token,
-    };
-  }
-
-  async login(email: string, password: string) {
-    const user = await this.findByEmail(email);
-    if (!user) throw new UnauthorizedException('Invalid credentials');
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid)
-      throw new UnauthorizedException('Invalid credentials');
-
-    const token = this.jwtService.sign({ sub: user.id, email: user.email });
-
-    return {
-      message: 'Login successful',
-      token,
+      token: this.authService.createToken({ sub: data.id, email: data.email }),
     };
   }
 
