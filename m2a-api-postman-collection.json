@@ -36,6 +36,33 @@
 					"response": []
 				},
 				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/user/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get User by ID",
 					"request": {
 						"method": "GET",
@@ -54,6 +81,63 @@
 									"key": "id",
 									"value": "user_id_here"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by Email",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user/get-by-email/:email",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"get-by-email",
+								":email"
+							],
+							"variable": [
+								{
+									"key": "email",
+									"value": "user@example.com"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Agents",
+			"item": [
+				{
+					"name": "Generate Diagram",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"transcriptText\": \"Example transcript text describing a system...\",\n    \"diagramType\": \"sequence\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/agents/generate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"agents",
+								"generate"
 							]
 						}
 					},

@@ -7,14 +7,7 @@ import {
 import { SupabaseService } from '../supabase/index.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  password: string;
-  created_at?: string;
-}
+import { User } from './index.schema';
 
 @Injectable()
 export class UsersService {

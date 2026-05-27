@@ -1,16 +1,6 @@
 import { Controller, Get, Param, Post, Body } from '@nestjs/common';
 import { UsersService } from './index.service';
-
-class CreateUserDto {
-  email: string;
-  password: string;
-  name: string;
-}
-
-class LoginDto {
-  email: string;
-  password: string;
-}
+import type { CreateUserDto, LoginDto } from './index.schema';
 
 @Controller('user')
 export class UsersController {
