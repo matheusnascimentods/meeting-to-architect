@@ -15,4 +15,9 @@ export const authService = {
     const { data } = await api.get(`/user/get-by-email/${email}`)
     return data
   },
+
+  getMe: async () => {
+    const { data } = await api.get('/user/me')
+    return data
+  },
 }

@@ -5,10 +5,11 @@ import {
   createRootRouteWithContext,
   useRouter,
 } from "@tanstack/react-router";
-import { ThemeProvider, BaseStyles } from "@primer/react";
-import { useState, createContext, useContext } from "react";
+import { ThemeProvider, BaseStyles, Text } from "@primer/react";
+import { useState, createContext, useContext, useEffect } from "react";
 import { AuthFlow } from "../components/Auth";
 import { User } from "../types/auth";
+import { authService } from "../services/auth.service";
 
 interface AuthContextType {
   user: User | null;
@@ -93,11 +94,46 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const onLogout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+  };
 
   const authValue = {
     user,
-    onLogout: () => setUser(null),
+    onLogout,
   };
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const userData = await authService.getMe();
+          setUser(userData);
+        } catch (error) {
+          console.error("Auth initialization failed", error);
+          localStorage.removeItem("token");
+        }
+      }
+      setLoading(false);
+    };
+    initAuth();
+  }, []);
+
+  if (loading) {
+    return (
+      <ThemeProvider colorMode="auto">
+        <BaseStyles>
+          <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center' }}>
+            <Text sx={{ color: 'fg.muted' }}>Loading session...</Text>
+          </div>
+        </BaseStyles>
+      </ThemeProvider>
+    );
+  }
 
   if (!user) {
     return (
