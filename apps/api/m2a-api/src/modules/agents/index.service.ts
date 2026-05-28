@@ -1,163 +1,65 @@
-import { Agent, InMemorySessionService, Runner, Gemini } from '@google/adk';
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { readFileSync } from 'fs';
-import { join } from 'path';
-import { z } from 'zod';
-import { MarkdownParser } from './parsers/markdown.parser';
-import { PdfParser } from './parsers/pdf.parser';
-
-const DiagramResponseSchema = z.object({
-    title: z.string(),
-    description: z.string(),
-    mermaidCode: z.string(),
-});
-
-type DiagramResponse = z.infer<typeof DiagramResponseSchema>;
+import { Agent, InMemorySessionService, Runner, Gemini } from '@google/adk'
+import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { DiagramResponse, DiagramResponseSchema } from './index.schema'
+import { getFile } from './helpers/file.helper'
+import { loadPrompt } from './helpers/prompt.helper'
 
 @Injectable()
 export class AgentService {
-    private architectureAgent: Agent;
-    private transcriptAnalyzer: Agent;
+    private architectureAgent: Agent
+    private transcriptAnalyzer: Agent
+    private gemini: Gemini
 
     constructor(private readonly configService: ConfigService) {
-        const apiKey = this.configService.get<string>('GOOGLE_API_KEY');
+        this.gemini = new Gemini({
+            model: this.configService.get<string>('GEMINI_MODEL', 'gemini-3.5-flash'),
+            apiKey: this.configService.get<string>('GEMINI_API_KEY'),
+        })
 
         this.architectureAgent = new Agent({
             name: 'architecture-architect',
-            description: 'Analyzes transcripts and generates Mermaid diagrams with titles and descriptions',
-            model: new Gemini({
-                model: 'gemini-3.5-flash',
-                apiKey,
-            }),
-            instruction: this.loadPrompt('unified-architect.md'),
-        });
+            description: 'Analyzes transcripts and generates Mermaid diagrams',
+            model: this.gemini,
+            instruction: loadPrompt('unified-architect.md'),
+        })
 
         this.transcriptAnalyzer = new Agent({
             name: 'transcript-analyzer',
             description: 'Extracts technical context from transcript files',
-            model: new Gemini({
-                model: 'gemini-3.5-flash',
-                apiKey,
-            }),
-            instruction: this.loadPrompt('transcript-analyzer.md'),
-        });
-
-    }
-
-    private resolveFilePart(file: Express.Multer.File) {
-        const ext = file.originalname.split('.').pop()?.toLowerCase();
-
-        if (ext === 'md') return MarkdownParser.parse(file.buffer);
-        if (ext === 'pdf') return PdfParser.parse(file.buffer);
-
-        throw new BadRequestException(`Unsupported file type: .${ext ?? 'unknown'}`);
-    }
-
-    private async analyzeTranscript(file: Express.Multer.File): Promise<string> {
-        const sessionService = new InMemorySessionService();
-        const runner = new Runner({
-            agent: this.transcriptAnalyzer,
-            appName: 'm2a',
-            sessionService,
-        });
-
-        const session = await sessionService.createSession({
-            appName: 'm2a',
-            userId: 'system',
-        });
-
-        const filePart = this.resolveFilePart(file);
-
-        const result = runner.runAsync({
-            userId: 'system',
-            sessionId: session.id,
-            newMessage: {
-                role: 'user',
-                parts: [
-                    filePart,
-                    {
-                        text: 'Extract the technical context from this transcript file.',
-                    },
-                ],
-            },
-        });
-
-        let text = '';
-        for await (const event of result) {
-            if (event.content?.parts) {
-                for (const part of event.content.parts) {
-                    if (part.text) {
-                        text += part.text;
-                    }
-                }
-            }
-        }
-
-        if (!text) throw new Error('No text generated');
-        return text;
+            model: this.gemini,
+            instruction: loadPrompt('transcript-analyzer.md'),
+        })
     }
 
     async generateDiagram(
         file: Express.Multer.File,
         diagramType: 'sequence' | 'class' | 'c4',
     ): Promise<DiagramResponse> {
-        const transcript = await this.analyzeTranscript(file);
+        const transcript = await this.runAgent(this.transcriptAnalyzer, [getFile(file), { text: 'Extract the technical context from this transcript file.' }])
 
-        const promptTemplate = this.loadPrompt('unified-architect.md');
-        this.architectureAgent.instruction = promptTemplate.replace(
-            '{{diagramType}}',
-            diagramType,
-        );
-
-        const sessionService = new InMemorySessionService();
-        const runner = new Runner({
-            agent: this.architectureAgent,
-            appName: 'm2a',
-            sessionService,
-        });
-
-        const session = await sessionService.createSession({
-            appName: 'm2a',
-            userId: 'system',
-        });
-
-        const result = runner.runAsync({
-            userId: 'system',
-            sessionId: session.id,
-            newMessage: {
-                role: 'user',
-                parts: [{ text: `Transcript: \n${transcript}` }],
-            },
-        });
-
-        let text = '';
-        for await (const event of result) {
-            if (event.content?.parts) {
-                for (const part of event.content.parts) {
-                    if (part.text) {
-                        text += part.text;
-                    }
-                }
-            }
-        }
-
-        if (!text) {
-            throw new Error('No response generated from the agent');
-        }
+        const response = await this.runAgent(this.architectureAgent, [{ text: `Transcript: \n${transcript}` }])
 
         try {
-            const parsed: unknown = JSON.parse(text);
-            return DiagramResponseSchema.parse(parsed);
+            return DiagramResponseSchema.parse(JSON.parse(response))
         } catch (error) {
-            console.error('Failed to parse agent response:', text);
-            const errorMessage =
-                error instanceof Error ? error.message : String(error);
-            throw new Error(`Invalid response format from agent: ${errorMessage}`);
+            throw new Error(`Invalid response format from agent: ${error instanceof Error ? error.message : String(error)}`)
         }
     }
 
-    private loadPrompt(filename: string): string {
-        return readFileSync(join(__dirname, 'prompts', filename), 'utf-8');
+    private async runAgent(agent: Agent, parts: any[]): Promise<string> {
+        const sessionService = new InMemorySessionService()
+        const runner = new Runner({ agent, appName: 'm2a', sessionService })
+        const session = await sessionService.createSession({ appName: 'm2a', userId: 'system' })
+
+        let text = ''
+        for await (const event of runner.runAsync({ userId: 'system', sessionId: session.id, newMessage: { role: 'user', parts } })) {
+            if (event.content?.parts) {
+                text += event.content.parts.filter((p) => p.text).map((p) => p.text).join('')
+            }
+        }
+
+        if (!text) throw new Error(`No text generated from agent: ${agent.name}`)
+        return text
     }
 }
