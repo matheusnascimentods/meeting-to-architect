@@ -5,6 +5,7 @@ import {
   UploadedFile,
   UseInterceptors,
   BadRequestException,
+  Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -33,9 +34,11 @@ export class AgentController {
   async generate(
     @UploadedFile() file: Express.Multer.File,
     @Body('diagramType') diagramType: 'sequence' | 'c4' | 'class',
+    @Req() req: any,
   ) {
     if (!file) throw new BadRequestException('File is required');
+    const userId = req.user.sub;
 
-    return this.agents.generateDiagram(file, diagramType);
+    return this.agents.generateDiagram(file, diagramType, userId);
   }
 }

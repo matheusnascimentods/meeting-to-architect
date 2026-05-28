@@ -23,7 +23,7 @@ You MUST respond with a valid JSON object matching this structure:
 {
   "title": "Short descriptive title",
   "description": "Technical summary of the diagram",
-  "mermaidCode": "The raw Mermaid code here"
+  "data": "The raw Mermaid code here"
 }
 ```
 
