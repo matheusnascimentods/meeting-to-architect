@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { Dialog, FormControl, Button, IconButton } from "@primer/react";
+import { useState, useRef } from "react";
+import { Dialog, FormControl, Button, IconButton, Flash, Spinner } from "@primer/react";
 import { FileIcon, XIcon, UploadIcon, ArrowSwitchIcon, PackageIcon, CodeSquareIcon } from "@primer/octicons-react";
 import { DiagramType } from "../../types";
+import { api } from "../../lib/api";
 import "./styles.css";
 
 const diagramTypes: { id: DiagramType; icon: React.ComponentType<any>; title: string; description: string }[] = [
@@ -12,12 +13,59 @@ const diagramTypes: { id: DiagramType; icon: React.ComponentType<any>; title: st
 
 interface NewDiagramDialogProps {
   onClose: () => void;
+  onSuccess?: (diagram: any) => void;
 }
 
-export function NewDiagramDialog({ onClose }: NewDiagramDialogProps) {
-  const [hasFile, setHasFile] = useState(false);
+export function NewDiagramDialog({ onClose, onSuccess }: NewDiagramDialogProps) {
+  const [file, setFile] = useState<File | null>(null);
   const [selectedType, setSelectedType] = useState<DiagramType | null>(null);
-  const canGenerate = hasFile && selectedType !== null;
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const canGenerate = file !== null && selectedType !== null && !loading;
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      const ext = selectedFile.name.split('.').pop()?.toLowerCase();
+      if (ext === 'pdf' || ext === 'md') {
+        setFile(selectedFile);
+        setError(null);
+      } else {
+        setError("Only PDF and MD files are allowed.");
+      }
+    }
+  };
+
+  const handleGenerate = async () => {
+    if (!canGenerate) return;
+
+    setLoading(true);
+    setError(null);
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("diagramType", selectedType);
+
+    try {
+      const response = await api.post("/agents/generate", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      
+      if (onSuccess) {
+        onSuccess(response.data);
+      }
+      onClose();
+    } catch (err: any) {
+      console.error(err);
+      setError(err.response?.data?.message || "Failed to generate diagram. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Dialog
@@ -26,38 +74,52 @@ export function NewDiagramDialog({ onClose }: NewDiagramDialogProps) {
       onClose={onClose}
       width="xlarge"
       footerButtons={[
-        { content: "Cancel", buttonType: "default", onClick: onClose },
+        { content: "Cancel", buttonType: "default", onClick: onClose, disabled: loading },
         {
-          content: "Generate Diagram",
+          content: loading ? "Generating..." : "Generate Diagram",
           buttonType: "primary",
           disabled: !canGenerate,
-          onClick: () => canGenerate && onClose(),
+          onClick: handleGenerate,
         },
       ]}
     >
       <div className="new-diagram-dialog">
+        {error && (
+          <Flash variant="danger" sx={{ mb: 3 }}>
+            {error}
+          </Flash>
+        )}
+
         <FormControl>
           <FormControl.Label>Transcript File</FormControl.Label>
-          {hasFile ? (
+          {file ? (
             <div className="file-preview">
               <div className="file-info">
                 <FileIcon size={18} />
-                <span className="file-name">meeting_transcript.vtt</span>
+                <span className="file-name">{file.name}</span>
               </div>
               <IconButton
                 icon={XIcon}
                 aria-label="Remove file"
                 variant="invisible"
                 size="small"
-                onClick={() => setHasFile(false)}
+                onClick={() => setFile(null)}
+                disabled={loading}
               />
             </div>
           ) : (
-            <div className="file-upload">
+            <div className="file-upload" onClick={() => fileInputRef.current?.click()}>
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                accept=".pdf,.md"
+                onChange={handleFileChange}
+              />
               <UploadIcon size={32} fill="#6E6E73" />
-              <div className="upload-title">Drag and drop your transcript file</div>
-              <div className="upload-subtitle">.txt, .vtt or .srt — max 10MB</div>
-              <Button size="small" onClick={() => setHasFile(true)}>Browse file</Button>
+              <div className="upload-title">Click to upload your transcript file</div>
+              <div className="upload-subtitle">.pdf or .md — max 10MB</div>
+              <Button size="small" disabled={loading}>Browse file</Button>
             </div>
           )}
         </FormControl>
@@ -73,14 +135,14 @@ export function NewDiagramDialog({ onClose }: NewDiagramDialogProps) {
                   key={t.id}
                   role="button"
                   tabIndex={0}
-                  onClick={() => setSelectedType(t.id)}
+                  onClick={() => !loading && setSelectedType(t.id)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-                      setSelectedType(t.id);
+                      if (!loading) setSelectedType(t.id);
                     }
                   }}
-                  className={`diagram-type-card ${selected ? 'selected' : ''}`}
+                  className={`diagram-type-card ${selected ? 'selected' : ''} ${loading ? 'disabled' : ''}`}
                 >
                   <span className="diagram-type-icon"><t.icon size={20} /></span>
                   <div className="diagram-type-title">{t.title}</div>
@@ -90,6 +152,13 @@ export function NewDiagramDialog({ onClose }: NewDiagramDialogProps) {
             })}
           </div>
         </FormControl>
+
+        {loading && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', gap: '10px', alignItems: 'center' }}>
+            <Spinner size="small" />
+            <span style={{ color: '#6E6E73', fontSize: '14px' }}>This may take a minute...</span>
+          </div>
+        )}
       </div>
     </Dialog>
   );

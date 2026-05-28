@@ -5,6 +5,7 @@ import { DiagramResponse, DiagramResponseSchema } from './index.schema'
 import { getFile } from './helpers/file.helper'
 import { loadPrompt } from './helpers/prompt.helper'
 import { SupabaseService } from '../supabase/index.service'
+import { DiagramsService } from '../diagrams/index.service'
 
 @Injectable()
 export class AgentService {
@@ -13,7 +14,8 @@ export class AgentService {
 
     constructor(
         private readonly configService: ConfigService,
-        private readonly supabase: SupabaseService
+        private readonly supabase: SupabaseService,
+        private readonly diagramsService: DiagramsService
     ) {
         this.gemini = new Gemini({
             model: this.configService.get<string>('GEMINI_MODEL', 'gemini-3.5-flash'),
@@ -47,21 +49,12 @@ export class AgentService {
         try {
             const parsed = DiagramResponseSchema.parse(JSON.parse(response))
 
-            const { data, error } = await this.supabase.getClient()
-                .from('Diagrams')
-                .insert([{
-                    title: parsed.title,
-                    description: parsed.description,
-                    data: parsed.data,
-                    createdByUser: userId
-                }])
-                .select()
-                .single()
-
-            if (error) {
-                console.error('Error saving diagram to database:', error)
-                throw new Error(`Failed to persist diagram: ${error.message}`)
-            }
+            const data = await this.diagramsService.save({
+                title: parsed.title,
+                description: parsed.description,
+                data: parsed.data,
+                createdByUser: userId
+            })
 
             return data as DiagramResponse
         } catch (error) {

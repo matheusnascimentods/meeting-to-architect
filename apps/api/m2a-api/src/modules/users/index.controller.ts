@@ -18,6 +18,7 @@ export class UsersController {
     return this.usersService.findById(id);
   }
 
+  @SkipAuth()
   @Get('get-by-email/:email')
   async findByEmail(@Param('email') email: string) {
     return this.usersService.findByEmail(email);

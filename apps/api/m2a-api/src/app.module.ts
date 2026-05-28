@@ -4,6 +4,7 @@ import { UsersModule } from './modules/users/index.module';
 import { ConfigModule } from '@nestjs/config';
 import { AgentsModule } from './modules/agents/index.module';
 import { AuthModule } from './modules/auth/index.module';
+import { DiagramsModule } from './modules/diagrams/index.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './modules/auth/index.guard';
 
@@ -16,6 +17,7 @@ import { AuthGuard } from './modules/auth/index.guard';
     UsersModule,
     AgentsModule,
     AuthModule,
+    DiagramsModule,
   ],
   providers: [
     {

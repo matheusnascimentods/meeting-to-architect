@@ -33,8 +33,8 @@ export function AuthFlow({ onAuthenticated }: AuthFlowProps) {
 
     setLoading(true);
     try {
-      const { exists, user } = await authService.checkEmail(email);
-      if (exists) {
+      const user = await authService.checkEmail(email);
+      if (user && user.email) {
         setCurrentUser(user);
         setStep('login');
       } else {

@@ -194,3 +194,12 @@ dialog {
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
   border: 1px solid var(--border) !important;
 }
+
+@keyframes primer-spinner-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+svg[class*="Spinner"], svg[class*="spinner"] {
+  animation: primer-spinner-rotate 1s linear infinite !important;
+}
