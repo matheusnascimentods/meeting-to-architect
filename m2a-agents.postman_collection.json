@@ -1,0 +1,73 @@
+{
+	"info": {
+		"_postman_id": "a3-ed-api-test",
+		"name": "M2A API - Agents",
+		"description": "Collection for testing the M2A API Agents module with PDF and Markdown support.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Generate Diagram",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"description": "The transcript file (.pdf or .md)",
+							"type": "file",
+							"src": []
+						},
+						{
+							"key": "diagramType",
+							"value": "sequence",
+							"description": "Type of diagram: sequence, class, or c4",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/agents/generate",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"agents",
+						"generate"
+					]
+				},
+				"description": "Uploads a PDF or MD file and generates a Mermaid diagram."
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}

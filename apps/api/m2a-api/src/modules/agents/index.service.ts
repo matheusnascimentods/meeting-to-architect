@@ -1,9 +1,11 @@
 import { Agent, InMemorySessionService, Runner, Gemini } from '@google/adk';
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { z } from 'zod';
+import { MarkdownParser } from './parsers/markdown.parser';
+import { PdfParser } from './parsers/pdf.parser';
 
 const DiagramResponseSchema = z.object({
     title: z.string(),
@@ -16,6 +18,7 @@ type DiagramResponse = z.infer<typeof DiagramResponseSchema>;
 @Injectable()
 export class AgentService {
     private architectureAgent: Agent;
+    private transcriptAnalyzer: Agent;
 
     constructor(private readonly configService: ConfigService) {
         const apiKey = this.configService.get<string>('GOOGLE_API_KEY');
@@ -30,12 +33,77 @@ export class AgentService {
             }),
             instruction: this.loadPrompt('unified-architect.md'),
         });
+
+        this.transcriptAnalyzer = new Agent({
+            name: 'transcript-analyzer',
+            description: 'Extracts technical context from transcript files',
+            model: new Gemini({
+                model: 'gemini-3.5-flash',
+                apiKey,
+            }),
+            instruction: 'Extract the technical context from this transcript file. Focus on actors, systems, components, and data flows.',
+        });
+    }
+
+    private resolveFilePart(file: Express.Multer.File) {
+        const ext = file.originalname.split('.').pop()?.toLowerCase();
+
+        if (ext === 'md') return MarkdownParser.parse(file.buffer);
+        if (ext === 'pdf') return PdfParser.parse(file.buffer);
+
+        throw new BadRequestException(`Unsupported file type: .${ext ?? 'unknown'}`);
+    }
+
+    private async analyzeTranscript(file: Express.Multer.File): Promise<string> {
+        const sessionService = new InMemorySessionService();
+        const runner = new Runner({
+            agent: this.transcriptAnalyzer,
+            appName: 'm2a',
+            sessionService,
+        });
+
+        const session = await sessionService.createSession({
+            appName: 'm2a',
+            userId: 'system',
+        });
+
+        const filePart = this.resolveFilePart(file);
+
+        const result = runner.runAsync({
+            userId: 'system',
+            sessionId: session.id,
+            newMessage: {
+                role: 'user',
+                parts: [
+                    filePart,
+                    {
+                        text: 'Extract the technical context from this transcript file.',
+                    },
+                ],
+            },
+        });
+
+        let text = '';
+        for await (const event of result) {
+            if (event.content?.parts) {
+                for (const part of event.content.parts) {
+                    if (part.text) {
+                        text += part.text;
+                    }
+                }
+            }
+        }
+
+        if (!text) throw new Error('No text generated');
+        return text;
     }
 
     async generateDiagram(
-        transcript: string,
+        file: Express.Multer.File,
         diagramType: 'sequence' | 'class' | 'c4',
     ): Promise<DiagramResponse> {
+        const transcript = await this.analyzeTranscript(file);
+
         const promptTemplate = this.loadPrompt('unified-architect.md');
         this.architectureAgent.instruction = promptTemplate.replace(
             '{{diagramType}}',
