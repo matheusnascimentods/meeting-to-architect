@@ -25,8 +25,7 @@ export class AgentService {
 
         this.architectureAgent = new Agent({
             name: 'architecture-architect',
-            description:
-                'Analyzes transcripts and generates Mermaid diagrams with titles and descriptions',
+            description: 'Analyzes transcripts and generates Mermaid diagrams with titles and descriptions',
             model: new Gemini({
                 model: 'gemini-3.5-flash',
                 apiKey,
@@ -41,8 +40,9 @@ export class AgentService {
                 model: 'gemini-3.5-flash',
                 apiKey,
             }),
-            instruction: 'Extract the technical context from this transcript file. Focus on actors, systems, components, and data flows.',
+            instruction: this.loadPrompt('transcript-analyzer.md'),
         });
+
     }
 
     private resolveFilePart(file: Express.Multer.File) {
