@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { ActionMenu, ActionList, IconButton, Label } from "@primer/react";
 import { KebabHorizontalIcon, PencilIcon, TrashIcon } from "@primer/octicons-react";
 import { Diagram } from "../../types";
+import { EditDiagramDialog } from "../EditDiagramDialog";
 import "./styles.css";
 
 interface DiagramCardProps {
@@ -9,12 +11,14 @@ interface DiagramCardProps {
 }
 
 export function DiagramCard({ diagram, onOpen }: DiagramCardProps) {
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { title, description } = diagram;
   const type = diagram.type || "Diagram";
   const variant = diagram.variant || "accent";
   const date = diagram.created_at ? new Date(diagram.created_at).toLocaleDateString() : "Just now";
   return (
-    <div
+    <>
+      <div
       className="m2a-card diagram-card"
       onClick={onOpen}
       role="button"
@@ -47,7 +51,7 @@ export function DiagramCard({ diagram, onOpen }: DiagramCardProps) {
             </ActionMenu.Anchor>
             <ActionMenu.Overlay>
               <ActionList>
-                <ActionList.Item onSelect={() => console.log('Editar', diagram.id)}>
+                <ActionList.Item onSelect={() => setIsEditDialogOpen(true)}>
                   <ActionList.LeadingVisual>
                     <PencilIcon />
                   </ActionList.LeadingVisual>
@@ -64,6 +68,17 @@ export function DiagramCard({ diagram, onOpen }: DiagramCardProps) {
           </ActionMenu>
         </span>
       </div>
-    </div>
+      </div>
+      {isEditDialogOpen && (
+        <EditDiagramDialog
+          diagram={diagram}
+          onClose={() => setIsEditDialogOpen(false)}
+          onSave={(updated) => {
+            console.log('Saved diagram updates:', updated);
+            setIsEditDialogOpen(false);
+          }}
+        />
+      )}
+    </>
   );
 }
