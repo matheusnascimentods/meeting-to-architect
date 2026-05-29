@@ -1,10 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider } from "@tanstack/react-router";
-import { getRouter } from "./router";
+import { getRouter } from "@/app/router";
 import "@primer/primitives/dist/css/functional/themes/light.css";
 import "@primer/primitives/dist/css/functional/themes/dark.css";
-import "./styles.css";
+import "@/shared/styles/index.css";
 
 const router = getRouter();
 

@@ -45,9 +45,9 @@ export class AgentService {
         })
 
         const response = await this.runAgent(architectureAgent, [{ text: `Transcript: \n${transcript}` }])
-        console.log(response);
         try {
-            const parsed = DiagramResponseSchema.parse(JSON.parse(response))
+            const cleanedResponse = response.replace(/```(?:json)?/gi, '').trim()
+            const parsed = DiagramResponseSchema.parse(JSON.parse(cleanedResponse))
 
             const data = await this.diagramsService.save({
                 title: parsed.title,
@@ -69,6 +69,9 @@ export class AgentService {
 
         let text = ''
         for await (const event of runner.runAsync({ userId: 'system', sessionId: session.id, newMessage: { role: 'user', parts } })) {
+            if (event.errorMessage) {
+                throw new Error(`Agent ${agent.name} failed: ${event.errorMessage}`)
+            }
             if (event.content?.parts) {
                 text += event.content.parts.filter((p) => p.text).map((p) => p.text).join('')
             }

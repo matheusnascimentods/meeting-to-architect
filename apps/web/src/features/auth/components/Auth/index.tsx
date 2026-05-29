@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Box, Text, FormControl, TextInput, Button, IconButton } from '@primer/react';
 import { ArrowLeftIcon } from '@primer/octicons-react';
-import { authService } from '../../services/auth.service';
-import { User } from '../../types/auth';
+import { authService } from '@/features/auth/services/auth.service';
+import { User } from '@/features/auth/types';
 
 export type AuthState = 'auth-email' | 'auth-login' | 'auth-signup' | 'app';
 

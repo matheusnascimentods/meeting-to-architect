@@ -7,9 +7,10 @@ import {
 } from "@tanstack/react-router";
 import { ThemeProvider, BaseStyles, Text } from "@primer/react";
 import { useState, createContext, useContext, useEffect } from "react";
-import { AuthFlow } from "../components/Auth";
-import { User } from "../types/auth";
-import { authService } from "../services/auth.service";
+import { AuthFlow } from "@/features/auth/components/Auth";
+import { Landing } from "@/features/landing/components/Landing";
+import { User } from "@/features/auth/types";
+import { authService } from "@/features/auth/services/auth.service";
 
 interface AuthContextType {
   user: User | null;
@@ -86,6 +87,17 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
 }>()({
+  head: () => ({
+    meta: [
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { title: "M2A - Meeting to Architecture" },
+      { name: "description", content: "Transform meeting transcripts into architecture diagrams automatically." },
+      { property: "og:title", content: "M2A - Meeting to Architecture" },
+      { property: "og:description", content: "Transform meeting transcripts into architecture diagrams automatically." },
+      { property: "og:type", content: "website" },
+    ],
+  }),
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
@@ -95,10 +107,12 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showAuth, setShowAuth] = useState(false);
 
   const onLogout = () => {
     localStorage.removeItem("token");
     setUser(null);
+    setShowAuth(false);
   };
 
   const authValue = {
@@ -135,25 +149,26 @@ function RootComponent() {
     );
   }
 
-  if (!user) {
-    return (
-      <ThemeProvider colorMode="auto">
-        <BaseStyles>
-          <AuthFlow onAuthenticated={(u) => setUser(u)} />
-        </BaseStyles>
-      </ThemeProvider>
-    );
-  }
-
   return (
     <ThemeProvider colorMode="auto">
       <BaseStyles>
-        <AuthContext.Provider value={authValue}>
-          <QueryClientProvider client={queryClient}>
-            <Outlet />
-          </QueryClientProvider>
-        </AuthContext.Provider>
+        <div lang="en">
+          {!user ? (
+            showAuth ? (
+              <AuthFlow onAuthenticated={(u) => setUser(u)} />
+            ) : (
+              <Landing onGetStarted={() => setShowAuth(true)} />
+            )
+          ) : (
+            <AuthContext.Provider value={authValue}>
+              <QueryClientProvider client={queryClient}>
+                <Outlet />
+              </QueryClientProvider>
+            </AuthContext.Provider>
+          )}
+        </div>
       </BaseStyles>
     </ThemeProvider>
   );
 }
+

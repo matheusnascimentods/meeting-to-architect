@@ -1,7 +1,7 @@
 import { Button, IconButton, ActionMenu, Box, Text, ActionList } from "@primer/react";
 import { ArrowLeftIcon, PlusIcon, PersonIcon, SignOutIcon } from "@primer/octicons-react";
 import "./styles.css";
-import { User } from "../../types/auth";
+import { User } from "@/features/auth/types";
 
 interface NavbarProps {
   showBack?: boolean;

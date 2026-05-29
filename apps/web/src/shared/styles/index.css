@@ -140,6 +140,10 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 }
 

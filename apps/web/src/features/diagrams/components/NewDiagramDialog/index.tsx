@@ -1,8 +1,8 @@
 import { useState, useRef } from "react";
 import { Dialog, FormControl, Button, IconButton, Flash, Spinner } from "@primer/react";
 import { FileIcon, XIcon, UploadIcon, ArrowSwitchIcon, PackageIcon, CodeSquareIcon } from "@primer/octicons-react";
-import { DiagramType } from "../../types";
-import { api } from "../../lib/api";
+import { DiagramType } from "@/features/diagrams/types";
+import { api } from "@/shared/lib/api";
 import "./styles.css";
 
 const diagramTypes: { id: DiagramType; icon: React.ComponentType<any>; title: string; description: string }[] = [

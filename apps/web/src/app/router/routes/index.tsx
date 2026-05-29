@@ -1,14 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CounterLabel, Spinner } from "@primer/react";
 import { useState, useEffect } from "react";
-import { Diagram } from "../types";
-import { Navbar } from "../components/Navbar";
-import { DiagramCard } from "../components/DiagramCard";
-import { DiagramDetail } from "../components/DiagramDetail";
-import { NewDiagramDialog } from "../components/NewDiagramDialog";
-import { EmptyState } from "../components/EmptyState";
+import { Diagram } from "@/features/diagrams/types";
+import { Navbar } from "@/shared/components/Navbar";
+import { DiagramCard } from "@/features/diagrams/components/DiagramCard";
+import { DiagramDetail } from "@/features/diagrams/components/DiagramDetail";
+import { NewDiagramDialog } from "@/features/diagrams/components/NewDiagramDialog";
+import { EmptyState } from "@/shared/components/EmptyState";
 import { useAuth } from "./__root";
-import { api } from "../lib/api";
+import { api } from "@/shared/lib/api";
 
 export const Route = createFileRoute("/")({
   component: Dashboard,

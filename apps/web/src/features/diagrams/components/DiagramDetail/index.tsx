@@ -1,8 +1,8 @@
 import { Label, Button, IconButton } from "@primer/react";
 import { ClockIcon, PersonIcon, CopyIcon, DownloadIcon, TrashIcon } from "@primer/octicons-react";
-import { Diagram } from "../../types";
-import { PanelBox } from "../PanelBox";
-import { PanelHeader } from "../PanelHeader";
+import { Diagram } from "@/features/diagrams/types";
+import { PanelBox } from "@/shared/components/PanelBox";
+import { PanelHeader } from "@/shared/components/PanelHeader";
 import { MermaidPreview } from "../MermaidPreview";
 import "./styles.css";
 

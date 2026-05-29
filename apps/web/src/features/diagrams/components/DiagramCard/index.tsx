@@ -12,7 +12,7 @@ export function DiagramCard({ diagram, onOpen }: DiagramCardProps) {
   const { title, description } = diagram;
   const type = diagram.type || "Diagram";
   const variant = diagram.variant || "accent";
-  const date = diagram.date || (diagram.created_at ? new Date(diagram.created_at).toLocaleDateString() : "Just now");
+  const date = diagram.created_at ? new Date(diagram.created_at).toLocaleDateString() : "Just now";
   return (
     <div
       className="m2a-card diagram-card"
