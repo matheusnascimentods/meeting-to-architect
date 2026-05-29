@@ -41,34 +41,34 @@ export function EditDiagramDialog({ diagram, onClose, onSave }: EditDiagramDialo
           <Textarea block value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
         </FormControl>
 
-        <FormControl>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px', width: '100%' }}>
-            <FormControl.Label sx={{ mb: 0 }}>Diagram Code (Mermaid)</FormControl.Label>
-            <SegmentedControl aria-label="View mode">
-              <SegmentedControl.Button selected={view === "code"} onClick={() => setView("code")}>
-                Code
-              </SegmentedControl.Button>
-              <SegmentedControl.Button selected={view === "preview"} onClick={() => setView("preview")}>
-                Preview
-              </SegmentedControl.Button>
-            </SegmentedControl>
-          </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px', width: '100%' }}>
+          <span style={{ fontWeight: 600, fontSize: '14px' }}>Diagram Code (Mermaid)</span>
+          <SegmentedControl aria-label="View mode">
+            <SegmentedControl.Button selected={view === "code"} onClick={() => setView("code")}>
+              Code
+            </SegmentedControl.Button>
+            <SegmentedControl.Button selected={view === "preview"} onClick={() => setView("preview")}>
+              Preview
+            </SegmentedControl.Button>
+          </SegmentedControl>
+        </div>
 
+        <div style={{ height: '350px', marginTop: '12px' }}>
           {view === "code" ? (
             <Textarea
               block
               value={code}
               onChange={(e) => setCode(e.target.value)}
               rows={15}
-              style={{ fontFamily: 'monospace', whiteSpace: 'pre', marginTop: '20px' }}
-              resize="vertical"
+              style={{ fontFamily: 'monospace', whiteSpace: 'pre', height: '100%' }}
+              resize="none"
             />
           ) : (
-            <div style={{ border: '1px solid var(--borderColor-default, #d0d7de)', borderRadius: '6px', padding: '16px', minHeight: '300px', backgroundColor: 'var(--bgColor-muted, #f6f8fa)' }}>
+            <div style={{ border: '1px solid var(--borderColor-default, #d0d7de)', borderRadius: '6px', padding: '16px', height: '100%', overflow: 'auto', backgroundColor: 'var(--bgColor-muted, #f6f8fa)' }}>
               <MermaidPreview source={code} id={`edit-${diagram.id}`} />
             </div>
           )}
-        </FormControl>
+        </div>
       </div>
     </Dialog>
   );
