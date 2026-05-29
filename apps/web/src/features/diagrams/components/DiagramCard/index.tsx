@@ -1,5 +1,5 @@
-import { IconButton, Label } from "@primer/react";
-import { KebabHorizontalIcon } from "@primer/octicons-react";
+import { ActionMenu, ActionList, IconButton, Label } from "@primer/react";
+import { KebabHorizontalIcon, PencilIcon, TrashIcon } from "@primer/octicons-react";
 import { Diagram } from "../../types";
 import "./styles.css";
 
@@ -41,7 +41,27 @@ export function DiagramCard({ diagram, onOpen }: DiagramCardProps) {
       <div className="diagram-card-footer">
         <span className="diagram-card-date">{date}</span>
         <span onClick={(e) => e.stopPropagation()}>
-          <IconButton icon={KebabHorizontalIcon} aria-label="Options" variant="invisible" size="small" />
+          <ActionMenu>
+            <ActionMenu.Anchor>
+              <IconButton icon={KebabHorizontalIcon} aria-label="Options" variant="invisible" size="small" />
+            </ActionMenu.Anchor>
+            <ActionMenu.Overlay>
+              <ActionList>
+                <ActionList.Item onSelect={() => console.log('Editar', diagram.id)}>
+                  <ActionList.LeadingVisual>
+                    <PencilIcon />
+                  </ActionList.LeadingVisual>
+                  Editar
+                </ActionList.Item>
+                <ActionList.Item variant="danger" onSelect={() => console.log('Excluir', diagram.id)}>
+                  <ActionList.LeadingVisual>
+                    <TrashIcon />
+                  </ActionList.LeadingVisual>
+                  Excluir
+                </ActionList.Item>
+              </ActionList>
+            </ActionMenu.Overlay>
+          </ActionMenu>
         </span>
       </div>
     </div>
