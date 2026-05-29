@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Label, Button, IconButton } from "@primer/react";
-import { ClockIcon, PersonIcon, CopyIcon, DownloadIcon, TrashIcon } from "@primer/octicons-react";
+import { ClockIcon, PersonIcon, CopyIcon, DownloadIcon, TrashIcon, ScreenFullIcon, XIcon } from "@primer/octicons-react";
 import { Diagram } from "@/features/diagrams/types";
 import { PanelBox } from "@/shared/components/PanelBox";
 import { PanelHeader } from "@/shared/components/PanelHeader";
@@ -12,8 +13,10 @@ interface DiagramDetailProps {
 
 export function DiagramDetail({ diagram }: DiagramDetailProps) {
   const source = diagram.data;
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   return (
+    <>
     <div className="diagram-detail-container">
       <div className="diagram-detail-type">
         <Label variant={diagram.variant || "accent"}>{diagram.type || "Sequence"}</Label>
@@ -42,9 +45,26 @@ export function DiagramDetail({ diagram }: DiagramDetailProps) {
         <PanelBox>
           <PanelHeader
             left={<span className="panel-label">Preview</span>}
-            right={<Label>Mermaid</Label>}
+            right={
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Label>Mermaid</Label>
+                <IconButton
+                  icon={ScreenFullIcon}
+                  aria-label="Fullscreen"
+                  variant="invisible"
+                  size="small"
+                  onClick={() => setIsFullscreen(true)}
+                />
+              </div>
+            }
           />
-          <MermaidPreview source={source} id={String(diagram.id)} />
+          <div
+            className="diagram-preview-clickable"
+            onClick={() => setIsFullscreen(true)}
+            title="Click to expand"
+          >
+            <MermaidPreview source={source} id={String(diagram.id)} />
+          </div>
         </PanelBox>
 
         <PanelBox>
@@ -60,5 +80,25 @@ export function DiagramDetail({ diagram }: DiagramDetailProps) {
         </PanelBox>
       </div>
     </div>
+
+      {isFullscreen && (
+        <div className="diagram-fullscreen-overlay" onClick={() => setIsFullscreen(false)}>
+          <div className="diagram-fullscreen-header">
+            <span className="diagram-fullscreen-title">{diagram.title}</span>
+            <IconButton
+              icon={XIcon}
+              aria-label="Close fullscreen"
+              variant="invisible"
+              size="medium"
+              onClick={() => setIsFullscreen(false)}
+              sx={{ color: '#fff' }}
+            />
+          </div>
+          <div className="diagram-fullscreen-content" onClick={(e) => e.stopPropagation()}>
+            <MermaidPreview source={source} id={`${diagram.id}-fullscreen`} />
+          </div>
+        </div>
+      )}
+    </>
   );
 }
