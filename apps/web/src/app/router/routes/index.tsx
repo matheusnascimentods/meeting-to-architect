@@ -108,6 +108,7 @@ function Dashboard() {
           onSuccess={(newDiagram) => {
             setDiagramList([newDiagram, ...diagramList]);
             setIsOpen(false);
+            setScreen({ name: "detail", diagramId: newDiagram.id });
           }}
         />
       )}
