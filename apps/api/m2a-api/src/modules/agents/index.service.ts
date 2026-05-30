@@ -3,9 +3,10 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { DiagramResponse, DiagramResponseSchema } from './index.schema'
 import { getFile } from './helpers/file.helper'
-import { loadPrompt } from './helpers/prompt.helper'
 import { SupabaseService } from '../supabase/index.service'
 import { DiagramsService } from '../diagrams/index.service'
+import { createTranscriptAnalyzerAgent } from './agents/transcript-analyzer.agent'
+import { createArchitectureAgent } from './agents/architecture-architect.agent'
 
 @Injectable()
 export class AgentService {
@@ -22,12 +23,7 @@ export class AgentService {
             apiKey: this.configService.get<string>('GEMINI_API_KEY'),
         })
 
-        this.transcriptAnalyzer = new Agent({
-            name: 'transcript-analyzer',
-            description: 'Extracts technical context from transcript files',
-            model: this.gemini,
-            instruction: loadPrompt('transcript-analyzer.md'),
-        })
+        this.transcriptAnalyzer = createTranscriptAnalyzerAgent(this.gemini)
     }
 
     async generateDiagram(
@@ -37,12 +33,7 @@ export class AgentService {
     ): Promise<DiagramResponse> {
         const transcript = await this.runAgent(this.transcriptAnalyzer, [getFile(file), { text: 'Extract the technical context from this transcript file.' }])
 
-        const architectureAgent = new Agent({
-            name: 'architecture-architect',
-            description: 'Analyzes transcripts and generates Mermaid diagrams',
-            model: this.gemini,
-            instruction: loadPrompt('unified-architect.md').replace('{{diagramType}}', diagramType),
-        })
+        const architectureAgent = createArchitectureAgent(this.gemini, diagramType)
 
         const response = await this.runAgent(architectureAgent, [{ text: `Transcript: \n${transcript}` }])
         try {
