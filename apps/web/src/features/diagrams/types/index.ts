@@ -8,7 +8,7 @@ export type Diagram = {
   type?: string;
   description: string;
   data: string;
-  created_at?: string;
+  createdAt?: string;
   createdByUser?: string;
   variant?: LabelVariant;
 };

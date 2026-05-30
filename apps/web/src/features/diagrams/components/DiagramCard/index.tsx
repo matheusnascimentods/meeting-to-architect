@@ -21,7 +21,7 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
   const { title, description } = diagram;
   const type = diagram.type || "Diagram";
   const variant = diagram.variant || "accent";
-  const date = diagram.created_at ? new Date(diagram.created_at).toLocaleDateString() : "Just now";
+  const date = diagram.createdAt ? new Date(diagram.createdAt).toLocaleDateString() : "Just now";
 
   const handleDelete = async () => {
     console.log("Sending delete request for diagram:", diagram.id);
@@ -38,55 +38,55 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
   return (
     <>
       <div
-      className="m2a-card diagram-card"
-      onClick={onOpen}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onOpen();
-        }
-      }}
-    >
-      <div>
-        <Label variant={variant}>{type}</Label>
-      </div>
-      <div>
-        <div className="diagram-card-title">
-          {title}
+        className="m2a-card diagram-card"
+        onClick={onOpen}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onOpen();
+          }
+        }}
+      >
+        <div>
+          <Label variant={variant}>{type}</Label>
         </div>
-        <div className="m2a-clamp diagram-card-description">
-          {description}
+        <div>
+          <div className="diagram-card-title">
+            {title}
+          </div>
+          <div className="m2a-clamp diagram-card-description">
+            {description}
+          </div>
         </div>
-      </div>
-      <div className="diagram-card-divider" />
-      <div className="diagram-card-footer">
-        <span className="diagram-card-date">{date}</span>
-        <span onClick={(e) => e.stopPropagation()}>
-          <ActionMenu>
-            <ActionMenu.Anchor>
-              <IconButton icon={KebabHorizontalIcon} aria-label="Options" variant="invisible" size="small" />
-            </ActionMenu.Anchor>
-            <ActionMenu.Overlay>
-              <ActionList>
-                <ActionList.Item onSelect={() => setIsEditDialogOpen(true)}>
-                  <ActionList.LeadingVisual>
-                    <PencilIcon />
-                  </ActionList.LeadingVisual>
-                  Editar
-                </ActionList.Item>
-                <ActionList.Item variant="danger" onSelect={() => setIsDeleteDialogOpen(true)}>
-                  <ActionList.LeadingVisual>
-                    <TrashIcon />
-                  </ActionList.LeadingVisual>
-                  Excluir
-                </ActionList.Item>
-              </ActionList>
-            </ActionMenu.Overlay>
-          </ActionMenu>
-        </span>
-      </div>
+        <div className="diagram-card-divider" />
+        <div className="diagram-card-footer">
+          <span className="diagram-card-date">{date}</span>
+          <span onClick={(e) => e.stopPropagation()}>
+            <ActionMenu>
+              <ActionMenu.Anchor>
+                <IconButton icon={KebabHorizontalIcon} aria-label="Options" variant="invisible" size="small" />
+              </ActionMenu.Anchor>
+              <ActionMenu.Overlay>
+                <ActionList>
+                  <ActionList.Item onSelect={() => setIsEditDialogOpen(true)}>
+                    <ActionList.LeadingVisual>
+                      <PencilIcon />
+                    </ActionList.LeadingVisual>
+                    Editar
+                  </ActionList.Item>
+                  <ActionList.Item variant="danger" onSelect={() => setIsDeleteDialogOpen(true)}>
+                    <ActionList.LeadingVisual>
+                      <TrashIcon />
+                    </ActionList.LeadingVisual>
+                    Excluir
+                  </ActionList.Item>
+                </ActionList>
+              </ActionMenu.Overlay>
+            </ActionMenu>
+          </span>
+        </div>
       </div>
       {isEditDialogOpen && (
         <EditDiagramDialog
