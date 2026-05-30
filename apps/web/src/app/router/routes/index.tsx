@@ -75,7 +75,17 @@ function Dashboard() {
           ) : (
             <div className="m2a-grid">
               {diagramList.map((d) => (
-                <DiagramCard key={d.id} diagram={d} onOpen={() => setScreen({ name: "detail", diagramId: d.id })} />
+                <DiagramCard
+                  key={d.id}
+                  diagram={d}
+                  onOpen={() => setScreen({ name: "detail", diagramId: d.id })}
+                  onUpdate={(updated) => {
+                    setDiagramList(diagramList.map((item) => (item.id === updated.id ? updated : item)));
+                  }}
+                  onDelete={(id) => {
+                    setDiagramList(diagramList.filter((item) => item.id !== id));
+                  }}
+                />
               ))}
             </div>
           )}

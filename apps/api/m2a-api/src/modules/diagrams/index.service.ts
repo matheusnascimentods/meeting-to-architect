@@ -32,4 +32,36 @@ export class DiagramsService {
     }
     return data;
   }
+
+  async update(id: string, userId: string, updateData: { title?: string; description?: string; data?: string }) {
+    const { data, error } = await this.supabase.getClient()
+      .from('Diagrams')
+      .update(updateData)
+      .eq('id', id)
+      .eq('createdByUser', userId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating diagram:', error);
+      throw new Error(`Failed to update diagram: ${error.message}`);
+    }
+    return data;
+  }
+
+  async remove(id: string, userId: string) {
+    const { data, error } = await this.supabase.getClient()
+      .from('Diagrams')
+      .delete()
+      .eq('id', id)
+      .eq('createdByUser', userId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error deleting diagram:', error);
+      throw new Error(`Failed to delete diagram: ${error.message}`);
+    }
+    return data;
+  }
 }

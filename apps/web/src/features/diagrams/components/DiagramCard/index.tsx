@@ -3,19 +3,34 @@ import { ActionMenu, ActionList, IconButton, Label } from "@primer/react";
 import { KebabHorizontalIcon, PencilIcon, TrashIcon } from "@primer/octicons-react";
 import { Diagram } from "../../types";
 import { EditDiagramDialog } from "../EditDiagramDialog";
+import { diagramService } from "../../services/diagram.service";
 import "./styles.css";
 
 interface DiagramCardProps {
   diagram: Diagram;
   onOpen: () => void;
+  onUpdate?: (updated: Diagram) => void;
+  onDelete?: (id: string | number) => void;
 }
 
-export function DiagramCard({ diagram, onOpen }: DiagramCardProps) {
+export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCardProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { title, description } = diagram;
   const type = diagram.type || "Diagram";
   const variant = diagram.variant || "accent";
   const date = diagram.created_at ? new Date(diagram.created_at).toLocaleDateString() : "Just now";
+
+  const handleDelete = async () => {
+    if (confirm("Are you sure you want to delete this diagram?")) {
+      try {
+        await diagramService.delete(diagram.id);
+        onDelete?.(diagram.id);
+      } catch (err) {
+        console.error("Failed to delete diagram", err);
+      }
+    }
+  };
+
   return (
     <>
       <div
@@ -57,7 +72,7 @@ export function DiagramCard({ diagram, onOpen }: DiagramCardProps) {
                   </ActionList.LeadingVisual>
                   Editar
                 </ActionList.Item>
-                <ActionList.Item variant="danger" onSelect={() => console.log('Excluir', diagram.id)}>
+                <ActionList.Item variant="danger" onSelect={handleDelete}>
                   <ActionList.LeadingVisual>
                     <TrashIcon />
                   </ActionList.LeadingVisual>
@@ -73,9 +88,14 @@ export function DiagramCard({ diagram, onOpen }: DiagramCardProps) {
         <EditDiagramDialog
           diagram={diagram}
           onClose={() => setIsEditDialogOpen(false)}
-          onSave={(updated) => {
-            console.log('Saved diagram updates:', updated);
-            setIsEditDialogOpen(false);
+          onSave={async (updated) => {
+            try {
+              const data = await diagramService.update(diagram.id, updated);
+              onUpdate?.(data);
+              setIsEditDialogOpen(false);
+            } catch (err) {
+              console.error("Failed to update diagram", err);
+            }
           }}
         />
       )}
