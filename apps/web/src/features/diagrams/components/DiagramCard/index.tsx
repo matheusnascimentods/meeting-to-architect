@@ -3,6 +3,7 @@ import { ActionMenu, ActionList, IconButton, Label } from "@primer/react";
 import { KebabHorizontalIcon, PencilIcon, TrashIcon } from "@primer/octicons-react";
 import { Diagram } from "../../types";
 import { EditDiagramDialog } from "../EditDiagramDialog";
+import { DeleteDiagramDialog } from "@/shared/components/DeleteDiagramDialog";
 import { diagramService } from "../../services/diagram.service";
 import "./styles.css";
 
@@ -15,19 +16,22 @@ interface DiagramCardProps {
 
 export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCardProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
   const { title, description } = diagram;
   const type = diagram.type || "Diagram";
   const variant = diagram.variant || "accent";
   const date = diagram.created_at ? new Date(diagram.created_at).toLocaleDateString() : "Just now";
 
   const handleDelete = async () => {
-    if (confirm("Are you sure you want to delete this diagram?")) {
-      try {
-        await diagramService.delete(diagram.id);
-        onDelete?.(diagram.id);
-      } catch (err) {
-        console.error("Failed to delete diagram", err);
-      }
+    console.log("Sending delete request for diagram:", diagram.id);
+    try {
+      await diagramService.delete(diagram.id);
+      onDelete?.(diagram.id);
+      setIsDeleteDialogOpen(false);
+    } catch (err) {
+      console.error("Failed to delete diagram", err);
+      throw err; // Re-throw to allow DeleteDiagramDialog to handle loading state
     }
   };
 
@@ -72,7 +76,7 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
                   </ActionList.LeadingVisual>
                   Editar
                 </ActionList.Item>
-                <ActionList.Item variant="danger" onSelect={handleDelete}>
+                <ActionList.Item variant="danger" onSelect={() => setIsDeleteDialogOpen(true)}>
                   <ActionList.LeadingVisual>
                     <TrashIcon />
                   </ActionList.LeadingVisual>
@@ -97,6 +101,13 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
               console.error("Failed to update diagram", err);
             }
           }}
+        />
+      )}
+      {isDeleteDialogOpen && (
+        <DeleteDiagramDialog
+          diagram={diagram}
+          onClose={() => setIsDeleteDialogOpen(false)}
+          onConfirm={handleDelete}
         />
       )}
     </>

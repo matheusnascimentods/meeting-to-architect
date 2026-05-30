@@ -93,7 +93,13 @@ function Dashboard() {
       )}
 
       {screen.name === "detail" && activeDiagram && (
-        <DiagramDetail diagram={activeDiagram} />
+        <DiagramDetail
+          diagram={activeDiagram}
+          onDelete={() => {
+            setDiagramList(diagramList.filter((d) => d.id !== activeDiagram.id));
+            setScreen({ name: "list" });
+          }}
+        />
       )}
 
       {isOpen && (
