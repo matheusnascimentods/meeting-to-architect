@@ -13,7 +13,7 @@ export class UsersService {
   constructor(
     private readonly supabase: SupabaseService,
     private readonly authService: AuthService,
-  ) { }
+  ) {}
 
   async create(email: string, password: string, name: string) {
     const existing = await this.findByEmail(email);
@@ -39,7 +39,10 @@ export class UsersService {
 
     return {
       message: 'User was created successfully',
-      token: await this.authService.createToken({ sub: data.id, email: data.email }),
+      token: await this.authService.createToken({
+        sub: data.id,
+        email: data.email,
+      }),
     };
   }
 

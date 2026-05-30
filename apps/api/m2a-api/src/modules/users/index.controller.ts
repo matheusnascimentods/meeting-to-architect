@@ -5,7 +5,7 @@ import { SkipAuth } from '../auth/index.decorator';
 
 @Controller('user')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @SkipAuth()
   @Post()

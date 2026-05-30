@@ -6,7 +6,8 @@ export class DiagramsService {
   constructor(private readonly supabase: SupabaseService) {}
 
   async findAll(userId: string) {
-    const { data, error } = await this.supabase.getClient()
+    const { data, error } = await this.supabase
+      .getClient()
       .from('Diagrams')
       .select('*')
       .eq('createdByUser', userId)
@@ -19,8 +20,14 @@ export class DiagramsService {
     return data;
   }
 
-  async save(diagram: { title: string; description: string; data: string; createdByUser: string }) {
-    const { data, error } = await this.supabase.getClient()
+  async save(diagram: {
+    title: string;
+    description: string;
+    data: string;
+    createdByUser: string;
+  }) {
+    const { data, error } = await this.supabase
+      .getClient()
       .from('Diagrams')
       .insert([diagram])
       .select()
@@ -33,8 +40,13 @@ export class DiagramsService {
     return data;
   }
 
-  async update(id: string, userId: string, updateData: { title?: string; description?: string; data?: string }) {
-    const { data, error } = await this.supabase.getClient()
+  async update(
+    id: string,
+    userId: string,
+    updateData: { title?: string; description?: string; data?: string },
+  ) {
+    const { data, error } = await this.supabase
+      .getClient()
       .from('Diagrams')
       .update(updateData)
       .eq('id', id)
@@ -50,7 +62,8 @@ export class DiagramsService {
   }
 
   async remove(id: string, userId: string) {
-    const { data, error } = await this.supabase.getClient()
+    const { data, error } = await this.supabase
+      .getClient()
       .from('Diagrams')
       .delete()
       .eq('id', id)

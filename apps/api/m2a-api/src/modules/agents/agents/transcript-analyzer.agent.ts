@@ -1,11 +1,20 @@
-import { Agent, Gemini } from '@google/adk'
-import { loadPrompt } from '../helpers/prompt.helper'
+import { Agent, Gemini, zodObjectToSchema } from '@google/adk';
+import { loadPrompt } from '../helpers/prompt.helper';
+import { z } from 'zod';
+
+export const TranscriptAnalyzerInputSchema = z.object({
+  documentContent: z
+    .string()
+    .describe('The raw text content of the transcript or document to analyze'),
+});
 
 export function createTranscriptAnalyzerAgent(gemini: Gemini): Agent {
-    return new Agent({
-        name: 'transcript-analyzer',
-        description: 'Extracts technical context from transcript files',
-        model: gemini,
-        instruction: loadPrompt('transcript-analyzer.md'),
-    })
+  return new Agent({
+    name: 'transcript-analyzer',
+    description:
+      'Analyzes raw meeting transcript or project document text and extracts a structured technical summary',
+    model: gemini,
+    instruction: loadPrompt('transcript-analyzer.md'),
+    inputSchema: zodObjectToSchema(TranscriptAnalyzerInputSchema),
+  });
 }

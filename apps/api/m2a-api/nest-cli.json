@@ -4,7 +4,7 @@
   "compilerOptions": {
     "assets": [
       {
-        "include": "modules/agents/prompts/**/*.md",
+        "include": "modules/agents/agents/prompts/**/*.md",
         "outDir": "dist"
       }
     ]
