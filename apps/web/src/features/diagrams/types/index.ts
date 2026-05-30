@@ -1,6 +1,9 @@
 export type LabelVariant = "accent" | "success" | "attention" | "danger";
 
-export type DiagramType = "sequence" | "c4" | "class";
+export type DiagramType = 
+  | "class" | "component" | "object" | "deployment" | "package" | "composite"
+  | "sequence" | "activity" | "use-case" | "state" | "communication" | "timing" | "interaction-overview"
+  | "c4";
 
 export type Diagram = {
   id: string | number;

@@ -19,7 +19,7 @@ export function SecuritySection() {
             Ethical by design
           </h3>
           <EthicItem icon={<PeopleIcon size={18} />} label="Full transparency — participants always know when AI is active" />
-          <EthicItem icon={<LawIcon size={18} />} label="LGPD compliant data handling" />
+          <EthicItem icon={<LawIcon size={18} />} label="Privacy-first data handling" />
           <EthicItem icon={<HeartIcon size={18} />} label="Privacy by design, not as an afterthought" />
         </div>
       </div>

@@ -74,13 +74,13 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
                     <ActionList.LeadingVisual>
                       <PencilIcon />
                     </ActionList.LeadingVisual>
-                    Editar
+                    Edit
                   </ActionList.Item>
                   <ActionList.Item variant="danger" onSelect={() => setIsDeleteDialogOpen(true)}>
                     <ActionList.LeadingVisual>
                       <TrashIcon />
                     </ActionList.LeadingVisual>
-                    Excluir
+                    Delete
                   </ActionList.Item>
                 </ActionList>
               </ActionMenu.Overlay>
