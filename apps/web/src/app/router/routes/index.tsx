@@ -1,124 +1,31 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CounterLabel, Spinner } from "@primer/react";
-import { useState, useEffect } from "react";
-import { Diagram } from "@/features/diagrams/types";
-import { Navbar } from "@/shared/components/Navbar";
-import { DiagramCard } from "@/features/diagrams/components/DiagramCard";
-import { DiagramDetail } from "@/features/diagrams/components/DiagramDetail";
-import { NewDiagramDialog } from "@/features/diagrams/components/NewDiagramDialog";
-import { EmptyState } from "@/shared/components/EmptyState";
-import { DeleteSuccessBanner } from "@/shared/components/DeleteSuccessBanner";
+import { useState } from "react";
+import { PeopleIcon, BellIcon, TrashIcon } from "@primer/octicons-react";
 import { useAuth } from "./__root";
-import { api } from "@/shared/lib/api";
+import { AppLayout } from "@/shared/components/AppLayout";
+import { DiagramsScreen } from "@/features/diagrams/components/DiagramsScreen";
+import { ComingSoon } from "@/shared/components/ComingSoon";
 
 export const Route = createFileRoute("/")({
   component: Dashboard,
 });
 
-type Screen = { name: "list" } | { name: "detail"; diagramId: string };
-
-const fontStack = "system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
-const mutedColor = "#6E6E73";
+type SidebarPage = 'diagrams' | 'teams' | 'notifications' | 'trash';
 
 function Dashboard() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [screen, setScreen] = useState<Screen>({ name: "list" });
-  const [diagramList, setDiagramList] = useState<Diagram[]>([]);
-  const { user, onLogout } = useAuth();
-
-  const fetchDiagrams = async () => {
-    setLoading(true);
-    try {
-      const response = await api.get("/diagrams");
-      setDiagramList(response.data);
-    } catch (err) {
-      console.error("Failed to fetch diagrams", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchDiagrams();
-  }, []);
-
-  const activeDiagram = screen.name === "detail" ? diagramList.find((d) => d.id === screen.diagramId) : null;
+  const [currentPage, setCurrentPage] = useState<SidebarPage>('diagrams');
+  const { onLogout } = useAuth();
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F2F2F7", fontFamily: fontStack }}>
-      <Navbar
-        showBack={screen.name === "detail"}
-        onBack={() => setScreen({ name: "list" })}
-        showNewButton={screen.name === "list"}
-        onNewClick={() => setIsOpen(true)}
-        user={user}
-        onLogout={onLogout}
-      />
-
-      {screen.name === "list" && (
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 32px" }}>
-          {showSuccess && <DeleteSuccessBanner />}
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-            <h1 style={{ fontSize: 34, fontWeight: 700, letterSpacing: "-0.02em", margin: 0, fontFamily: fontStack }}>Diagrams</h1>
-            {!loading && <CounterLabel>{diagramList.length}</CounterLabel>}
-          </div>
-          <p style={{ fontSize: 15, color: mutedColor, fontFamily: fontStack, marginBottom: 32 }}>
-            All architecture diagrams generated from your meeting transcripts
-          </p>
-
-          {loading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '100px', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-              <Spinner size="large" />
-              <span style={{ color: mutedColor, fontSize: 14 }}>Loading your workspace...</span>
-            </div>
-          ) : diagramList.length === 0 ? (
-            <EmptyState onAction={() => setIsOpen(true)} />
-          ) : (
-            <div className="m2a-grid">
-              {diagramList.map((d) => (
-                <DiagramCard
-                  key={d.id}
-                  diagram={d}
-                  onOpen={() => setScreen({ name: "detail", diagramId: d.id })}
-                  onUpdate={(updated) => {
-                    setDiagramList(diagramList.map((item) => (item.id === updated.id ? updated : item)));
-                  }}
-                  onDelete={(id) => {
-                    setDiagramList(diagramList.filter((item) => item.id !== id));
-                    setShowSuccess(true);
-                    setTimeout(() => setShowSuccess(false), 3000);
-                  }}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {screen.name === "detail" && activeDiagram && (
-        <DiagramDetail
-          diagram={activeDiagram}
-          onDelete={() => {
-            setDiagramList(diagramList.filter((d) => d.id !== activeDiagram.id));
-            setScreen({ name: "list" });
-            setShowSuccess(true);
-            setTimeout(() => setShowSuccess(false), 3000);
-          }}
-        />
-      )}
-
-      {isOpen && (
-        <NewDiagramDialog 
-          onClose={() => setIsOpen(false)} 
-          onSuccess={(newDiagram) => {
-            setDiagramList([newDiagram, ...diagramList]);
-            setIsOpen(false);
-            setScreen({ name: "detail", diagramId: newDiagram.id });
-          }}
-        />
-      )}
-    </div>
+    <AppLayout
+      currentPage={currentPage}
+      onNavigate={setCurrentPage}
+      onLogout={onLogout}
+    >
+      {currentPage === 'diagrams' && <DiagramsScreen />}
+      {currentPage === 'teams' && <ComingSoon icon={PeopleIcon} label="My Teams" />}
+      {currentPage === 'notifications' && <ComingSoon icon={BellIcon} label="Notifications" />}
+      {currentPage === 'trash' && <ComingSoon icon={TrashIcon} label="Trash" />}
+    </AppLayout>
   );
 }
