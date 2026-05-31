@@ -13,7 +13,7 @@ export class UsersService {
   constructor(
     private readonly supabase: SupabaseService,
     private readonly authService: AuthService,
-  ) {}
+  ) { }
 
   async create(email: string, password: string, name: string) {
     const existing = await this.findByEmail(email);
@@ -23,11 +23,11 @@ export class UsersService {
 
     const { data, error } = await this.supabase
       .getClient()
-      .from('User')
+      .from('Users')
       .insert([
         {
           email,
-          password: hash,
+          password_hash: hash,
           name,
         },
       ])
@@ -49,7 +49,7 @@ export class UsersService {
   async findById(id: string): Promise<User> {
     const { data, error } = await this.supabase
       .getClient()
-      .from('User')
+      .from('Users')
       .select('*')
       .eq('id', id)
       .single<User>();
@@ -61,7 +61,7 @@ export class UsersService {
   async findByEmail(email: string): Promise<User | null> {
     const { data } = await this.supabase
       .getClient()
-      .from('User')
+      .from('Users')
       .select('*')
       .eq('email', email)
       .single<User>();

@@ -16,7 +16,7 @@ export class UsersController {
   @Get('me')
   async getMe(@Request() req) {
     const user = await this.usersService.findById(req.user.sub);
-    const { password, ...result } = user;
+    const { password_hash, ...result } = user;
     return result;
   }
 

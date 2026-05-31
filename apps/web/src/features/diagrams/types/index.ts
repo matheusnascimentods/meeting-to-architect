@@ -6,12 +6,12 @@ export type DiagramType =
   | "c4";
 
 export type Diagram = {
-  id: string | number;
+  id: string;
   title: string;
   type?: string;
   description: string;
-  data: string;
-  createdAt?: string;
-  createdByUser?: string;
+  mermaid_code: string;
+  created_at?: string;
+  created_by?: string;
   variant?: LabelVariant;
 };

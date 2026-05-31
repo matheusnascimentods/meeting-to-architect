@@ -20,11 +20,11 @@ export const DiagramTypeSchema = z.enum([
 export type DiagramType = z.infer<typeof DiagramTypeSchema>;
 
 export const DiagramResponseSchema = z.object({
-  id: z.number().optional(),
+  id: z.string().uuid().optional(),
   title: z.string(),
   description: z.string(),
-  data: z.string(),
-  createdByUser: z.string().optional(),
+  mermaid_code: z.string(),
+  created_by: z.string().optional(),
 });
 
 export type DiagramResponse = z.infer<typeof DiagramResponseSchema>;

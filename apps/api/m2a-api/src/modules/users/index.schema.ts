@@ -10,7 +10,7 @@ export const userSchema = z.object({
   id: z.string().uuid(),
   email: z.string().email(),
   name: z.string(),
-  password: z.string(),
+  password_hash: z.string(),
   created_at: z.string().optional(),
 });
 

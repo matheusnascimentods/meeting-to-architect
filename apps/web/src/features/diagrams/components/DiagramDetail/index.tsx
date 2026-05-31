@@ -15,13 +15,13 @@ interface DiagramDetailProps {
 }
 
 export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
-  const source = diagram.data;
+  const source = diagram.mermaid_code;
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const handleDelete = async () => {
     try {
-      await diagramService.delete(diagram.id);
+      await diagramService.deleteDiagram(diagram.id);
       onDelete?.();
     } catch (err) {
       console.error("Failed to delete diagram:", err);
@@ -46,7 +46,7 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
           <span>·</span>
           <span className="meta-item">
             <PersonIcon size={14} />
-            <span>{diagram.createdByUser || 'System Agent'}</span>
+            <span>{diagram.created_by || 'System Agent'}</span>
           </span>
         </div>
         <div className="diagram-detail-actions">

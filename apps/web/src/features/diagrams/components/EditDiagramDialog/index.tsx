@@ -12,11 +12,11 @@ interface EditDiagramDialogProps {
 export function EditDiagramDialog({ diagram, onClose, onSave }: EditDiagramDialogProps) {
   const [title, setTitle] = useState(diagram.title);
   const [description, setDescription] = useState(diagram.description || "");
-  const [code, setCode] = useState(diagram.data || "");
+  const [code, setCode] = useState(diagram.mermaid_code || "");
   const [view, setView] = useState<"code" | "preview">("code");
 
   const handleSave = () => {
-    onSave({ title, description, data: code });
+    onSave({ title, description, mermaid_code: code });
   };
 
   return (

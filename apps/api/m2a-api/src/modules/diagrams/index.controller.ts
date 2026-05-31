@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Req,
@@ -31,8 +33,9 @@ export class DiagramsController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string, @Req() req: any) {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async softDelete(@Param('id') id: string, @Req() req: any) {
     const userId = req.user.sub;
-    return this.diagramsService.remove(id, userId);
+    return this.diagramsService.softDelete(id, userId);
   }
 }

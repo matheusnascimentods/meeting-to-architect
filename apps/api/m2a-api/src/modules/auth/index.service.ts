@@ -14,14 +14,14 @@ export class AuthService {
   async login(email: string, password: string) {
     const { data } = await this.supabaseService
       .getClient()
-      .from('User')
+      .from('Users')
       .select('*')
       .eq('email', email)
       .single<User>();
 
     if (!data) throw new UnauthorizedException('Invalid credentials');
 
-    const isPasswordValid = await bcrypt.compare(password, data.password);
+    const isPasswordValid = await bcrypt.compare(password, data.password_hash);
     if (!isPasswordValid)
       throw new UnauthorizedException('Invalid credentials');
 

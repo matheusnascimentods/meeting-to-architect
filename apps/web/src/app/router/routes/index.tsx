@@ -7,6 +7,7 @@ import { DiagramCard } from "@/features/diagrams/components/DiagramCard";
 import { DiagramDetail } from "@/features/diagrams/components/DiagramDetail";
 import { NewDiagramDialog } from "@/features/diagrams/components/NewDiagramDialog";
 import { EmptyState } from "@/shared/components/EmptyState";
+import { DeleteSuccessBanner } from "@/shared/components/DeleteSuccessBanner";
 import { useAuth } from "./__root";
 import { api } from "@/shared/lib/api";
 
@@ -14,7 +15,7 @@ export const Route = createFileRoute("/")({
   component: Dashboard,
 });
 
-type Screen = { name: "list" } | { name: "detail"; diagramId: string | number };
+type Screen = { name: "list" } | { name: "detail"; diagramId: string };
 
 const fontStack = "system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
 const mutedColor = "#6E6E73";
@@ -22,6 +23,7 @@ const mutedColor = "#6E6E73";
 function Dashboard() {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [screen, setScreen] = useState<Screen>({ name: "list" });
   const [diagramList, setDiagramList] = useState<Diagram[]>([]);
   const { user, onLogout } = useAuth();
@@ -57,6 +59,7 @@ function Dashboard() {
 
       {screen.name === "list" && (
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 32px" }}>
+          {showSuccess && <DeleteSuccessBanner />}
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
             <h1 style={{ fontSize: 34, fontWeight: 700, letterSpacing: "-0.02em", margin: 0, fontFamily: fontStack }}>Diagrams</h1>
             {!loading && <CounterLabel>{diagramList.length}</CounterLabel>}
@@ -84,6 +87,8 @@ function Dashboard() {
                   }}
                   onDelete={(id) => {
                     setDiagramList(diagramList.filter((item) => item.id !== id));
+                    setShowSuccess(true);
+                    setTimeout(() => setShowSuccess(false), 3000);
                   }}
                 />
               ))}
@@ -98,6 +103,8 @@ function Dashboard() {
           onDelete={() => {
             setDiagramList(diagramList.filter((d) => d.id !== activeDiagram.id));
             setScreen({ name: "list" });
+            setShowSuccess(true);
+            setTimeout(() => setShowSuccess(false), 3000);
           }}
         />
       )}

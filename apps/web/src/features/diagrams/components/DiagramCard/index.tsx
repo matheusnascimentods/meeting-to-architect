@@ -11,7 +11,7 @@ interface DiagramCardProps {
   diagram: Diagram;
   onOpen: () => void;
   onUpdate?: (updated: Diagram) => void;
-  onDelete?: (id: string | number) => void;
+  onDelete?: (id: string) => void;
 }
 
 export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCardProps) {
@@ -21,17 +21,18 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
   const { title, description } = diagram;
   const type = diagram.type || "Diagram";
   const variant = diagram.variant || "accent";
-  const date = diagram.createdAt ? new Date(diagram.createdAt).toLocaleDateString() : "Just now";
+  const date = diagram.created_at ? new Date(diagram.created_at).toLocaleDateString() : "Just now";
 
   const handleDelete = async () => {
     console.log("Sending delete request for diagram:", diagram.id);
     try {
-      await diagramService.delete(diagram.id);
+      await diagramService.deleteDiagram(diagram.id);
       onDelete?.(diagram.id);
       setIsDeleteDialogOpen(false);
+      // TODO: show DeleteSuccessBanner
     } catch (err) {
       console.error("Failed to delete diagram", err);
-      throw err; // Re-throw to allow DeleteDiagramDialog to handle loading state
+      throw err; // Re-throw so DeleteDiagramDialog can show the error Flash
     }
   };
 

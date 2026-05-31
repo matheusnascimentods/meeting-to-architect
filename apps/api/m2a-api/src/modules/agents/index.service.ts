@@ -70,8 +70,8 @@ export class AgentService {
       const data = await this.diagramsService.save({
         title: parsed.title,
         description: parsed.description,
-        data: parsed.data,
-        createdByUser: userId,
+        mermaid_code: parsed.mermaid_code,
+        created_by: userId,
       });
 
       return data as DiagramResponse;

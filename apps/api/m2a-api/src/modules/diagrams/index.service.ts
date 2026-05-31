@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../supabase/index.service';
 
 @Injectable()
@@ -10,8 +10,9 @@ export class DiagramsService {
       .getClient()
       .from('Diagrams')
       .select('*')
-      .eq('createdByUser', userId)
-      .order('createdAt', { ascending: false });
+      .eq('created_by', userId)
+      .eq('is_deleted', false)
+      .order('created_at', { ascending: false });
 
     if (error) {
       console.error('Error fetching diagrams:', error);
@@ -20,11 +21,33 @@ export class DiagramsService {
     return data;
   }
 
+  async softDelete(id: string, userId: string): Promise<void> {
+    const { data, error: findError } = await this.supabase
+      .getClient()
+      .from('Diagrams')
+      .select('id, created_by')
+      .eq('id', id)
+      .single();
+
+    if (findError || !data)
+      throw new NotFoundException('Diagrama não encontrado');
+    if (data.created_by !== userId)
+      throw new ForbiddenException('Sem permissão para excluir este diagrama');
+
+    const { error } = await this.supabase
+      .getClient()
+      .from('Diagrams')
+      .update({ is_deleted: true, updated_at: new Date().toISOString() })
+      .eq('id', id);
+
+    if (error) throw new Error(`Falha ao excluir diagrama: ${error.message}`);
+  }
+
   async save(diagram: {
     title: string;
     description: string;
-    data: string;
-    createdByUser: string;
+    mermaid_code: string;
+    created_by: string;
   }) {
     const { data, error } = await this.supabase
       .getClient()
@@ -43,14 +66,14 @@ export class DiagramsService {
   async update(
     id: string,
     userId: string,
-    updateData: { title?: string; description?: string; data?: string },
+    updateData: { title?: string; description?: string; mermaid_code?: string },
   ) {
     const { data, error } = await this.supabase
       .getClient()
       .from('Diagrams')
       .update(updateData)
       .eq('id', id)
-      .eq('createdByUser', userId)
+      .eq('created_by', userId)
       .select()
       .single();
 
@@ -67,7 +90,7 @@ export class DiagramsService {
       .from('Diagrams')
       .delete()
       .eq('id', id)
-      .eq('createdByUser', userId)
+      .eq('created_by', userId)
       .select()
       .single();
 
