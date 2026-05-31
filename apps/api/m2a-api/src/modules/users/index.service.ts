@@ -1,11 +1,17 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { SupabaseService } from '../supabase/index.service';
 import * as bcrypt from 'bcrypt';
-import { User } from './index.schema';
+import {
+  ChangePasswordDto,
+  UpdateUserDto,
+  User,
+} from './index.schema';
 import { AuthService } from '../auth/index.service';
 
 @Injectable()
@@ -67,5 +73,68 @@ export class UsersService {
       .single<User>();
 
     return data;
+  }
+
+  async delete(id: string, requesterId: string): Promise<void> {
+    if (id !== requesterId)
+      throw new ForbiddenException('Sem permissão para excluir este usuário');
+
+    const { error } = await this.supabase
+      .getClient()
+      .from('Users')
+      .update({ is_active: false, updated_at: new Date().toISOString() })
+      .eq('id', id);
+
+    if (error) throw new Error(`Falha ao desativar usuário: ${error.message}`);
+  }
+
+  async update(
+    id: string,
+    requesterId: string,
+    dto: UpdateUserDto,
+  ): Promise<void> {
+    if (id !== requesterId)
+      throw new ForbiddenException('Sem permissão para atualizar este usuário');
+
+    const { error } = await this.supabase
+      .getClient()
+      .from('Users')
+      .update({ ...dto, updated_at: new Date().toISOString() })
+      .eq('id', id);
+
+    if (error) throw new Error(`Falha ao atualizar usuário: ${error.message}`);
+  }
+
+  async changePassword(
+    id: string,
+    requesterId: string,
+    dto: ChangePasswordDto,
+  ): Promise<void> {
+    if (id !== requesterId)
+      throw new ForbiddenException(
+        'Sem permissão para alterar a senha deste usuário',
+      );
+
+    const { data, error: findError } = await this.supabase
+      .getClient()
+      .from('Users')
+      .select('password_hash')
+      .eq('id', id)
+      .single();
+
+    if (findError || !data) throw new NotFoundException('Usuário não encontrado');
+
+    const isMatch = await bcrypt.compare(dto.currentPassword, data.password_hash);
+    if (!isMatch) throw new UnauthorizedException('Senha atual incorreta');
+
+    const newHash = await bcrypt.hash(dto.newPassword, 10);
+
+    const { error } = await this.supabase
+      .getClient()
+      .from('Users')
+      .update({ password_hash: newHash, updated_at: new Date().toISOString() })
+      .eq('id', id);
+
+    if (error) throw new Error(`Falha ao alterar senha: ${error.message}`);
   }
 }
