@@ -14,5 +14,14 @@ export const diagramService = {
   findAll: async () => {
     const response = await api.get("/diagrams");
     return response.data;
-  }
+  },
+
+  getTrash: async (): Promise<Diagram[]> => {
+    const { data } = await api.get('/diagrams/trash')
+    return data
+  },
+
+  permanentDeleteDiagram: async (id: string): Promise<void> => {
+    await api.delete(`/diagrams/${id}/permanent`)
+  },
 };

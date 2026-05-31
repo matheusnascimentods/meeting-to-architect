@@ -12,6 +12,7 @@ export type Diagram = {
   description: string;
   mermaid_code: string;
   created_at?: string;
+  updated_at?: string;
   created_by?: string;
   variant?: LabelVariant;
 };

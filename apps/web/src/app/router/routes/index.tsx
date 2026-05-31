@@ -5,6 +5,7 @@ import { useAuth } from "@/features/auth/hooks/use-auth";
 import { AppLayout } from "@/shared/components/AppLayout";
 import { DiagramsScreen } from "@/features/diagrams/components/DiagramsScreen";
 import { ComingSoon } from "@/shared/components/ComingSoon";
+import { TrashScreen } from "@/features/diagrams/components/TrashScreen";
 
 export const Route = createFileRoute("/")({
   component: Dashboard,
@@ -25,7 +26,7 @@ function Dashboard() {
       {currentPage === 'diagrams' && <DiagramsScreen />}
       {currentPage === 'teams' && <ComingSoon icon={PeopleIcon} label="My Teams" />}
       {currentPage === 'notifications' && <ComingSoon icon={BellIcon} label="Notifications" />}
-      {currentPage === 'trash' && <ComingSoon icon={TrashIcon} label="Trash" />}
+      {currentPage === 'trash' && <TrashScreen />}
     </AppLayout>
   );
 }

@@ -21,6 +21,42 @@ export class DiagramsService {
     return data;
   }
 
+  async getDeletedByUser(userId: string) {
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('Diagrams')
+      .select('*')
+      .eq('created_by', userId)
+      .eq('is_deleted', true)
+      .order('updated_at', { ascending: false });
+
+    if (error) throw new Error(`Falha ao buscar lixeira: ${error.message}`);
+    return data ?? [];
+  }
+
+  async permanentDelete(id: string, userId: string): Promise<void> {
+    const { data, error: findError } = await this.supabase
+      .getClient()
+      .from('Diagrams')
+      .select('id, created_by')
+      .eq('id', id)
+      .single();
+
+    if (findError || !data)
+      throw new NotFoundException('Diagrama não encontrado');
+    if (data.created_by !== userId)
+      throw new ForbiddenException('Sem permissão para excluir este diagrama');
+
+    const { error } = await this.supabase
+      .getClient()
+      .from('Diagrams')
+      .delete()
+      .eq('id', id);
+
+    if (error)
+      throw new Error(`Falha ao excluir permanentemente: ${error.message}`);
+  }
+
   async softDelete(id: string, userId: string): Promise<void> {
     const { data, error: findError } = await this.supabase
       .getClient()
