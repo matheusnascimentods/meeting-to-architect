@@ -6,26 +6,12 @@ import {
   useRouter,
 } from "@tanstack/react-router";
 import { ThemeProvider, BaseStyles, Text } from "@primer/react";
-import { useState, createContext, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { AuthFlow } from "@/features/auth/components/Auth";
 import { Landing } from "@/features/landing/components/Landing";
 import { User } from "@/features/auth/types";
 import { authService } from "@/features/auth/services/auth.service";
-
-interface AuthContextType {
-  user: User | null;
-  onLogout: () => void;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
-}
+import { AuthContext, AuthContextType } from "@/features/auth/hooks/use-auth";
 
 function NotFoundComponent() {
   return (
