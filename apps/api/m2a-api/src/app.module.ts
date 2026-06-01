@@ -7,6 +7,7 @@ import { AuthModule } from './modules/auth/index.module';
 import { DiagramsModule } from './modules/diagrams/index.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './modules/auth/index.guard';
+import { TeamsModule } from './modules/teams/index.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AuthGuard } from './modules/auth/index.guard';
     AgentsModule,
     AuthModule,
     DiagramsModule,
+    TeamsModule,
   ],
   providers: [
     {
