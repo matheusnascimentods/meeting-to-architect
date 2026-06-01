@@ -17,6 +17,7 @@ export function TeamsScreen() {
     setLoading(true);
     try {
       const data = await teamService.findAll();
+      console.log('Dados recebidos do servidor:', data);
       setTeamList(data);
     } catch (err) {
       console.error("Failed to fetch teams", err);
@@ -80,8 +81,11 @@ export function TeamsScreen() {
             }}
           >
             {teamList.map((ut) => {
-              const team = ut.Teams;
-              if (!team) return null;
+              const team = ut.Teams || ut.teams;
+              if (!team) {
+                console.warn('Registro de membro sem dados do time:', ut);
+                return null;
+              }
 
               return (
                 <Box

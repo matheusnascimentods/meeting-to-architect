@@ -16,22 +16,33 @@ export class TeamsService {
 
     if (error) throw new Error(`Falha ao criar time: ${error.message}`);
 
-    await this.supabase
+    const { error: memberError } = await this.supabase
       .getClient()
       .from('Team_Members')
       .insert({ team_id: data.id, user_id: userId, role: 'admin' });
+
+    if (memberError) {
+      console.error('Erro ao adicionar membro:', memberError);
+      throw new Error(`Falha ao vincular usuário ao time: ${memberError.message}`);
+    }
 
     return data;
   }
 
   async findAllByUser(userId: string) {
+    console.log(`Buscando times para o usuário: ${userId}`);
     const { data, error } = await this.supabase
       .getClient()
       .from('Team_Members')
-      .select('team_id, role, Teams(*)')
+      .select('team_id, role, Teams (*)')
       .eq('user_id', userId);
 
-    if (error) throw new Error(`Falha ao buscar times: ${error.message}`);
+    if (error) {
+      console.error('Erro ao buscar times:', error);
+      throw new Error(`Falha ao buscar times: ${error.message}`);
+    }
+    
+    console.log(`Times encontrados: ${data?.length || 0}`);
     return data ?? [];
   }
 

@@ -25,5 +25,6 @@ export interface UpdateTeamDto {
 export interface UserTeam {
   team_id: string;
   role: 'admin' | 'member';
-  Teams: Team;
+  Teams?: Team;
+  teams?: Team; // Add lowercase option
 }
