@@ -32,7 +32,7 @@ export class AgentService {
     setLogLevel(LogLevel.ERROR);
 
     this.gemini = new Gemini({
-      model: this.configService.get<string>('GEMINI_MODEL', 'gemini-3.5-flash'),
+      model: this.configService.get<string>('GEMINI_MODEL', 'gemini-1.5-flash'),
       apiKey: this.configService.get<string>('GEMINI_API_KEY'),
     });
 
@@ -72,6 +72,7 @@ export class AgentService {
         description: parsed.description,
         mermaid_code: parsed.mermaid_code,
         created_by: userId,
+        type: diagramType,
       });
 
       return data as DiagramResponse;

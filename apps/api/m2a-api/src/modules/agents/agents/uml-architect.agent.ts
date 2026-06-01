@@ -18,7 +18,7 @@ export const AgentOutputSchema = z.object({
   description: z
     .string()
     .describe('Technical description of what the diagram represents'),
-  data: z
+  mermaid_code: z
     .string()
     .describe(
       "Raw Mermaid syntax for the diagram (without backticks or the 'mermaid' prefix)",

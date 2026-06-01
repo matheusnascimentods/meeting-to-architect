@@ -24,7 +24,7 @@ export function AppLayout({ children, currentPage, onNavigate, onLogout }: Props
       <Box
         sx={{
           flex: 1,
-          marginLeft: isExpanded ? '240px' : '64px',
+          marginLeft: isExpanded ? '300px' : '64px',
           transition: 'margin-left 0.2s ease',
           minHeight: '100vh',
           bg: 'canvas.default',

@@ -26,5 +26,5 @@ You MUST return ONLY a valid JSON object matching the following schema. Do not i
 {
   "title": "Title of the diagram",
   "description": "Description of the diagram",
-  "data": "Raw Mermaid code (without markdown backticks)"
+  "mermaid_code": "Raw Mermaid code (without markdown backticks)"
 }

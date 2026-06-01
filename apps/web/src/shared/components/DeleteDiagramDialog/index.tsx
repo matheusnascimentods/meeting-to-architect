@@ -28,9 +28,9 @@ export function DeleteDiagramDialog({ diagram, onClose, onConfirm }: DeleteDiagr
 
   return (
     <Dialog
-      title={`Delete ${diagram.title}`}
+      title='Do you really want to delete this diagram?'
       onClose={onClose}
-      width="medium"
+      width="large"
     >
       <Box sx={{ p: 3, textAlign: 'center' }}>
         {error && (
@@ -57,18 +57,10 @@ export function DeleteDiagramDialog({ diagram, onClose, onConfirm }: DeleteDiagr
           <Text sx={{ fontWeight: 'bold', fontSize: 3, mb: 1, display: 'block' }}>
             {diagram.title}
           </Text>
-          <Box sx={{ display: 'flex', gap: 3, color: 'fg.muted', fontSize: 0 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <StarIcon size={12} /> 0 stars
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <EyeIcon size={12} /> 0 watchers
-            </Box>
-          </Box>
         </Box>
 
         <Text sx={{ display: 'block', mb: 3, fontSize: 1, color: 'fg.muted' }}>
-            This action cannot be undone. This will permanently delete the <strong>{diagram.title}</strong> diagram and all of its data.
+          This action can be undone. This will move the <strong>{diagram.title}</strong> diagram and all of its data to trash.
         </Text>
 
         <Button

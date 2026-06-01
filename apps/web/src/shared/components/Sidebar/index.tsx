@@ -36,7 +36,7 @@ export function Sidebar({ currentPage, onNavigate, onLogout, isExpanded, onToggl
   return (
     <Box
       sx={{
-        width: isExpanded ? 240 : 64,
+        width: isExpanded ? 300 : 64,
         transition: "width 0.2s ease",
         overflow: "hidden",
         height: "100vh",
@@ -73,7 +73,7 @@ export function Sidebar({ currentPage, onNavigate, onLogout, isExpanded, onToggl
         ) : (
           <Text sx={{ fontSize: 4, fontWeight: 'bold' }}>M</Text>
         )}
-        
+
         {isExpanded && (
           <IconButton
             icon={SidebarCollapseIcon}

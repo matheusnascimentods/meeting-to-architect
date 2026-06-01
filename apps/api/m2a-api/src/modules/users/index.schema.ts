@@ -30,4 +30,3 @@ export const changePasswordSchema = z.object({
 });
 
 export type ChangePasswordDto = z.infer<typeof changePasswordSchema>;
-

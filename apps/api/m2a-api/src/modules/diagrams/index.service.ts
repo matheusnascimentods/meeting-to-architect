@@ -236,7 +236,7 @@ export class DiagramsService {
     const { data, error } = await this.supabase
       .getClient()
       .from('Diagram_Approval_Requests')
-      .select('*, Diagrams(title, type), Users(name, email)')
+      .select('*, Diagrams(title, type), Users!requested_by(name, email)')
       .eq('team_id', teamId)
       .eq('status', 'pending');
 

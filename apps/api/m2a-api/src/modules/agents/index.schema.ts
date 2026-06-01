@@ -23,6 +23,7 @@ export const DiagramResponseSchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string(),
   description: z.string(),
+  type: DiagramTypeSchema.optional(),
   mermaid_code: z.string(),
   created_by: z.string().optional(),
 });

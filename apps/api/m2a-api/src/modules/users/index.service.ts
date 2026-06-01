@@ -7,11 +7,7 @@ import {
 } from '@nestjs/common';
 import { SupabaseService } from '../supabase/index.service';
 import * as bcrypt from 'bcrypt';
-import {
-  ChangePasswordDto,
-  UpdateUserDto,
-  User,
-} from './index.schema';
+import { ChangePasswordDto, UpdateUserDto, User } from './index.schema';
 import { AuthService } from '../auth/index.service';
 
 @Injectable()
@@ -19,7 +15,7 @@ export class UsersService {
   constructor(
     private readonly supabase: SupabaseService,
     private readonly authService: AuthService,
-  ) { }
+  ) {}
 
   async create(email: string, password: string, name: string) {
     const existing = await this.findByEmail(email);
@@ -122,9 +118,13 @@ export class UsersService {
       .eq('id', id)
       .single();
 
-    if (findError || !data) throw new NotFoundException('Usuário não encontrado');
+    if (findError || !data)
+      throw new NotFoundException('Usuário não encontrado');
 
-    const isMatch = await bcrypt.compare(dto.currentPassword, data.password_hash);
+    const isMatch = await bcrypt.compare(
+      dto.currentPassword,
+      data.password_hash,
+    );
     if (!isMatch) throw new UnauthorizedException('Senha atual incorreta');
 
     const newHash = await bcrypt.hash(dto.newPassword, 10);
