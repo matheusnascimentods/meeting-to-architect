@@ -4,6 +4,7 @@ import { PeopleIcon, BellIcon, TrashIcon } from "@primer/octicons-react";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { AppLayout } from "@/shared/components/AppLayout";
 import { DiagramsScreen } from "@/features/diagrams/components/DiagramsScreen";
+import { TeamsScreen } from "@/features/teams/components/TeamsScreen";
 import { ComingSoon } from "@/shared/components/ComingSoon";
 import { TrashScreen } from "@/features/diagrams/components/TrashScreen";
 
@@ -24,9 +25,9 @@ function Dashboard() {
       onLogout={onLogout}
     >
       {currentPage === 'diagrams' && <DiagramsScreen />}
-      {currentPage === 'teams' && <ComingSoon icon={PeopleIcon} label="My Teams" />}
+      {currentPage === 'teams' && <TeamsScreen />}
       {currentPage === 'notifications' && <ComingSoon icon={BellIcon} label="Notifications" />}
-      {currentPage === 'trash' && <TrashScreen onNavigate={setCurrentPage} />}
+      {currentPage === 'trash' && <TrashScreen onNavigate={(s) => setCurrentPage(s as SidebarPage)} />}
     </AppLayout>
   );
 }

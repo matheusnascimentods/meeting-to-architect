@@ -15,6 +15,7 @@ export function EmptyState({
   title = "No diagrams yet",
   description = "Upload a meeting transcript to generate your first architecture diagram.",
   icon: Icon = FileCodeIcon,
+  onAction,
 }: EmptyStateProps) {
   return (
     <div className="empty-state">
@@ -23,6 +24,11 @@ export function EmptyState({
       <p className="empty-state-description">
         {description}
       </p>
+      {onAction && (
+        <Button variant="primary" onClick={onAction} sx={{ mt: 3 }}>
+          {title.includes("team") ? "Create Team" : "Get Started"}
+        </Button>
+      )}
     </div>
   );
 }
