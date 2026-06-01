@@ -179,9 +179,14 @@ export function TrashScreen() {
                   onClick={() => handleRestore(diagram.id)}
                   leadingVisual={ReplyIcon}
                   sx={{
-                    bg: 'canvas.default',
                     color: 'fg.default',
+                    backgroundColor: 'canvas.default',
                     borderColor: 'border.default',
+                    '&:hover:not([disabled])': {
+                      backgroundColor: 'success.subtle',
+                      color: 'success.fg',
+                      borderColor: 'success.muted',
+                    },
                     transition: 'all 0.15s ease',
                   }}
                 >
@@ -191,9 +196,14 @@ export function TrashScreen() {
                   size="small"
                   onClick={() => setDiagramToDelete(diagram)}
                   sx={{
-                    bg: 'canvas.default',
                     color: 'fg.default',
+                    backgroundColor: 'canvas.default',
                     borderColor: 'border.default',
+                    '&:hover:not([disabled])': {
+                      backgroundColor: 'danger.subtle',
+                      color: 'danger.fg',
+                      borderColor: 'danger.muted',
+                    },
                     transition: 'all 0.15s ease',
                   }}
                 >
