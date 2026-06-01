@@ -24,4 +24,8 @@ export const diagramService = {
   permanentDeleteDiagram: async (id: string): Promise<void> => {
     await api.delete(`/diagrams/${id}/permanent`)
   },
+
+  restoreDiagram: async (id: string): Promise<void> => {
+    await api.patch(`/diagrams/${id}/restore`)
+  },
 };

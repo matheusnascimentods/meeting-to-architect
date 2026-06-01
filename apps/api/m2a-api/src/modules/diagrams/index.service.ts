@@ -57,6 +57,28 @@ export class DiagramsService {
       throw new Error(`Falha ao excluir permanentemente: ${error.message}`);
   }
 
+  async restore(id: string, userId: string): Promise<void> {
+    const { data, error: findError } = await this.supabase
+      .getClient()
+      .from('Diagrams')
+      .select('id, created_by')
+      .eq('id', id)
+      .single();
+
+    if (findError || !data)
+      throw new NotFoundException('Diagrama não encontrado');
+    if (data.created_by !== userId)
+      throw new ForbiddenException('Sem permissão para restaurar este diagrama');
+
+    const { error } = await this.supabase
+      .getClient()
+      .from('Diagrams')
+      .update({ is_deleted: false, updated_at: new Date().toISOString() })
+      .eq('id', id);
+
+    if (error) throw new Error(`Falha ao restaurar diagrama: ${error.message}`);
+  }
+
   async softDelete(id: string, userId: string): Promise<void> {
     const { data, error: findError } = await this.supabase
       .getClient()

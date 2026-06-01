@@ -8,12 +8,10 @@ import {
   Param,
   Patch,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import { DiagramsService } from './index.service';
 import type { UpdateDiagramDto } from './index.schema';
 import { CurrentUser } from '../auth/index.decorator';
-import { AuthGuard } from '../auth/index.guard';
 
 @Controller('diagrams')
 export class DiagramsController {
@@ -26,7 +24,6 @@ export class DiagramsController {
   }
 
   @Get('trash')
-  @UseGuards(AuthGuard)
   getTrash(@CurrentUser() user: { sub: string }) {
     return this.diagramsService.getDeletedByUser(user.sub);
   }
@@ -41,6 +38,12 @@ export class DiagramsController {
     return this.diagramsService.update(id, userId, updateData);
   }
 
+  @Patch(':id/restore')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  restore(@Param('id') id: string, @CurrentUser() user: { sub: string }) {
+    return this.diagramsService.restore(id, user.sub);
+  }
+
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async softDelete(@Param('id') id: string, @Req() req: any) {
@@ -49,7 +52,6 @@ export class DiagramsController {
   }
 
   @Delete(':id/permanent')
-  @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   permanentDelete(@Param('id') id: string, @CurrentUser() user: { sub: string }) {
     return this.diagramsService.permanentDelete(id, user.sub);

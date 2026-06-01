@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text, Button, Spinner, Flash, Dialog } from '@primer/react';
-import { Blankslate } from '@primer/react/experimental';
-import { TrashIcon, AlertIcon } from '@primer/octicons-react';
+import { Box, Text, Button, Spinner, Flash, Dialog, Heading, CounterLabel, Label } from '@primer/react';
+import { TrashIcon, AlertIcon, FileCodeIcon, ReplyIcon } from '@primer/octicons-react';
 import { diagramService } from '../../services/diagram.service';
 import { Diagram } from '../../types';
 
@@ -46,6 +45,18 @@ export function TrashScreen() {
     }
   };
 
+  const handleRestore = async (id: string) => {
+    try {
+      await diagramService.restoreDiagram(id);
+      setDiagrams((prev) => prev.filter((d) => d.id !== id));
+      setSuccessMessage('Diagrama restaurado com sucesso. Acesse My Diagrams para visualizá-lo.');
+      setTimeout(() => setSuccessMessage(null), 5000);
+    } catch (err: any) {
+      setError('Erro ao restaurar o diagrama.');
+      console.error(err);
+    }
+  };
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
@@ -58,10 +69,13 @@ export function TrashScreen() {
     <Box sx={{ p: 4 }}>
       <Box sx={{ mb: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-          <TrashIcon size={24} />
-          <Text as="h2" sx={{ fontSize: 4, fontWeight: 'bold' }}>Trash</Text>
+          <TrashIcon size={20} />
+          <Heading as="h2" sx={{ fontSize: 3 }}>Trash</Heading>
+          {diagrams.length > 0 && (
+            <CounterLabel>{diagrams.length}</CounterLabel>
+          )}
         </Box>
-        <Text sx={{ color: 'fg.muted' }}>
+        <Text sx={{ color: 'fg.muted', fontSize: 1 }}>
           Diagramas excluídos. A exclusão permanente não pode ser desfeita.
         </Text>
       </Box>
@@ -79,14 +93,35 @@ export function TrashScreen() {
       )}
 
       {diagrams.length === 0 ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '40vh' }}>
-          <Blankslate>
-            <Blankslate.Visual>
-              <TrashIcon size={40} />
-            </Blankslate.Visual>
-            <Blankslate.Heading>Lixeira vazia</Blankslate.Heading>
-            <Blankslate.Description>Nenhum diagrama foi excluído ainda.</Blankslate.Description>
-          </Blankslate>
+        <Box sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '60vh',
+          gap: 3,
+        }}>
+          <Box sx={{
+            width: '64px',
+            height: '64px',
+            borderRadius: '50%',
+            bg: 'canvas.subtle',
+            border: '1px solid',
+            borderColor: 'border.default',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <TrashIcon size={28} />
+          </Box>
+          <Box sx={{ textAlign: 'center' }}>
+            <Text as="p" sx={{ fontWeight: 'bold', fontSize: 2, color: 'fg.default' }}>
+              Lixeira vazia
+            </Text>
+            <Text as="p" sx={{ color: 'fg.muted', fontSize: 1, mt: 1 }}>
+              Os diagramas excluídos aparecem aqui antes da remoção permanente.
+            </Text>
+          </Box>
         </Box>
       ) : (
         <Box>
@@ -94,30 +129,65 @@ export function TrashScreen() {
             <Box
               key={diagram.id}
               sx={{
+                bg: 'canvas.default',
+                border: '1px solid',
+                borderColor: 'border.default',
+                borderRadius: 2,
+                padding: 3,
+                mb: 2,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: 3,
-                bg: 'canvas.default',
-                borderRadius: 2,
-                border: '1px solid',
-                borderColor: 'border.default',
-                mb: 2,
+                transition: 'box-shadow 0.15s ease',
+                ':hover': {
+                  boxShadow: 'shadow.medium',
+                },
               }}
             >
-              <Box>
-                <Text sx={{ fontWeight: 'bold', display: 'block' }}>{diagram.title}</Text>
-                <Text sx={{ color: 'fg.muted', fontSize: 0 }}>
-                  {diagram.type} · Excluído em {diagram.updated_at ? new Date(diagram.updated_at).toLocaleDateString('pt-BR') : 'Data desconhecida'}
-                </Text>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                <Box sx={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: 2,
+                  bg: 'danger.subtle',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  color: 'danger.fg',
+                }}>
+                  <FileCodeIcon size={16} />
+                </Box>
+                <Box>
+                  <Text sx={{ fontWeight: 'bold', fontSize: 1, display: 'block', color: 'fg.default' }}>
+                    {diagram.title}
+                  </Text>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
+                    <Label variant="danger" size="small">{diagram.type}</Label>
+                    <Text sx={{ color: 'fg.muted', fontSize: 0 }}>
+                      Excluído em {diagram.updated_at ? new Date(diagram.updated_at).toLocaleDateString('pt-BR') : 'Data desconhecida'}
+                    </Text>
+                  </Box>
+                </Box>
               </Box>
-              <Button
-                variant="danger"
-                size="small"
-                onClick={() => setDiagramToDelete(diagram)}
-              >
-                Excluir permanentemente
-              </Button>
+
+              <Box sx={{ display: 'flex', gap: 2, flexShrink: 0 }}>
+                <Button
+                  variant="default"
+                  size="small"
+                  leadingVisual={ReplyIcon}
+                  onClick={() => handleRestore(diagram.id)}
+                >
+                  Restaurar
+                </Button>
+                <Button
+                  variant="danger"
+                  size="small"
+                  onClick={() => setDiagramToDelete(diagram)}
+                >
+                  Excluir permanentemente
+                </Button>
+              </Box>
             </Box>
           ))}
         </Box>
