@@ -53,7 +53,18 @@ export class DiagramsController {
 
   @Delete(':id/permanent')
   @HttpCode(HttpStatus.NO_CONTENT)
-  permanentDelete(@Param('id') id: string, @CurrentUser() user: { sub: string }) {
+  permanentDelete(
+    @Param('id') id: string,
+    @CurrentUser() user: { sub: string },
+  ) {
     return this.diagramsService.permanentDelete(id, user.sub);
+  }
+
+  @Get('team/:teamId')
+  findByTeam(
+    @Param('teamId') teamId: string,
+    @CurrentUser() user: { sub: string },
+  ) {
+    return this.diagramsService.findByTeam(teamId, user.sub);
   }
 }

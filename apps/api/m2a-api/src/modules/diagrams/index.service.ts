@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { SupabaseService } from '../supabase/index.service';
 
 @Injectable()
@@ -68,7 +72,9 @@ export class DiagramsService {
     if (findError || !data)
       throw new NotFoundException('Diagrama não encontrado');
     if (data.created_by !== userId)
-      throw new ForbiddenException('Sem permissão para restaurar este diagrama');
+      throw new ForbiddenException(
+        'Sem permissão para restaurar este diagrama',
+      );
 
     const { error } = await this.supabase
       .getClient()
@@ -106,6 +112,7 @@ export class DiagramsService {
     description: string;
     mermaid_code: string;
     created_by: string;
+    type: string;
   }) {
     const { data, error } = await this.supabase
       .getClient()
@@ -124,7 +131,12 @@ export class DiagramsService {
   async update(
     id: string,
     userId: string,
-    updateData: { title?: string; description?: string; mermaid_code?: string },
+    updateData: {
+      title?: string;
+      description?: string;
+      mermaid_code?: string;
+      type?: string;
+    },
   ) {
     const { data, error } = await this.supabase
       .getClient()
@@ -157,5 +169,30 @@ export class DiagramsService {
       throw new Error(`Failed to delete diagram: ${error.message}`);
     }
     return data;
+  }
+
+  async findByTeam(teamId: string, userId: string): Promise<any[]> {
+    const member = await this.supabase
+      .getClient()
+      .from('Team_Members')
+      .select('user_id')
+      .eq('team_id', teamId)
+      .eq('user_id', userId)
+      .single();
+
+    if (!member.data)
+      throw new ForbiddenException('Você não faz parte deste time');
+
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('Diagrams')
+      .select('*')
+      .eq('team_id', teamId)
+      .eq('is_deleted', false)
+      .order('created_at', { ascending: false });
+
+    if (error)
+      throw new Error(`Falha ao buscar diagramas do time: ${error.message}`);
+    return data ?? [];
   }
 }

@@ -28,4 +28,9 @@ export const diagramService = {
   restoreDiagram: async (id: string): Promise<void> => {
     await api.patch(`/diagrams/${id}/restore`)
   },
+
+  findByTeam: async (teamId: string): Promise<Diagram[]> => {
+    const { data } = await api.get(`/diagrams/team/${teamId}`)
+    return data
+  },
 };

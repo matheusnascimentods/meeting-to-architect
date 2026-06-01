@@ -5,19 +5,24 @@ import { UserTeam } from "../../types";
 import { teamService } from "../../services/team.service";
 import { NewTeamDialog } from "../NewTeamDialog";
 import { EmptyState } from "@/shared/components/EmptyState";
+import { TeamDetailScreen } from "@/features/diagrams/components/TeamDetailScreen";
 
 const fontStack = "system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
+
+type TeamsView =
+  | { name: 'list' }
+  | { name: 'detail'; team: { id: string; name: string } }
 
 export function TeamsScreen() {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [teamList, setTeamList] = useState<UserTeam[]>([]);
+  const [view, setView] = useState<TeamsView>({ name: 'list' })
 
   const fetchTeams = async () => {
     setLoading(true);
     try {
       const data = await teamService.findAll();
-      console.log('Dados recebidos do servidor:', data);
       setTeamList(data);
     } catch (err) {
       console.error("Failed to fetch teams", err);
@@ -29,6 +34,15 @@ export function TeamsScreen() {
   useEffect(() => {
     fetchTeams();
   }, []);
+
+  if (view.name === 'detail') {
+    return (
+      <TeamDetailScreen
+        team={view.team}
+        onBack={() => setView({ name: 'list' })}
+      />
+    )
+  }
 
   return (
     <Box sx={{ minHeight: "100vh", fontFamily: fontStack }}>
@@ -66,11 +80,11 @@ export function TeamsScreen() {
             <Text sx={{ color: 'fg.muted', fontSize: 1 }}>Loading your teams...</Text>
           </Box>
         ) : teamList.length === 0 ? (
-          <EmptyState 
+          <EmptyState
             title="No teams yet"
             description="Create a team to start collaborating with your colleagues."
             icon={PeopleIcon}
-            onAction={() => setIsOpen(true)} 
+            onAction={() => setIsOpen(true)}
           />
         ) : (
           <Box
@@ -90,6 +104,15 @@ export function TeamsScreen() {
               return (
                 <Box
                   key={ut.team_id}
+                  onClick={() => setView({ name: 'detail', team: { id: team.id, name: team.name } })}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e: React.KeyboardEvent) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setView({ name: 'detail', team: { id: team.id, name: team.name } });
+                    }
+                  }}
                   sx={{
                     p: 4,
                     borderRadius: 2,
@@ -100,6 +123,7 @@ export function TeamsScreen() {
                     flexDirection: "column",
                     gap: 3,
                     transition: "all 0.2s ease",
+                    cursor: 'pointer',
                     "&:hover": {
                       borderColor: "accent.emphasis",
                       boxShadow: "shadow.medium",
@@ -115,11 +139,10 @@ export function TeamsScreen() {
                       {ut.role}
                     </Label>
                   </Box>
-                  
+
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <PeopleIcon size={16} fill="#6E6E73" />
                     <Text sx={{ fontSize: 0, color: "fg.muted" }}>
-                      Team Member
+                      Description: This team is for architecture diagrams!
                     </Text>
                   </Box>
 
