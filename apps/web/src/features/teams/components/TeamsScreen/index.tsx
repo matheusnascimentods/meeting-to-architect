@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Button, CounterLabel, Spinner, Text, Label } from "@primer/react";
+import { Box, Button, CounterLabel, Spinner, Text, Label, TextInput } from "@primer/react";
 import { PeopleIcon, PlusIcon } from "@primer/octicons-react";
 import { UserTeam } from "../../types";
 import { teamService } from "../../services/team.service";
@@ -17,15 +17,20 @@ export function TeamsScreen() {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [teamList, setTeamList] = useState<UserTeam[]>([]);
+  const [invites, setInvites] = useState<any[]>([]);
   const [view, setView] = useState<TeamsView>({ name: 'list' })
 
   const fetchTeams = async () => {
     setLoading(true);
     try {
-      const data = await teamService.findAll();
-      setTeamList(data);
+      const [teamsData, invitesData] = await Promise.all([
+        teamService.findAll(),
+        teamService.getMyInvites()
+      ]);
+      setTeamList(teamsData);
+      setInvites(invitesData);
     } catch (err) {
-      console.error("Failed to fetch teams", err);
+      console.error("Failed to fetch teams or invites", err);
     } finally {
       setLoading(false);
     }
@@ -34,6 +39,15 @@ export function TeamsScreen() {
   useEffect(() => {
     fetchTeams();
   }, []);
+
+  const handleRespond = async (inviteId: string, accept: boolean) => {
+    try {
+      await teamService.respondInvite(inviteId, accept);
+      fetchTeams();
+    } catch (err) {
+      console.error("Failed to respond to invite", err);
+    }
+  };
 
   if (view.name === 'detail') {
     return (
@@ -64,6 +78,41 @@ export function TeamsScreen() {
       </Box>
 
       <Box sx={{ maxWidth: 1200, margin: "0 auto", padding: "40px 32px" }}>
+        {invites.length > 0 && (
+          <Box sx={{ mb: 4 }}>
+            <Text as="h2" sx={{ fontSize: 2, fontWeight: 'bold', mb: 2 }}>
+              Meus Convites
+              <CounterLabel sx={{ ml: 2 }}>{invites.length}</CounterLabel>
+            </Text>
+            {invites.map((invite) => (
+              <Box key={invite.id} sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                p: 3,
+                mb: 2,
+                border: '1px solid',
+                borderColor: 'border.default',
+                borderRadius: 2,
+                bg: 'canvas.default',
+              }}>
+                <Box>
+                  <Text sx={{ fontWeight: 'bold', display: 'block' }}>{invite.Teams?.name}</Text>
+                  <Text sx={{ color: 'fg.muted', fontSize: 0 }}>Você foi convidado para este time</Text>
+                </Box>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  <Button size="small" variant="primary" onClick={() => handleRespond(invite.id, true)}>
+                    Aceitar
+                  </Button>
+                  <Button size="small" variant="danger" onClick={() => handleRespond(invite.id, false)}>
+                    Recusar
+                  </Button>
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        )}
+
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, marginBottom: 1 }}>
           <Text as="h1" sx={{ fontSize: 5, fontWeight: 'bold', letterSpacing: "-0.02em", margin: 0 }}>
             Teams

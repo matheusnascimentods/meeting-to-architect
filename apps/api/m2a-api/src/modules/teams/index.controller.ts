@@ -1,6 +1,23 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { TeamsService } from './index.service';
-import { createTeamSchema, updateTeamSchema, CreateTeamDto, UpdateTeamDto } from './index.schema';
+import {
+  createTeamSchema,
+  updateTeamSchema,
+  inviteMemberSchema,
+  CreateTeamDto,
+  UpdateTeamDto,
+} from './index.schema';
 import { AuthGuard } from '../auth/index.guard';
 import { CurrentUser } from '../auth/index.decorator';
 
@@ -10,12 +27,33 @@ export class TeamsController {
   constructor(private readonly teams: TeamsService) {}
 
   @Post()
-  create(
+  create(@Body() body: unknown, @CurrentUser() user: { sub: string }) {
+    const dto: CreateTeamDto = createTeamSchema.parse(body);
+    return this.teams.create(dto, user.sub);
+  }
+
+  @Get('invites/me')
+  getMyInvites(@CurrentUser() user: { sub: string }) {
+    return this.teams.getMyInvites(user.sub);
+  }
+
+  @Post(':id/invite')
+  invite(
+    @Param('id') id: string,
     @Body() body: unknown,
     @CurrentUser() user: { sub: string },
   ) {
-    const dto: CreateTeamDto = createTeamSchema.parse(body);
-    return this.teams.create(dto, user.sub);
+    const dto = inviteMemberSchema.parse(body);
+    return this.teams.inviteMember(id, dto.email, user.sub);
+  }
+
+  @Patch('invites/:inviteId/respond')
+  respondInvite(
+    @Param('inviteId') inviteId: string,
+    @Body() body: { accept: boolean },
+    @CurrentUser() user: { sub: string },
+  ) {
+    return this.teams.respondInvite(inviteId, user.sub, body.accept);
   }
 
   @Get()
@@ -24,10 +62,7 @@ export class TeamsController {
   }
 
   @Get(':id')
-  findById(
-    @Param('id') id: string,
-    @CurrentUser() user: { sub: string },
-  ) {
+  findById(@Param('id') id: string, @CurrentUser() user: { sub: string }) {
     return this.teams.findById(id, user.sub);
   }
 
@@ -43,10 +78,7 @@ export class TeamsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  delete(
-    @Param('id') id: string,
-    @CurrentUser() user: { sub: string },
-  ) {
+  delete(@Param('id') id: string, @CurrentUser() user: { sub: string }) {
     return this.teams.delete(id, user.sub);
   }
 }

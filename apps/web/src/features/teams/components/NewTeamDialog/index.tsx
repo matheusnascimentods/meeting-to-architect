@@ -59,7 +59,7 @@ export function NewTeamDialog({ onClose, onSuccess }: Props) {
         <FormControl>
           <FormControl.Label>Team Name</FormControl.Label>
           <TextInput
-            placeholder="e.g. Engineering, Marketing, Product"
+            placeholder="App development, site creation, etc..."
             block
             value={name}
             onChange={(e) => setName(e.target.value)}

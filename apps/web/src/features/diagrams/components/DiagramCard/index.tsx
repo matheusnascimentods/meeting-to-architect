@@ -1,10 +1,12 @@
-import { useState } from "react";
-import { ActionMenu, ActionList, IconButton, Label } from "@primer/react";
-import { KebabHorizontalIcon, PencilIcon, TrashIcon } from "@primer/octicons-react";
+import { useState, useEffect } from "react";
+import { ActionMenu, ActionList, IconButton, Label, Dialog, Box, Select, Button, Flash, Text } from "@primer/react";
+import { KebabHorizontalIcon, PencilIcon, TrashIcon, PeopleIcon } from "@primer/octicons-react";
 import { Diagram } from "../../types";
+import { UserTeam } from "@/features/teams/types";
 import { EditDiagramDialog } from "../EditDiagramDialog";
 import { DeleteDiagramDialog } from "@/shared/components/DeleteDiagramDialog";
 import { diagramService } from "../../services/diagram.service";
+import { teamService } from "@/features/teams/services/team.service";
 import "./styles.css";
 
 interface DiagramCardProps {
@@ -17,11 +19,21 @@ interface DiagramCardProps {
 export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCardProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [showAddToTeam, setShowAddToTeam] = useState(false);
+  const [userTeams, setUserTeams] = useState<UserTeam[]>([]);
+  const [selectedTeamId, setSelectedTeamId] = useState("");
+  const [flashMessage, setFlashMessage] = useState<{ text: string, variant: 'success' | 'danger' } | null>(null);
 
   const { title, description } = diagram;
   const type = diagram.type || "Diagram";
   const variant = diagram.variant || "accent";
   const date = diagram.created_at ? new Date(diagram.created_at).toLocaleDateString() : "Just now";
+
+  useEffect(() => {
+    if (showAddToTeam) {
+      teamService.findAll().then(setUserTeams).catch(console.error);
+    }
+  }, [showAddToTeam]);
 
   const handleDelete = async () => {
     console.log("Sending delete request for diagram:", diagram.id);
@@ -29,10 +41,29 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
       await diagramService.deleteDiagram(diagram.id);
       onDelete?.(diagram.id);
       setIsDeleteDialogOpen(false);
-      // TODO: show DeleteSuccessBanner
     } catch (err) {
       console.error("Failed to delete diagram", err);
-      throw err; // Re-throw so DeleteDiagramDialog can show the error Flash
+      throw err;
+    }
+  };
+
+  const handleAddToTeam = async () => {
+    if (!selectedTeamId) return;
+    try {
+      const team = userTeams.find(t => t.team_id === selectedTeamId);
+      await diagramService.addToTeam(diagram.id, selectedTeamId);
+      setFlashMessage({
+        text: team?.role === 'admin'
+          ? 'Diagrama adicionado ao time com sucesso.'
+          : 'Solicitação enviada. Aguarde a aprovação do admin.',
+        variant: 'success'
+      });
+      setShowAddToTeam(false);
+      setTimeout(() => setFlashMessage(null), 5000);
+    } catch (err) {
+      console.error("Failed to add diagram to team", err);
+      setFlashMessage({ text: 'Falha ao adicionar ao time.', variant: 'danger' });
+      setTimeout(() => setFlashMessage(null), 5000);
     }
   };
 
@@ -77,6 +108,12 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
                     </ActionList.LeadingVisual>
                     Edit
                   </ActionList.Item>
+                  <ActionList.Item onSelect={() => setShowAddToTeam(true)}>
+                    <ActionList.LeadingVisual>
+                      <PeopleIcon />
+                    </ActionList.LeadingVisual>
+                    Add to Team
+                  </ActionList.Item>
                   <ActionList.Item variant="danger" onSelect={() => setIsDeleteDialogOpen(true)}>
                     <ActionList.LeadingVisual>
                       <TrashIcon />
@@ -110,6 +147,45 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
           onClose={() => setIsDeleteDialogOpen(false)}
           onConfirm={handleDelete}
         />
+      )}
+
+      {showAddToTeam && (
+        <Dialog
+          title="Add to Team"
+          onClose={() => setShowAddToTeam(false)}
+          footerButtons={[
+            { buttonType: 'default', content: 'Cancel', onClick: () => setShowAddToTeam(false) },
+            {
+              buttonType: 'primary',
+              content: 'Add',
+              onClick: handleAddToTeam
+            }
+          ]}
+        >
+          <Box sx={{ p: 3 }}>
+            <Text sx={{ display: 'block', mb: 2 }}>Selecione o time:</Text>
+            <Select
+              value={selectedTeamId}
+              onChange={(e) => setSelectedTeamId(e.target.value)}
+              sx={{ width: '100%' }}
+            >
+              <Select.Option value="">Selecione um time...</Select.Option>
+              {userTeams.map(ut => (
+                <Select.Option key={ut.team_id} value={ut.team_id}>
+                  {ut.Teams?.name || ut.teams?.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </Box>
+        </Dialog>
+      )}
+
+      {flashMessage && (
+        <Box sx={{ position: 'fixed', bottom: 24, right: 24, zIndex: 100 }}>
+          <Flash variant={flashMessage.variant}>
+            {flashMessage.text}
+          </Flash>
+        </Box>
       )}
     </>
   );

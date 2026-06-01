@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Box, CounterLabel, IconButton, Spinner, Text } from "@primer/react";
+import { Box, CounterLabel, IconButton, Spinner, Text, TextInput, Button } from "@primer/react";
 import { ArrowLeftIcon } from "@primer/octicons-react";
 import { Diagram } from "../../types";
 import { diagramService } from "../../services/diagram.service";
+import { teamService } from "@/features/teams/services/team.service";
 import { DiagramCard } from "../DiagramCard";
 import { DiagramDetail } from "../DiagramDetail";
 import { EmptyState } from "@/shared/components/EmptyState";
@@ -18,22 +19,55 @@ export function TeamDetailScreen({ team, onBack }: Props) {
   const [loading, setLoading] = useState(true);
   const [diagrams, setDiagrams] = useState<Diagram[]>([]);
   const [selectedDiagram, setSelectedDiagram] = useState<Diagram | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [requests, setRequests] = useState<any[]>([]);
+  const [inviteEmail, setInviteEmail] = useState("");
 
-  const fetchTeamDiagrams = async () => {
+  const fetchData = async () => {
     setLoading(true);
     try {
-      const data = await diagramService.findByTeam(team.id);
-      setDiagrams(data);
+      const [diagramsData, teamInfo] = await Promise.all([
+        diagramService.findByTeam(team.id),
+        teamService.findById(team.id)
+      ]);
+      setDiagrams(diagramsData);
+      setIsAdmin(teamInfo.role === 'admin');
+
+      if (teamInfo.role === 'admin') {
+        const requestsData = await diagramService.getTeamRequests(team.id);
+        setRequests(requestsData);
+      }
     } catch (err) {
-      console.error("Failed to fetch team diagrams", err);
+      console.error("Failed to fetch team data", err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTeamDiagrams();
+    fetchData();
   }, [team.id]);
+
+  const handleInvite = async () => {
+    if (!inviteEmail) return;
+    try {
+      await teamService.invite(team.id, inviteEmail);
+      setInviteEmail("");
+      alert("Convite enviado com sucesso!");
+    } catch (err) {
+      console.error("Failed to invite member", err);
+      alert("Falha ao enviar convite.");
+    }
+  };
+
+  const handleRespondRequest = async (requestId: string, approve: boolean) => {
+    try {
+      await diagramService.respondRequest(requestId, approve);
+      fetchData();
+    } catch (err) {
+      console.error("Failed to respond to request", err);
+    }
+  };
 
   if (selectedDiagram) {
     return (
@@ -85,6 +119,62 @@ export function TeamDetailScreen({ team, onBack }: Props) {
         <Text as="p" sx={{ fontSize: 1, color: 'fg.muted', marginBottom: 4 }}>
           This team is for architecture diagrams.
         </Text>
+
+        {isAdmin && (
+          <Box sx={{ mb: 4, p: 3, border: '1px solid', borderColor: 'border.default', borderRadius: 2, bg: 'canvas.subtle' }}>
+            <Text sx={{ fontWeight: 'bold', fontSize: 1, display: 'block', mb: 2 }}>
+              Convidar membro
+            </Text>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <TextInput
+                placeholder="email@exemplo.com"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                sx={{ flex: 1 }}
+              />
+              <Button variant="primary" onClick={handleInvite}>
+                Convidar
+              </Button>
+            </Box>
+          </Box>
+        )}
+
+        {isAdmin && requests.length > 0 && (
+          <Box sx={{ mb: 4 }}>
+            <Text as="h2" sx={{ fontSize: 2, fontWeight: 'bold', mb: 2 }}>
+              Solicitações pendentes
+              <CounterLabel sx={{ ml: 2 }}>{requests.length}</CounterLabel>
+            </Text>
+            {requests.map((req) => (
+              <Box key={req.id} sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                p: 3,
+                mb: 2,
+                border: '1px solid',
+                borderColor: 'attention.muted',
+                borderRadius: 2,
+                bg: 'attention.subtle',
+              }}>
+                <Box>
+                  <Text sx={{ fontWeight: 'bold', display: 'block' }}>{req.Diagrams?.title}</Text>
+                  <Text sx={{ color: 'fg.muted', fontSize: 0 }}>
+                    Solicitado por {req.Users?.name || req.Users?.email} · {req.Diagrams?.type}
+                  </Text>
+                </Box>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  <Button size="small" variant="primary" onClick={() => handleRespondRequest(req.id, true)}>
+                    Aprovar
+                  </Button>
+                  <Button size="small" variant="danger" onClick={() => handleRespondRequest(req.id, false)}>
+                    Rejeitar
+                  </Button>
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        )}
 
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', padding: '100px', flexDirection: 'column', alignItems: 'center', gap: 3 }}>

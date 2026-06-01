@@ -195,4 +195,101 @@ export class DiagramsService {
       throw new Error(`Falha ao buscar diagramas do time: ${error.message}`);
     return data ?? [];
   }
+
+  async addToTeam(
+    diagramId: string,
+    teamId: string,
+    userId: string,
+  ): Promise<void> {
+    const { data: member } = await this.supabase
+      .getClient()
+      .from('Team_Members')
+      .select('role')
+      .eq('team_id', teamId)
+      .eq('user_id', userId)
+      .single();
+
+    if (!member) throw new ForbiddenException('Você não faz parte deste time');
+
+    if (member.role === 'admin') {
+      await this.supabase
+        .getClient()
+        .from('Diagrams')
+        .update({ team_id: teamId, updated_at: new Date().toISOString() })
+        .eq('id', diagramId);
+    } else {
+      await this.supabase
+        .getClient()
+        .from('Diagram_Approval_Requests')
+        .insert({
+          diagram_id: diagramId,
+          team_id: teamId,
+          requested_by: userId,
+          status: 'pending',
+        });
+    }
+  }
+
+  async getTeamRequests(teamId: string, userId: string) {
+    await this.verifyAdmin(teamId, userId);
+
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('Diagram_Approval_Requests')
+      .select('*, Diagrams(title, type), Users(name, email)')
+      .eq('team_id', teamId)
+      .eq('status', 'pending');
+
+    if (error)
+      throw new Error(`Falha ao buscar solicitações: ${error.message}`);
+    return data ?? [];
+  }
+
+  async respondRequest(
+    requestId: string,
+    adminId: string,
+    approve: boolean,
+  ): Promise<void> {
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('Diagram_Approval_Requests')
+      .select('*')
+      .eq('id', requestId)
+      .single();
+
+    if (error || !data) throw new NotFoundException('Solicitação não encontrada');
+    await this.verifyAdmin(data.team_id, adminId);
+
+    await this.supabase
+      .getClient()
+      .from('Diagram_Approval_Requests')
+      .update({
+        status: approve ? 'approved' : 'rejected',
+        reviewed_by: adminId,
+        reviewed_at: new Date().toISOString(),
+      })
+      .eq('id', requestId);
+
+    if (approve) {
+      await this.supabase
+        .getClient()
+        .from('Diagrams')
+        .update({ team_id: data.team_id, updated_at: new Date().toISOString() })
+        .eq('id', data.diagram_id);
+    }
+  }
+
+  private async verifyAdmin(teamId: string, userId: string): Promise<void> {
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('Team_Members')
+      .select('role')
+      .eq('team_id', teamId)
+      .eq('user_id', userId)
+      .single();
+
+    if (error || !data) throw new NotFoundException('Time não encontrado');
+    if (data.role !== 'admin')
+      throw new ForbiddenException('Apenas admins podem realizar esta ação');
+  }
 }

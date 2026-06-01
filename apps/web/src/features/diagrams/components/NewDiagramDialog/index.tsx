@@ -61,7 +61,7 @@ export function NewDiagramDialog({ onClose, onSuccess }: Props) {
         <FormControl>
           <FormControl.Label>Transcript File</FormControl.Label>
           {file ? (
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 3, borderRadius: 2, border: '1px solid', borderColor: 'border.default', bg: 'canvas.subtle' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 3, borderRadius: 2, border: '1px solid', width: '100%', borderColor: 'border.default', bg: 'canvas.subtle' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Icons.FileIcon size={18} />
                 <Text sx={{ fontSize: 1, fontWeight: 'medium' }}>{file.name}</Text>

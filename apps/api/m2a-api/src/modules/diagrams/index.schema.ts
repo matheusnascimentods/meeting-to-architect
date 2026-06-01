@@ -7,4 +7,9 @@ export const UpdateDiagramSchema = z.object({
   type: z.string().optional(),
 });
 
+export const addToTeamSchema = z.object({
+  team_id: z.string().uuid(),
+});
+
 export type UpdateDiagramDto = z.infer<typeof UpdateDiagramSchema>;
+export type AddToTeamDto = z.infer<typeof addToTeamSchema>;

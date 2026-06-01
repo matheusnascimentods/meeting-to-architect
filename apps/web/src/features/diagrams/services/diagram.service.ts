@@ -33,4 +33,17 @@ export const diagramService = {
     const { data } = await api.get(`/diagrams/team/${teamId}`)
     return data
   },
+
+  addToTeam: async (diagramId: string, teamId: string): Promise<void> => {
+    await api.post(`/diagrams/${diagramId}/add-to-team`, { team_id: teamId });
+  },
+
+  getTeamRequests: async (teamId: string): Promise<any[]> => {
+    const { data } = await api.get(`/diagrams/team/${teamId}/requests`);
+    return data;
+  },
+
+  respondRequest: async (requestId: string, approve: boolean): Promise<void> => {
+    await api.patch(`/diagrams/requests/${requestId}/respond`, { approve });
+  },
 };
