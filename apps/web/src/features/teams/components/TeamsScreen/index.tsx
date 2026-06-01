@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Button, CounterLabel, Spinner, Text } from "@primer/react";
+import { Box, Button, CounterLabel, Spinner, Text, Label } from "@primer/react";
 import { PeopleIcon, PlusIcon } from "@primer/octicons-react";
 import { UserTeam } from "../../types";
 import { teamService } from "../../services/team.service";
@@ -79,29 +79,54 @@ export function TeamsScreen() {
               gridTemplateColumns: ["1fr", "repeat(2, 1fr)", "repeat(3, 1fr)"],
             }}
           >
-            {teamList.map((ut) => (
-              <Box
-                key={ut.team_id}
-                sx={{
-                  p: 3,
-                  borderRadius: 2,
-                  border: "1px solid",
-                  borderColor: "border.default",
-                  bg: "canvas.default",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 2,
-                  "&:hover": {
-                    borderColor: "accent.emphasis",
-                  },
-                }}
-              >
-                <Text sx={{ fontWeight: "bold", fontSize: 2 }}>{ut.Teams.name}</Text>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <Text sx={{ fontSize: 0, color: "fg.muted" }}>Role: {ut.role}</Text>
+            {teamList.map((ut) => {
+              const team = ut.Teams;
+              if (!team) return null;
+
+              return (
+                <Box
+                  key={ut.team_id}
+                  sx={{
+                    p: 4,
+                    borderRadius: 2,
+                    border: "1px solid",
+                    borderColor: "border.default",
+                    bg: "canvas.default",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 3,
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      borderColor: "accent.emphasis",
+                      boxShadow: "shadow.medium",
+                      transform: "translateY(-2px)",
+                    },
+                  }}
+                >
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <Text sx={{ fontWeight: "bold", fontSize: 2, color: 'fg.default' }}>
+                      {team.name}
+                    </Text>
+                    <Label variant={ut.role === 'admin' ? 'accent' : 'secondary'} sx={{ textTransform: 'capitalize' }}>
+                      {ut.role}
+                    </Label>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <PeopleIcon size={16} fill="#6E6E73" />
+                    <Text sx={{ fontSize: 0, color: "fg.muted" }}>
+                      Team Member
+                    </Text>
+                  </Box>
+
+                  <Box sx={{ mt: 'auto', pt: 2, borderTop: '1px solid', borderColor: 'border.subtle' }}>
+                    <Text sx={{ fontSize: 0, color: 'fg.subtle' }}>
+                      Created at {team.created_at ? new Date(team.created_at).toLocaleDateString() : 'N/A'}
+                    </Text>
+                  </Box>
                 </Box>
-              </Box>
-            ))}
+              );
+            })}
           </Box>
         )}
       </Box>
