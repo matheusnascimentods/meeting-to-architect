@@ -49,7 +49,7 @@ export function TrashScreen() {
     try {
       await diagramService.restoreDiagram(id);
       setDiagrams((prev) => prev.filter((d) => d.id !== id));
-      setSuccessMessage('Diagrama restaurado com sucesso. Acesse My Diagrams para visualizá-lo.');
+      setSuccessMessage('Diagram successfully restored. Access My Diagrams to view it.');
       setTimeout(() => setSuccessMessage(null), 5000);
     } catch (err: any) {
       setError('Erro ao restaurar o diagrama.');
@@ -76,7 +76,7 @@ export function TrashScreen() {
           )}
         </Box>
         <Text sx={{ color: 'fg.muted', fontSize: 1 }}>
-          Diagramas excluídos. A exclusão permanente não pode ser desfeita.
+          Diagrams deleted. Permanent deletion cannot be undone.
         </Text>
       </Box>
 
@@ -138,7 +138,12 @@ export function TrashScreen() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                transition: 'box-shadow 0.15s ease',
+                cursor: 'default',
+                ':hover': {
+                  bg: 'canvas.subtle',
+                  borderColor: 'border.muted',
+                },
+                transition: 'background-color 0.15s ease, border-color 0.15s ease',
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
@@ -177,11 +182,6 @@ export function TrashScreen() {
                     bg: 'canvas.default',
                     color: 'fg.default',
                     borderColor: 'border.default',
-                    ':hover': {
-                      bg: 'success.subtle',
-                      color: 'success.fg',
-                      borderColor: 'success.muted',
-                    },
                     transition: 'all 0.15s ease',
                   }}
                 >
@@ -194,11 +194,6 @@ export function TrashScreen() {
                     bg: 'canvas.default',
                     color: 'fg.default',
                     borderColor: 'border.default',
-                    ':hover': {
-                      bg: 'danger.subtle',
-                      color: 'danger.fg',
-                      borderColor: 'danger.muted',
-                    },
                     transition: 'all 0.15s ease',
                   }}
                 >
