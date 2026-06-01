@@ -139,9 +139,6 @@ export function TrashScreen() {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 transition: 'box-shadow 0.15s ease',
-                ':hover': {
-                  boxShadow: 'shadow.medium',
-                },
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
@@ -173,17 +170,37 @@ export function TrashScreen() {
 
               <Box sx={{ display: 'flex', gap: 2, flexShrink: 0 }}>
                 <Button
-                  variant="default"
                   size="small"
-                  leadingVisual={ReplyIcon}
                   onClick={() => handleRestore(diagram.id)}
+                  leadingVisual={ReplyIcon}
+                  sx={{
+                    bg: 'canvas.default',
+                    color: 'fg.default',
+                    borderColor: 'border.default',
+                    ':hover': {
+                      bg: 'success.subtle',
+                      color: 'success.fg',
+                      borderColor: 'success.muted',
+                    },
+                    transition: 'all 0.15s ease',
+                  }}
                 >
                   Restaurar
                 </Button>
                 <Button
-                  variant="danger"
                   size="small"
                   onClick={() => setDiagramToDelete(diagram)}
+                  sx={{
+                    bg: 'canvas.default',
+                    color: 'fg.default',
+                    borderColor: 'border.default',
+                    ':hover': {
+                      bg: 'danger.subtle',
+                      color: 'danger.fg',
+                      borderColor: 'danger.muted',
+                    },
+                    transition: 'all 0.15s ease',
+                  }}
                 >
                   Excluir permanentemente
                 </Button>
