@@ -6,17 +6,23 @@ const mutedColor = "#6E6E73";
 
 interface EmptyStateProps {
   onAction?: () => void;
+  title?: string;
+  description?: string;
+  icon?: React.ElementType;
 }
 
-export function EmptyState({ onAction }: EmptyStateProps) {
+export function EmptyState({
+  title = "No diagrams yet",
+  description = "Upload a meeting transcript to generate your first architecture diagram.",
+  icon: Icon = FileCodeIcon,
+}: EmptyStateProps) {
   return (
     <div className="empty-state">
-      <FileCodeIcon size={64} fill={mutedColor} />
-      <h2 className="empty-state-title">No diagrams yet</h2>
+      <Icon size={64} fill={mutedColor} />
+      <h2 className="empty-state-title">{title}</h2>
       <p className="empty-state-description">
-        Upload a meeting transcript to generate your first architecture diagram.
+        {description}
       </p>
-      <Button variant="primary" onClick={onAction}>Generate Diagram</Button>
     </div>
   );
 }

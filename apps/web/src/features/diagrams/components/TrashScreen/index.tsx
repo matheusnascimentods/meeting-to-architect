@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text, Button, Spinner, Flash, Dialog, Heading, CounterLabel, Label } from '@primer/react';
+import { Box, Text, Button, Spinner, Flash, Dialog, CounterLabel, Label } from '@primer/react';
 import { TrashIcon, AlertIcon, FileCodeIcon, ReplyIcon } from '@primer/octicons-react';
 import { diagramService } from '../../services/diagram.service';
 import { Diagram } from '../../types';
+import { EmptyState } from '@/shared/components/EmptyState';
 
-export function TrashScreen() {
+export function TrashScreen({ onNavigate }: { onNavigate?: (screen: string) => void }) {
   const [diagrams, setDiagrams] = useState<Diagram[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,163 +58,129 @@ export function TrashScreen() {
     }
   };
 
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-        <Spinner size="large" />
-      </Box>
-    );
-  }
+  const fontStack = "system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
 
   return (
-    <Box sx={{ p: 4 }}>
-      <Box sx={{ mb: 4 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-          <TrashIcon size={20} />
-          <Heading as="h2" sx={{ fontSize: 3 }}>Trash</Heading>
-          {diagrams.length > 0 && (
+    <Box sx={{ minHeight: '100vh', fontFamily: fontStack }}>
+      <Box sx={{ maxWidth: 1200, margin: '0 auto', padding: '40px 32px' }}>
+        {successMessage && (
+          <Flash variant="success" sx={{ mb: 3 }}>
+            {successMessage}
+          </Flash>
+        )}
+
+        {error && (
+          <Flash variant="danger" sx={{ mb: 3 }}>
+            <AlertIcon /> {error}
+          </Flash>
+        )}
+
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, marginBottom: 1 }}>
+          <Text as="h1" sx={{ fontSize: 5, fontWeight: 'bold', letterSpacing: '-0.02em', margin: 0 }}>
+            Trash
+          </Text>
+          {!loading && diagrams.length > 0 && (
             <CounterLabel>{diagrams.length}</CounterLabel>
           )}
         </Box>
-        <Text sx={{ color: 'fg.muted', fontSize: 1 }}>
+        <Text as="p" sx={{ fontSize: 1, color: 'fg.muted', marginBottom: 4 }}>
           Diagrams deleted. Permanent deletion cannot be undone.
         </Text>
-      </Box>
 
-      {successMessage && (
-        <Flash variant="success" sx={{ mb: 3 }}>
-          {successMessage}
-        </Flash>
-      )}
-
-      {error && (
-        <Flash variant="danger" sx={{ mb: 3 }}>
-          <AlertIcon /> {error}
-        </Flash>
-      )}
-
-      {diagrams.length === 0 ? (
-        <Box sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '60vh',
-          gap: 3,
-        }}>
-          <Box sx={{
-            width: '64px',
-            height: '64px',
-            borderRadius: '50%',
-            bg: 'canvas.subtle',
-            border: '1px solid',
-            borderColor: 'border.default',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-            <TrashIcon size={28} />
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', padding: '100px', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+            <Spinner size="large" />
+            <Text sx={{ color: 'fg.muted', fontSize: 1 }}>Carregando lixeira...</Text>
           </Box>
-          <Box sx={{ textAlign: 'center' }}>
-            <Text as="p" sx={{ fontWeight: 'bold', fontSize: 2, color: 'fg.default' }}>
-              Lixeira vazia
-            </Text>
-            <Text as="p" sx={{ color: 'fg.muted', fontSize: 1, mt: 1 }}>
-              Os diagramas excluídos aparecem aqui antes da remoção permanente.
-            </Text>
-          </Box>
-        </Box>
-      ) : (
-        <Box>
-          {diagrams.map((diagram) => (
-            <Box
-              key={diagram.id}
-              sx={{
-                bg: 'canvas.default',
-                border: '1px solid',
-                borderColor: 'border.default',
-                borderRadius: 2,
-                padding: 3,
-                mb: 2,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                cursor: 'default',
-                ':hover': {
-                  bg: 'canvas.subtle',
-                  borderColor: 'border.muted',
-                },
-                transition: 'background-color 0.15s ease, border-color 0.15s ease',
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                <Box sx={{
-                  width: '36px',
-                  height: '36px',
+        ) : diagrams.length === 0 ? (
+          <EmptyState
+            icon={TrashIcon}
+            title="The trash can is empty"
+            description="Deleted diagrams appear here before they are permanently removed."
+          />
+        ) : (
+          <Box>
+            {diagrams.map((diagram) => (
+              <Box
+                key={diagram.id}
+                sx={{
+                  bg: 'canvas.default',
+                  border: '1px solid',
+                  borderColor: 'border.default',
                   borderRadius: 2,
-                  bg: 'danger.subtle',
+                  padding: 3,
+                  mb: 2,
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  color: 'danger.fg',
-                }}>
-                  <FileCodeIcon size={16} />
-                </Box>
-                <Box>
-                  <Text sx={{ fontWeight: 'bold', fontSize: 1, display: 'block', color: 'fg.default' }}>
-                    {diagram.title}
-                  </Text>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
-                    <Label variant="danger" size="small">{diagram.type}</Label>
-                    <Text sx={{ color: 'fg.muted', fontSize: 0 }}>
-                      Excluído em {diagram.updated_at ? new Date(diagram.updated_at).toLocaleDateString('pt-BR') : 'Data desconhecida'}
+                  justifyContent: 'space-between',
+                  cursor: 'default',
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                  <Box sx={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: 2,
+                    bg: 'danger.subtle',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    color: 'danger.fg',
+                  }}>
+                    <FileCodeIcon size={16} />
+                  </Box>
+                  <Box>
+                    <Text sx={{ fontWeight: 'bold', fontSize: 1, display: 'block', color: 'fg.default' }}>
+                      {diagram.title}
                     </Text>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
+                      <Label variant="danger" size="small">{diagram.type}</Label>
+                      <Text sx={{ color: 'fg.muted', fontSize: 0 }}>
+                        Excluído em {diagram.updated_at ? new Date(diagram.updated_at).toLocaleDateString('pt-BR') : 'Data desconhecida'}
+                      </Text>
+                    </Box>
                   </Box>
                 </Box>
-              </Box>
 
-              <Box sx={{ display: 'flex', gap: 2, flexShrink: 0 }}>
-                <Button
-                  size="small"
-                  onClick={() => handleRestore(diagram.id)}
-                  leadingVisual={ReplyIcon}
-                  sx={{
-                    color: 'fg.default',
-                    backgroundColor: 'canvas.default',
-                    borderColor: 'border.default',
-                    '&:hover:not([disabled])': {
-                      backgroundColor: 'success.subtle',
-                      color: 'success.fg',
-                      borderColor: 'success.muted',
-                    },
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  Restaurar
-                </Button>
-                <Button
-                  size="small"
-                  onClick={() => setDiagramToDelete(diagram)}
-                  sx={{
-                    color: 'fg.default',
-                    backgroundColor: 'canvas.default',
-                    borderColor: 'border.default',
-                    '&:hover:not([disabled])': {
-                      backgroundColor: 'danger.subtle',
-                      color: 'danger.fg',
-                      borderColor: 'danger.muted',
-                    },
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  Excluir permanentemente
-                </Button>
+                <Box sx={{ display: 'flex', gap: 2, flexShrink: 0 }}>
+                  <Button
+                    size="small"
+                    leadingVisual={ReplyIcon}
+                    onClick={() => handleRestore(diagram.id)}
+                    sx={{
+                      backgroundColor: 'success.emphasis',
+                      color: 'white',
+                      borderColor: 'success.emphasis',
+                      '&:hover:not([disabled])': {
+                        backgroundColor: 'success.emphasis',
+                        borderColor: 'success.emphasis',
+                      },
+                    }}
+                  >
+                    Restaurar
+                  </Button>
+                  <Button
+                    size="small"
+                    onClick={() => setDiagramToDelete(diagram)}
+                    sx={{
+                      backgroundColor: 'danger.emphasis',
+                      color: 'white',
+                      borderColor: 'danger.emphasis',
+                      '&:hover:not([disabled])': {
+                        backgroundColor: 'danger.emphasis',
+                        borderColor: 'danger.emphasis',
+                      },
+                    }}
+                  >
+                    Excluir permanentemente
+                  </Button>
+                </Box>
               </Box>
-            </Box>
-          ))}
-        </Box>
-      )}
+            ))}
+          </Box>
+        )}
+      </Box>
 
       {diagramToDelete && (
         <Dialog

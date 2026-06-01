@@ -26,7 +26,7 @@ function Dashboard() {
       {currentPage === 'diagrams' && <DiagramsScreen />}
       {currentPage === 'teams' && <ComingSoon icon={PeopleIcon} label="My Teams" />}
       {currentPage === 'notifications' && <ComingSoon icon={BellIcon} label="Notifications" />}
-      {currentPage === 'trash' && <TrashScreen />}
+      {currentPage === 'trash' && <TrashScreen onNavigate={setCurrentPage} />}
     </AppLayout>
   );
 }
