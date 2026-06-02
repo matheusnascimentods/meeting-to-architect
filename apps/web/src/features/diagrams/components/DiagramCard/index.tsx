@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ActionMenu, ActionList, IconButton, Label, Dialog, Box, Select, Button, Flash, Text } from "@primer/react";
+import { ActionMenu, ActionList, IconButton, Label, Dialog, Box, Select, Flash, Text } from "@primer/react";
 import { KebabHorizontalIcon, PencilIcon, TrashIcon, PeopleIcon } from "@primer/octicons-react";
 import { Diagram } from "../../types";
 import { UserTeam } from "@/features/teams/types";
@@ -7,6 +7,7 @@ import { EditDiagramDialog } from "../EditDiagramDialog";
 import { DeleteDiagramDialog } from "@/shared/components/DeleteDiagramDialog";
 import { diagramService } from "../../services/diagram.service";
 import { teamService } from "@/features/teams/services/team.service";
+import { COPY } from "@/shared/constants/copy";
 import "./styles.css";
 
 interface DiagramCardProps {
@@ -31,18 +32,20 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
 
   useEffect(() => {
     if (showAddToTeam) {
-      teamService.findAll().then(setUserTeams).catch(console.error);
+      teamService.findAll().then(setUserTeams).catch(() => {
+        setFlashMessage({ text: 'Falha ao carregar times.', variant: 'danger' });
+        setTimeout(() => setFlashMessage(null), 5000);
+      });
     }
   }, [showAddToTeam]);
 
   const handleDelete = async () => {
-    console.log("Sending delete request for diagram:", diagram.id);
     try {
       await diagramService.deleteDiagram(diagram.id);
       onDelete?.(diagram.id);
       setIsDeleteDialogOpen(false);
     } catch (err) {
-      console.error("Failed to delete diagram", err);
+      // Re-throw to be handled by the dialog component if needed
       throw err;
     }
   };
@@ -61,7 +64,6 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
       setShowAddToTeam(false);
       setTimeout(() => setFlashMessage(null), 5000);
     } catch (err) {
-      console.error("Failed to add diagram to team", err);
       setFlashMessage({ text: 'Falha ao adicionar ao time.', variant: 'danger' });
       setTimeout(() => setFlashMessage(null), 5000);
     }
@@ -136,7 +138,7 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
               onUpdate?.(data);
               setIsEditDialogOpen(false);
             } catch (err) {
-              console.error("Failed to update diagram", err);
+              // Silently fail or show error
             }
           }}
         />
@@ -154,7 +156,7 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
           title="Add to Team"
           onClose={() => setShowAddToTeam(false)}
           footerButtons={[
-            { buttonType: 'default', content: 'Cancel', onClick: () => setShowAddToTeam(false) },
+            { buttonType: 'default', content: COPY.common.cancel, onClick: () => setShowAddToTeam(false) },
             {
               buttonType: 'primary',
               content: 'Add',

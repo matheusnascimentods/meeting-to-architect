@@ -1,45 +1,46 @@
-import { useState, useEffect } from "react";
-import { Box, Button, CounterLabel, IconButton, Spinner, Text } from "@primer/react";
+import { useState } from "react";
+import { Box, Button, CounterLabel, IconButton, Text } from "@primer/react";
 import { ArrowLeftIcon, PlusIcon } from "@primer/octicons-react";
-import { Diagram } from "../../types";
-import { diagramService } from "../../services/diagram.service";
 import { DiagramCard } from "../DiagramCard";
 import { DiagramDetail } from "../DiagramDetail";
 import { NewDiagramDialog } from "../NewDiagramDialog";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { DeleteSuccessBanner } from "@/shared/components/DeleteSuccessBanner";
+import { useDiagrams } from "../../hooks/useDiagrams";
+import { LoadingState } from "@/shared/components/LoadingState";
+import { ErrorState } from "@/shared/components/ErrorState";
+import { tokens } from "@/shared/styles/tokens";
+import { COPY } from "@/shared/constants/copy";
 
 type Screen = { name: "list" } | { name: "detail"; diagramId: string };
 
-const fontStack = "system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
-
 export function DiagramsScreen() {
+  const { diagrams, loading, error, refetch } = useDiagrams();
   const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
   const [screen, setScreen] = useState<Screen>({ name: "list" });
-  const [diagramList, setDiagramList] = useState<Diagram[]>([]);
 
-  const fetchDiagrams = async () => {
-    setLoading(true);
-    try {
-      const data = await diagramService.findAll();
-      setDiagramList(data);
-    } catch (err) {
-      console.error("Failed to fetch diagrams", err);
-    } finally {
-      setLoading(false);
+  const activeDiagram = screen.name === "detail" ? diagrams.find((d) => d.id === screen.diagramId) : null;
+
+  const handleDelete = () => {
+    refetch();
+    if (screen.name === "detail") {
+      setScreen({ name: "list" });
     }
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 3000);
   };
 
-  useEffect(() => {
-    fetchDiagrams();
-  }, []);
+  if (loading && diagrams.length === 0) {
+    return <LoadingState message={COPY.diagrams.loading} />;
+  }
 
-  const activeDiagram = screen.name === "detail" ? diagramList.find((d) => d.id === screen.diagramId) : null;
+  if (error) {
+    return <ErrorState message={error} />;
+  }
 
   return (
-    <Box sx={{ minHeight: "100vh", fontFamily: fontStack }}>
+    <Box sx={{ minHeight: "100vh", fontFamily: tokens.layout.fontStack }}>
       <Box
         as="nav"
         sx={{
@@ -62,30 +63,25 @@ export function DiagramsScreen() {
         )}
         {screen.name === "list" && (
           <Button variant="primary" leadingVisual={PlusIcon} onClick={() => setIsOpen(true)}>
-            New Diagram
+            {COPY.diagrams.empty.action}
           </Button>
         )}
       </Box>
 
       {screen.name === "list" && (
-        <Box sx={{ maxWidth: 1200, margin: "0 auto", padding: "40px 32px" }}>
+        <Box sx={tokens.container.page}>
           {showSuccess && <DeleteSuccessBanner />}
           <Box sx={{ display: "flex", alignItems: "center", gap: 2, marginBottom: 1 }}>
-            <Text as="h1" sx={{ fontSize: 5, fontWeight: 'bold', letterSpacing: "-0.02em", margin: 0 }}>
-              Diagrams
+            <Text as="h1" sx={tokens.text.heading}>
+              {COPY.diagrams.title}
             </Text>
-            {!loading && <CounterLabel>{diagramList.length}</CounterLabel>}
+            <CounterLabel>{diagrams.length}</CounterLabel>
           </Box>
-          <Text as="p" sx={{ fontSize: 1, color: 'fg.muted', marginBottom: 4 }}>
-            All architecture diagrams generated from your meeting transcripts
+          <Text as="p" sx={{ ...tokens.text.muted, marginBottom: 4 }}>
+            {COPY.diagrams.subtitle}
           </Text>
 
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', padding: '100px', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-              <Spinner size="large" />
-              <Text sx={{ color: 'fg.muted', fontSize: 1 }}>Loading your workspace...</Text>
-            </Box>
-          ) : diagramList.length === 0 ? (
+          {diagrams.length === 0 ? (
             <EmptyState onAction={() => setIsOpen(true)} />
           ) : (
             <Box
@@ -95,19 +91,13 @@ export function DiagramsScreen() {
                 gridTemplateColumns: ["1fr", "repeat(2, 1fr)", "repeat(3, 1fr)"],
               }}
             >
-              {diagramList.map((d) => (
+              {diagrams.map((d) => (
                 <DiagramCard
                   key={d.id}
                   diagram={d}
                   onOpen={() => setScreen({ name: "detail", diagramId: d.id })}
-                  onUpdate={(updated) => {
-                    setDiagramList(diagramList.map((item) => (item.id === updated.id ? updated : item)));
-                  }}
-                  onDelete={(id) => {
-                    setDiagramList(diagramList.filter((item) => item.id !== id));
-                    setShowSuccess(true);
-                    setTimeout(() => setShowSuccess(false), 3000);
-                  }}
+                  onUpdate={refetch}
+                  onDelete={handleDelete}
                 />
               ))}
             </Box>
@@ -118,12 +108,7 @@ export function DiagramsScreen() {
       {screen.name === "detail" && activeDiagram && (
         <DiagramDetail
           diagram={activeDiagram}
-          onDelete={() => {
-            setDiagramList(diagramList.filter((d) => d.id !== activeDiagram.id));
-            setScreen({ name: "list" });
-            setShowSuccess(true);
-            setTimeout(() => setShowSuccess(false), 3000);
-          }}
+          onDelete={handleDelete}
         />
       )}
 
@@ -131,7 +116,7 @@ export function DiagramsScreen() {
         <NewDiagramDialog 
           onClose={() => setIsOpen(false)} 
           onSuccess={(newDiagram) => {
-            setDiagramList([newDiagram, ...diagramList]);
+            refetch();
             setIsOpen(false);
             setScreen({ name: "detail", diagramId: newDiagram.id });
           }}

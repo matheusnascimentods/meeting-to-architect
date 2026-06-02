@@ -1,0 +1,87 @@
+import { Box, Text, Button, Label } from '@primer/react';
+import { FileCodeIcon, ReplyIcon } from '@primer/octicons-react';
+import { Diagram } from '../../types';
+import { tokens } from '@/shared/styles/tokens';
+import { COPY } from '@/shared/constants/copy';
+
+interface Props {
+  diagram: Diagram;
+  onRestore: (id: string) => void;
+  onDelete: (diagram: Diagram) => void;
+}
+
+export function TrashItem({ diagram, onRestore, onDelete }: Props) {
+  return (
+    <Box
+      sx={{
+        ...tokens.card.base,
+        mb: 2,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        cursor: 'default',
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+        <Box sx={{
+          width: '36px',
+          height: '36px',
+          borderRadius: 2,
+          bg: 'danger.subtle',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+          color: 'danger.fg',
+        }}>
+          <FileCodeIcon size={16} />
+        </Box>
+        <Box>
+          <Text sx={{ fontWeight: 'bold', fontSize: 1, display: 'block', color: 'fg.default' }}>
+            {diagram.title}
+          </Text>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
+            <Label variant="danger" size="small">{diagram.type}</Label>
+            <Text sx={{ color: 'fg.muted', fontSize: 0 }}>
+              Excluído em {diagram.updated_at ? new Date(diagram.updated_at).toLocaleDateString('pt-BR') : 'Data desconhecida'}
+            </Text>
+          </Box>
+        </Box>
+      </Box>
+
+      <Box sx={{ display: 'flex', gap: 2, flexShrink: 0 }}>
+        <Button
+          size="small"
+          leadingVisual={ReplyIcon}
+          onClick={() => onRestore(diagram.id)}
+          sx={{
+            backgroundColor: 'success.emphasis',
+            color: 'white',
+            borderColor: 'success.emphasis',
+            '&:hover:not([disabled])': {
+              backgroundColor: 'success.emphasis',
+              borderColor: 'success.emphasis',
+            },
+          }}
+        >
+          Restaurar
+        </Button>
+        <Button
+          size="small"
+          onClick={() => onDelete(diagram)}
+          sx={{
+            backgroundColor: 'danger.emphasis',
+            color: 'white',
+            borderColor: 'danger.emphasis',
+            '&:hover:not([disabled])': {
+              backgroundColor: 'danger.emphasis',
+              borderColor: 'danger.emphasis',
+            },
+          }}
+        >
+          {COPY.common.delete}
+        </Button>
+      </Box>
+    </Box>
+  );
+}

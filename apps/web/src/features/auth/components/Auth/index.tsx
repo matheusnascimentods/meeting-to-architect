@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Box, Text, FormControl, TextInput, Button, IconButton } from '@primer/react';
-import { ArrowLeftIcon } from '@primer/octicons-react';
+import { Box } from '@primer/react';
 import { authService } from '@/features/auth/services/auth.service';
 import { User } from '@/features/auth/types';
+import { EmailStep } from './EmailStep';
+import { LoginStep } from './LoginStep';
+import { SignupStep } from './SignupStep';
 
 export type AuthState = 'auth-email' | 'auth-login' | 'auth-signup' | 'app';
 
@@ -60,8 +62,8 @@ export function AuthFlow({ onAuthenticated }: AuthFlowProps) {
       const data = await authService.login(email, password);
       localStorage.setItem('token', data.access_token || data.token);
       onAuthenticated(data.user || { email, name: currentUser?.name || '' });
-    } catch (error: any) {
-      if (error.response?.status === 401) {
+    } catch (error: unknown) {
+      if (error instanceof Error && (error as any).response?.status === 401) {
         setPasswordError('Incorrect password. Try again.');
       } else {
         setPasswordError('Something went wrong. Try again.');
@@ -98,8 +100,8 @@ export function AuthFlow({ onAuthenticated }: AuthFlowProps) {
       const data = await authService.register(email, password, name);
       localStorage.setItem('token', data.access_token || data.token);
       onAuthenticated(data.user || { email, name });
-    } catch (error: any) {
-      if (error.response?.status === 409) {
+    } catch (error: unknown) {
+      if (error instanceof Error && (error as any).response?.status === 409) {
         setPasswordError('An account with this email already exists.');
       } else {
         setPasswordError('Something went wrong. Try again.');
@@ -108,177 +110,6 @@ export function AuthFlow({ onAuthenticated }: AuthFlowProps) {
       setLoading(false);
     }
   };
-
-  const renderEmailStep = () => (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: 400 }}>
-      <Box sx={{ mb: 4, textAlign: 'center' }}>
-        <Text sx={{ fontSize: 40, fontWeight: 'bold', display: 'block' }}>M2A</Text>
-        <Text sx={{ color: 'fg.muted', fontSize: 1 }}>Meeting to Architecture</Text>
-      </Box>
-      <Box
-        as="form"
-        onSubmit={handleEmailSubmit}
-        sx={{
-          bg: 'canvas.default',
-          p: 5,
-          borderRadius: '16px',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-          width: '100%',
-        }}
-      >
-        <Text sx={{ fontSize: 3, fontWeight: 'bold', mb: 1, display: 'block' }}>Welcome</Text>
-        <Text sx={{ color: 'fg.muted', fontSize: 1, mb: 4, display: 'block' }}>Enter your email to continue</Text>
-        <FormControl>
-          <TextInput
-            type="email"
-            placeholder="you@company.com"
-            block
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          {emailError && <FormControl.Validation variant="error">{emailError}</FormControl.Validation>}
-        </FormControl>
-        <Button variant="primary" block sx={{ mt: 3 }} type="submit" loading={loading}>
-          Continue
-        </Button>
-      </Box>
-    </Box>
-  );
-
-  const renderLoginStep = () => (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: 400 }}>
-      <Box
-        as="form"
-        onSubmit={handleLoginSubmit}
-        sx={{
-          bg: 'canvas.default',
-          p: 5,
-          borderRadius: '16px',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-          width: '100%',
-          position: 'relative',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <IconButton
-          icon={ArrowLeftIcon}
-          aria-label="Back"
-          variant="invisible"
-          onClick={() => setStep('email')}
-          sx={{ position: 'absolute', top: 2, left: 2 }}
-        />
-        <Box
-          sx={{
-            width: 40,
-            height: 40,
-            borderRadius: '50%',
-            bg: 'accent.subtle',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            mb: 2,
-            mt: 2,
-          }}
-        >
-          <Text sx={{ color: 'accent.fg', fontWeight: 'bold' }}>{currentUser?.name?.[0] || '?'}</Text>
-        </Box>
-        <Text sx={{ fontWeight: 'bold', fontSize: 2 }}>{currentUser?.name}</Text>
-        <Text sx={{ color: 'fg.muted', fontSize: 1, mb: 4 }}>{currentUser?.email}</Text>
-
-        <FormControl sx={{ width: '100%' }}>
-          <FormControl.Label>Password</FormControl.Label>
-          <TextInput
-            type="password"
-            placeholder="Enter your password"
-            block
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          {passwordError && <FormControl.Validation variant="error">{passwordError}</FormControl.Validation>}
-        </FormControl>
-
-        <Button variant="primary" block sx={{ mt: 3 }} type="submit" loading={loading}>
-          Sign in
-        </Button>
-        <Text sx={{ color: 'fg.muted', fontSize: 0, mt: 3, cursor: 'pointer' }}>Forgot your password?</Text>
-      </Box>
-    </Box>
-  );
-
-  const renderSignupStep = () => (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: 400 }}>
-      <Box
-        as="form"
-        onSubmit={handleSignupSubmit}
-        sx={{
-          bg: 'canvas.default',
-          p: 5,
-          borderRadius: '16px',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-          width: '100%',
-          position: 'relative',
-        }}
-      >
-        <IconButton
-          icon={ArrowLeftIcon}
-          aria-label="Back"
-          variant="invisible"
-          onClick={() => setStep('email')}
-          sx={{ position: 'absolute', top: 2, left: 2 }}
-        />
-        <Text sx={{ fontSize: 2, fontWeight: 'bold', mb: 1, display: 'block', mt: 4 }}>Create your account</Text>
-        <Text sx={{ color: 'fg.muted', fontSize: 1, mb: 4, display: 'block' }}>
-          No account found for this email. Fill in the details below.
-        </Text>
-
-        <FormControl sx={{ mb: 2 }}>
-          <FormControl.Label>Full name</FormControl.Label>
-          <TextInput
-            placeholder="Your full name"
-            block
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          {nameError && <FormControl.Validation variant="error">{nameError}</FormControl.Validation>}
-        </FormControl>
-
-        <FormControl sx={{ mb: 2 }}>
-          <FormControl.Label>Email</FormControl.Label>
-          <TextInput value={email} disabled block />
-        </FormControl>
-
-        <FormControl sx={{ mb: 2 }}>
-          <FormControl.Label>Password</FormControl.Label>
-          <TextInput
-            type="password"
-            placeholder="Create a password"
-            block
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          {passwordError && <FormControl.Validation variant="error">{passwordError}</FormControl.Validation>}
-        </FormControl>
-
-        <FormControl sx={{ mb: 3 }}>
-          <FormControl.Label>Confirm password</FormControl.Label>
-          <TextInput
-            type="password"
-            placeholder="Repeat your password"
-            block
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-          {confirmPasswordError && <FormControl.Validation variant="error">{confirmPasswordError}</FormControl.Validation>}
-        </FormControl>
-
-        <Button variant="primary" block type="submit" loading={loading}>
-          Create account
-        </Button>
-      </Box>
-    </Box>
-  );
 
   return (
     <Box
@@ -291,9 +122,45 @@ export function AuthFlow({ onAuthenticated }: AuthFlowProps) {
         px: 4,
       }}
     >
-      {step === 'email' && renderEmailStep()}
-      {step === 'login' && renderLoginStep()}
-      {step === 'signup' && renderSignupStep()}
+      {step === 'email' && (
+        <EmailStep
+          email={email}
+          setEmail={setEmail}
+          onSubmit={handleEmailSubmit}
+          loading={loading}
+          error={emailError}
+        />
+      )}
+      {step === 'login' && (
+        <LoginStep
+          currentUser={currentUser}
+          password={password}
+          setPassword={setPassword}
+          onSubmit={handleLoginSubmit}
+          onBack={() => setStep('email')}
+          loading={loading}
+          error={passwordError}
+        />
+      )}
+      {step === 'signup' && (
+        <SignupStep
+          email={email}
+          name={name}
+          setName={setName}
+          password={password}
+          setPassword={setPassword}
+          confirmPassword={confirmPassword}
+          setConfirmPassword={setConfirmPassword}
+          onSubmit={handleSignupSubmit}
+          onBack={() => setStep('email')}
+          loading={loading}
+          errors={{
+            name: nameError,
+            password: passwordError,
+            confirmPassword: confirmPasswordError
+          }}
+        />
+      )}
     </Box>
   );
 }

@@ -16,3 +16,20 @@ export type Diagram = {
   created_by?: string;
   variant?: LabelVariant;
 };
+
+export interface DiagramRequest {
+  id: string;
+  diagram_id: string;
+  user_id: string;
+  team_id: string;
+  status: 'pending' | 'approved' | 'rejected';
+  created_at: string;
+  Diagrams?: {
+    title: string;
+    type: string;
+  };
+  Users?: {
+    name: string;
+    email: string;
+  };
+}

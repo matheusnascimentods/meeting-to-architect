@@ -1,7 +1,8 @@
 import React from "react";
 import { Dialog, Box, Text, Button, Flash } from "@primer/react";
-import { RepoIcon, StarIcon, EyeIcon, AlertIcon } from "@primer/octicons-react";
+import { RepoIcon, AlertIcon } from "@primer/octicons-react";
 import { Diagram } from "@/features/diagrams/types";
+import { COPY } from "@/shared/constants/copy";
 
 interface DeleteDiagramDialogProps {
   diagram: Diagram;
@@ -18,9 +19,13 @@ export function DeleteDiagramDialog({ diagram, onClose, onConfirm }: DeleteDiagr
     setError(null);
     try {
       await onConfirm();
-    } catch (err: any) {
-      console.error("Failed to confirm deletion:", err);
-      setError(err.response?.data?.message || "Ocorreu um erro ao excluir o diagrama.");
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosErr = err as { response: { data: { message: string } } };
+        setError(axiosErr.response?.data?.message || COPY.common.error);
+      } else {
+        setError(COPY.common.error);
+      }
     } finally {
       setLoading(false);
     }

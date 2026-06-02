@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Dialog, Box, TextInput, FormControl, Flash, Spinner, Text } from "@primer/react";
 import { teamService } from "../../services/team.service";
+import { Team } from "../../types";
+import { COPY } from "@/shared/constants/copy";
 
 interface Props {
   onClose: () => void;
-  onSuccess?: (team: any) => void;
+  onSuccess?: (team: Team) => void;
 }
 
 export function NewTeamDialog({ onClose, onSuccess }: Props) {
@@ -22,8 +24,13 @@ export function NewTeamDialog({ onClose, onSuccess }: Props) {
       const team = await teamService.create({ name });
       onSuccess?.(team);
       onClose();
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to create team. Please try again.");
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosErr = err as { response: { data: { message: string } } };
+        setError(axiosErr.response?.data?.message || "Failed to create team. Please try again.");
+      } else {
+        setError("Failed to create team. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -34,7 +41,7 @@ export function NewTeamDialog({ onClose, onSuccess }: Props) {
       title="Create New Team"
       onClose={onClose}
       footerButtons={[
-        { content: "Cancel", onClick: onClose, disabled: loading },
+        { content: COPY.common.cancel, onClick: onClose, disabled: loading },
         {
           content: loading ? (
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>

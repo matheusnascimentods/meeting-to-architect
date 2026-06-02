@@ -28,3 +28,12 @@ export interface UserTeam {
   Teams?: Team;
   teams?: Team; // Add lowercase option
 }
+
+export interface TeamInvite {
+  id: string;
+  team_id: string;
+  email: string;
+  status: 'pending' | 'accepted' | 'rejected';
+  created_at: string;
+  Teams?: Team;
+}

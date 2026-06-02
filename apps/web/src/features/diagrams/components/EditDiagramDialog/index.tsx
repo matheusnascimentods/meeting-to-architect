@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Dialog, FormControl, TextInput, Textarea, SegmentedControl } from "@primer/react";
+import { Dialog, FormControl, TextInput, Textarea, SegmentedControl, Box, Text } from "@primer/react";
 import { Diagram } from "../../types";
 import { MermaidPreview } from "../MermaidPreview";
+import { COPY } from "@/shared/constants/copy";
 
 interface EditDiagramDialogProps {
   diagram: Diagram;
@@ -26,11 +27,11 @@ export function EditDiagramDialog({ diagram, onClose, onSave }: EditDiagramDialo
       onClose={onClose}
       width="xlarge"
       footerButtons={[
-        { content: "Cancel", buttonType: "default", onClick: onClose },
-        { content: "Save Changes", buttonType: "primary", onClick: handleSave },
+        { content: COPY.common.cancel, buttonType: "default", onClick: onClose },
+        { content: COPY.common.save, buttonType: "primary", onClick: handleSave },
       ]}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '16px' }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, p: 3 }}>
         <FormControl>
           <FormControl.Label>Title</FormControl.Label>
           <TextInput block value={title} onChange={(e) => setTitle(e.target.value)} />
@@ -41,8 +42,8 @@ export function EditDiagramDialog({ diagram, onClose, onSave }: EditDiagramDialo
           <Textarea block value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
         </FormControl>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px', width: '100%' }}>
-          <span style={{ fontWeight: 600, fontSize: '14px' }}>Diagram Code (Mermaid)</span>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3, width: '100%' }}>
+          <Text sx={{ fontWeight: 600, fontSize: 1 }}>Diagram Code (Mermaid)</Text>
           <SegmentedControl aria-label="View mode">
             <SegmentedControl.Button selected={view === "code"} onClick={() => setView("code")}>
               Code
@@ -51,25 +52,25 @@ export function EditDiagramDialog({ diagram, onClose, onSave }: EditDiagramDialo
               Preview
             </SegmentedControl.Button>
           </SegmentedControl>
-        </div>
+        </Box>
 
-        <div style={{ height: '350px', marginTop: '12px' }}>
+        <Box sx={{ height: '350px', mt: 2 }}>
           {view === "code" ? (
             <Textarea
               block
               value={code}
               onChange={(e) => setCode(e.target.value)}
               rows={15}
-              style={{ fontFamily: 'monospace', whiteSpace: 'pre', height: '100%' }}
+              sx={{ fontFamily: 'monospace', whiteSpace: 'pre', height: '100%' }}
               resize="none"
             />
           ) : (
-            <div style={{ border: '1px solid var(--borderColor-default, #d0d7de)', borderRadius: '6px', padding: '16px', height: '100%', overflow: 'auto', backgroundColor: 'var(--bgColor-muted, #f6f8fa)' }}>
+            <Box sx={{ border: '1px solid', borderColor: 'border.default', borderRadius: 2, p: 3, height: '100%', overflow: 'auto', bg: 'canvas.subtle' }}>
               <MermaidPreview source={code} id={`edit-${diagram.id}`} />
-            </div>
+            </Box>
           )}
-        </div>
-      </div>
+        </Box>
+      </Box>
     </Dialog>
   );
 }

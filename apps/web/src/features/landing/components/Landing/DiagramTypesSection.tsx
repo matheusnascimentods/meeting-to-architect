@@ -73,7 +73,7 @@ function DiagramTypeCard({ illustration, tag, tagVariant, title, description }: 
         {illustration}
       </div>
       <div>
-        <Label variant={tagVariant as any}>{tag}</Label>
+        <Label variant={tagVariant}>{tag}</Label>
       </div>
       <div>
         <h3 style={{ fontSize: 18, fontWeight: 600, margin: "0 0 8px", letterSpacing: "-0.01em" }}>{title}</h3>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Label, Button, IconButton } from "@primer/react";
+import { Label, Button, IconButton, Box } from "@primer/react";
 import { ClockIcon, PersonIcon, CopyIcon, DownloadIcon, TrashIcon, ScreenFullIcon, XIcon } from "@primer/octicons-react";
 import { Diagram } from "@/features/diagrams/types";
 import { PanelBox } from "@/shared/components/PanelBox";
@@ -7,6 +7,7 @@ import { PanelHeader } from "@/shared/components/PanelHeader";
 import { DeleteDiagramDialog } from "@/shared/components/DeleteDiagramDialog";
 import { diagramService } from "@/features/diagrams/services/diagram.service";
 import { MermaidPreview } from "../MermaidPreview";
+import { tokens } from "@/shared/styles/tokens";
 import "./styles.css";
 
 interface DiagramDetailProps {
@@ -24,7 +25,7 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
       await diagramService.deleteDiagram(diagram.id);
       onDelete?.();
     } catch (err) {
-      console.error("Failed to delete diagram:", err);
+      // Re-throw to be handled by the dialog
       throw err;
     }
   };
@@ -60,7 +61,7 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
             <PanelHeader
               left={<span className="panel-label">Preview</span>}
               right={
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                   <Label>Mermaid</Label>
                   <IconButton
                     icon={ScreenFullIcon}
@@ -69,7 +70,7 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
                     size="small"
                     onClick={() => setIsFullscreen(true)}
                   />
-                </div>
+                </Box>
               }
             />
             <div

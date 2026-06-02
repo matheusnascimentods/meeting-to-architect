@@ -1,13 +1,14 @@
 import { useState, useRef } from "react";
 import { Dialog, Box, Button, Text, FormControl, IconButton, Flash, Spinner } from "@primer/react";
 import * as Icons from "@primer/octicons-react";
-import { DiagramType } from "@/features/diagrams/types";
+import { DiagramType, Diagram } from "@/features/diagrams/types";
 import { api } from "@/shared/lib/api";
 import { DIAGRAM_CATEGORIES, DIAGRAM_TYPES, TYPE_LABELS, DiagramCategory } from "./diagram-types";
+import { COPY } from "@/shared/constants/copy";
 
 const ALLOWED_EXTS = ['pdf', 'md', 'txt', 'vtt', 'srt'];
 
-interface Props { onClose: () => void; onSuccess?: (d: any) => void }
+interface Props { onClose: () => void; onSuccess?: (d: Diagram) => void }
 
 export function NewDiagramDialog({ onClose, onSuccess }: Props) {
   const [file, setFile] = useState<File | null>(null);
@@ -35,8 +36,13 @@ export function NewDiagramDialog({ onClose, onSuccess }: Props) {
     try {
       const { data } = await api.post("/agents/generate", form, { headers: { "Content-Type": "multipart/form-data" } });
       onSuccess?.(data); onClose();
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to generate diagram. Please try again.");
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosErr = err as { response: { data: { message: string } } };
+        setError(axiosErr.response?.data?.message || "Failed to generate diagram. Please try again.");
+      } else {
+        setError("Failed to generate diagram. Please try again.");
+      }
     } finally { setLoading(false); }
   };
 
@@ -47,7 +53,7 @@ export function NewDiagramDialog({ onClose, onSuccess }: Props) {
       onClose={onClose}
       width="xlarge"
       footerButtons={[
-        { content: "Cancel", buttonType: "default", onClick: onClose, disabled: loading },
+        { content: COPY.common.cancel, buttonType: "default", onClick: onClose, disabled: loading },
         {
           content: loading ? <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}><Spinner size="small" /><Text>Generating...</Text></Box> : (selected ? `Generate ${TYPE_LABELS[selected]}` : "Generate Diagram"),
           buttonType: "primary", disabled: !canGenerate, onClick: handleGenerate,
@@ -102,7 +108,7 @@ export function NewDiagramDialog({ onClose, onSuccess }: Props) {
             <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2, mt: 3, overflowY: 'auto', flex: 1, minHeight: 0, pr: 1 }}>
               {filteredTypes.map(t => {
                 const isSelected = selected === t.id;
-                const Icon = (Icons as any)[t.icon] ?? Icons.CodeSquareIcon;
+                const Icon = (Icons as Record<string, any>)[t.icon] ?? Icons.CodeSquareIcon;
                 return (
                   <Box key={t.id} role="button" tabIndex={0}
                     onClick={() => !loading && setSelected(t.id as DiagramType)}

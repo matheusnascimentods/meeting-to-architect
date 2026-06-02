@@ -29,7 +29,7 @@ export function Navbar({ showBack, onBack, showNewButton, onNewClick, user, onLo
           <span className="brand-sub">Meeting to Architecture</span>
         </div>
       </div>
-      <div className="navbar-right" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <Box className="navbar-right" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         {showNewButton && (
           <Button variant="primary" leadingVisual={PlusIcon} onClick={onNewClick}>New Diagram</Button>
         )}
@@ -75,7 +75,7 @@ export function Navbar({ showBack, onBack, showNewButton, onNewClick, user, onLo
             </ActionMenu.Overlay>
           </ActionMenu>
         )}
-      </div>
+      </Box>
     </nav>
   );
 }
