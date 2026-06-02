@@ -226,7 +226,18 @@ export class DiagramsService {
   }
 
   async getTeamRequests(teamId: string, userId: string) {
-    await this.verifyAdmin(teamId, userId);
+    const { data: member, error: memberError } = await this.supabase
+      .getClient()
+      .from('Team_Members')
+      .select('role')
+      .eq('team_id', teamId)
+      .eq('user_id', userId)
+      .single();
+
+    if (memberError || !member)
+      throw new ForbiddenException('Você não faz parte deste time');
+
+    if (member.role !== 'admin') return [];
 
     const { data, error } = await this.supabase
       .getClient()
