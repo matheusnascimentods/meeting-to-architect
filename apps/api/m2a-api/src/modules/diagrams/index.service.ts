@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { SupabaseService } from '../supabase/index.service';
+import { CreateDiagramDto } from './index.schema';
 
 @Injectable()
 export class DiagramsService {
@@ -283,11 +284,6 @@ export class DiagramsService {
       .single();
 
     if (error || !data) throw new NotFoundException('Time não encontrado');
-    if (data.role !== 'admin')
-      throw new ForbiddenException('Apenas admins podem realizar esta ação');
-  }
-}
-Exception('Time não encontrado');
     if (data.role !== 'admin')
       throw new ForbiddenException('Apenas admins podem realizar esta ação');
   }
