@@ -36,9 +36,14 @@ export const teamInviteSchema = z.object({
   created_at: z.string().optional(),
 });
 
+export const respondInviteSchema = z.object({
+  accept: z.boolean(),
+});
+
 export type CreateTeamDto = z.infer<typeof createTeamSchema>;
 export type UpdateTeamDto = z.infer<typeof updateTeamSchema>;
 export type Team = z.infer<typeof teamSchema>;
 export type TeamMember = z.infer<typeof teamMemberSchema>;
 export type InviteMemberDto = z.infer<typeof inviteMemberSchema>;
 export type TeamInvite = z.infer<typeof teamInviteSchema>;
+export type RespondInviteDto = z.infer<typeof respondInviteSchema>;

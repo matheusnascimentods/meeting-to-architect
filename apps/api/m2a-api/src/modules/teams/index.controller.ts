@@ -15,8 +15,10 @@ import {
   createTeamSchema,
   updateTeamSchema,
   inviteMemberSchema,
+  respondInviteSchema,
   CreateTeamDto,
   UpdateTeamDto,
+  RespondInviteDto,
 } from './index.schema';
 import { AuthGuard } from '../auth/index.guard';
 import { CurrentUser } from '../auth/index.decorator';
@@ -50,10 +52,11 @@ export class TeamsController {
   @Patch('invites/:inviteId/respond')
   respondInvite(
     @Param('inviteId') inviteId: string,
-    @Body() body: { accept: boolean },
+    @Body() body: unknown,
     @CurrentUser() user: { sub: string },
   ) {
-    return this.teams.respondInvite(inviteId, user.sub, body.accept);
+    const dto = respondInviteSchema.parse(body);
+    return this.teams.respondInvite(inviteId, user.sub, dto.accept);
   }
 
   @Get()

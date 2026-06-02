@@ -1,91 +1,115 @@
-# Meeting to Architect (M2A)
+# M2A — Meeting to Architecture
 
-Bem-vindo ao repositório do **Meeting to Architect (M2A)**! 🚀
+> Transforme transcrições de reuniões em diagramas de arquitetura UML e C4 automaticamente com IA.
 
-Este projeto é uma ferramenta inovadora que utiliza Inteligência Artificial (LLMs) para transformar descrições, ideias e transcrições de reuniões em **diagramas de arquitetura de software** prontos para uso. O M2A automatiza a criação de documentação visual (como fluxogramas e diagramas de arquitetura usando Mermaid.js), integrando-se com serviços modernos em nuvem.
+## Sobre o projeto
 
-## 🎯 Finalidade do Projeto
+O M2A (Meeting to Architecture) é uma plataforma desenvolvida para simplificar a criação de documentação técnica. Ele utiliza Inteligência Artificial para analisar transcrições de reuniões ou documentos de requisitos e gerar automaticamente diagramas de arquitetura nos formatos Mermaid (UML e C4), permitindo que times de desenvolvimento documentem sistemas com agilidade e precisão.
 
-O principal objetivo do M2A é reduzir o tempo que engenheiros de software e arquitetos de soluções gastam desenhando diagramas. A partir de prompts textuais detalhados, o backend processa as informações através de um agente LLM (via Google ADK) e gera uma representação em código (Mermaid), que é então renderizada e apresentada visualmente na interface web. Todos os diagramas e sessões são persistidos de forma segura no Supabase.
+## Tecnologias
 
-### Principais Funcionalidades:
-- 🤖 **Geração de diagramas com IA**: Conversão de texto livre em diagramas precisos.
-- 🎨 **Visualização Interativa**: Renderização instantânea utilizando o ecossistema Mermaid na web.
-- 🔐 **Autenticação**: Fluxo seguro de usuários gerenciado via Supabase.
-- 💾 **Histórico e Persistência**: Salvamento de diagramas, permitindo o gerenciamento e recuperação de arquiteturas geradas anteriormente.
+| Camada | Tecnologia |
+|---|---|
+| Frontend | React, Vite, TypeScript, TanStack Router, Primer React, TailwindCSS, Mermaid.js, Styled Components |
+| Backend | NestJS, TypeScript, @google/adk (Agents SDK), JWT, Multer |
+| Banco de dados | Supabase (PostgreSQL) |
+| IA | Google Gemini (via Gemini SDK e ADK) |
 
----
-
-## 🏗 Estrutura do Repositório
-
-Este repositório está organizado no formato de **Monorepo**, facilitando o compartilhamento de configurações, dependências e código (via workspaces do Bun/npm).
+## Estrutura do monorepo
 
 ```text
-/
-├── apps/                 # Aplicações principais do sistema
-│   ├── api/m2a-api/      # Backend da aplicação (NestJS)
-│   └── web/              # Frontend da aplicação (React + Vite)
-├── package.json          # Gerenciamento de dependências root (Workspaces)
-├── bun.lock              # Lockfile do gerenciador de pacotes Bun
-└── README.md             # Esta documentação
+.
+├── apps
+│   ├── api (m2a-api)      # Backend NestJS
+│   │   └── src
+│   │       └── modules    # Módulos da API (Auth, Users, Teams, Diagrams, Agents)
+│   └── web                # Frontend React + Vite
+│       └── src
+│           ├── features   # Funcionalidades principais (Auth, Teams, Diagrams)
+│           └── shared     # Componentes e hooks compartilhados
+├── package.json           # Configurações do monorepo
+└── README.md              # Este arquivo
 ```
 
----
+## Como rodar localmente
 
-## 📁 Organização dos Arquivos e Tecnologias
+### Pré-requisitos
+- Node.js (v20+)
+- Bun (recomendado) ou npm
 
-### 1. Frontend (`apps/web/`)
-A interface do usuário é construída visando performance, design moderno e usabilidade.
+### Instalação
 
-- **Tecnologias**: React, Vite, TypeScript, Tailwind CSS, Radix UI, TanStack Router, TanStack Query, Mermaid, Recharts.
-- **Estrutura interna (`apps/web/src/`)**:
-  - `components/`: Componentes visuais reutilizáveis da interface (ex: modais, botões, painéis).
-  - `routes/`: Definições das páginas da aplicação utilizando o TanStack Router.
-  - `services/`: Lógica de comunicação com a API backend (m2a-api).
-  - `hooks/`: Hooks customizados do React para encapsulamento de lógicas complexas.
-  - `lib/`: Utilitários e configurações gerais (ex: clientes HTTP, configurações de estilo).
-  - `types/`: Definições de tipos do TypeScript compartilhados no frontend.
-
-### 2. Backend (`apps/api/m2a-api/`)
-A API é responsável por orquestrar a lógica de negócios, integração com LLMs e banco de dados.
-
-- **Tecnologias**: NestJS, TypeScript, Supabase (Banco de dados e Auth), Google ADK, Zod.
-- **Estrutura interna (`apps/api/m2a-api/src/`)**:
-  - `modules/`: Funcionalidades do sistema divididas em módulos isolados (ex: `agents`, `auth`, `diagrams`).
-    - Ex: O módulo `agents` contém os serviços que se comunicam com a IA para processar os prompts e extrair o código JSON/Mermaid de arquitetura.
-  - `main.ts`: Ponto de entrada (entry point) da aplicação NestJS.
-  - `app.module.ts`: Módulo raiz que importa e gerencia todas as dependências da API.
-
----
-
-## 🚀 Como Executar Localmente
-
-Certifique-se de ter o **Bun** e o **Node.js** instalados em sua máquina.
-
-1. **Instale as dependências:**
-   No diretório raiz, execute:
+1. Instale as dependências na raiz:
    ```bash
    bun install
    ```
 
-2. **Configure as Variáveis de Ambiente:**
-   Crie arquivos `.env` dentro de `apps/web/` e `apps/api/m2a-api/` (você pode se basear em `.env.example` se disponível) com as chaves do Supabase, porta da API e chaves da API de IA (Google ADK).
+2. Configure as variáveis de ambiente (veja abaixo).
 
-3. **Inicie o Backend (API):**
-   ```bash
-   bun run dev:api
-   ```
-   *O backend subirá em modo de desenvolvimento (watch).*
+3. Inicie os projetos:
+   - Backend: `cd apps/api/m2a-api && bun run start:dev`
+   - Frontend: `cd apps/web && bun run dev`
 
-4. **Inicie o Frontend (Web):**
-   Abra um novo terminal e execute:
-   ```bash
-   bun run dev:web
-   ```
-   *A interface estará acessível via `localhost` na porta informada pelo Vite.*
+### Variáveis de ambiente
 
----
+**`apps/api/m2a-api/.env`**
+- `SUPABASE_URL`: URL do seu projeto Supabase.
+- `SUPABASE_SERVICE_KEY`: Service Role Key do Supabase.
+- `GEMINI_API_KEY`: Chave de API do Google Gemini.
+- `GEMINI_MODEL`: Modelo do Gemini (ex: `gemini-1.5-flash`).
+- `JWT_SECRET`: Segredo para assinatura de tokens JWT.
 
-## 📄 Licença
+**`apps/web/.env`**
+- `VITE_API_URL`: URL base da API (ex: `http://localhost:3000`).
 
-Este projeto é desenvolvido para fins específicos descritos no contexto do repositório. Consulte o arquivo `LICENSE` (se aplicável) para mais detalhes sobre os direitos de uso e distribuição.
+## Módulos da API
+
+### Auth
+- `POST /auth/login`: Realiza o login do usuário.
+
+### Users
+- `POST /user`: Registra um novo usuário.
+- `GET /user/me`: Retorna os dados do usuário autenticado.
+- `GET /user/:id`: Busca um usuário por ID.
+- `GET /user/get-by-email/:email`: Busca um usuário por e-mail.
+- `PATCH /user/:id`: Atualiza dados do usuário.
+- `PATCH /user/:id/password`: Altera a senha do usuário.
+- `DELETE /user/:id`: Desativa um usuário.
+
+### Teams
+- `GET /teams`: Lista os times do usuário.
+- `POST /teams`: Cria um novo time.
+- `GET /teams/:id`: Detalhes de um time.
+- `PATCH /teams/:id`: Atualiza dados do time.
+- `DELETE /teams/:id`: Remove um time.
+- `GET /teams/invites/me`: Lista convites pendentes para o usuário.
+- `POST /teams/:id/invite`: Convida um membro para o time.
+- `PATCH /teams/invites/:inviteId/respond`: Aceita ou recusa um convite.
+
+### Diagrams
+- `GET /diagrams`: Lista diagramas criados pelo usuário.
+- `GET /diagrams/trash`: Lista diagramas na lixeira.
+- `PATCH /diagrams/:id`: Atualiza um diagrama.
+- `PATCH /diagrams/:id/restore`: Restaura um diagrama da lixeira.
+- `DELETE /diagrams/:id`: Move um diagrama para a lixeira.
+- `DELETE /diagrams/:id/permanent`: Exclui permanentemente um diagrama.
+- `GET /diagrams/team/:teamId`: Lista diagramas de um time.
+- `POST /diagrams/:id/add-to-team`: Associa ou solicita adição de diagrama a um time.
+- `GET /diagrams/team/:teamId/requests`: Lista solicitações de aprovação de diagramas.
+- `PATCH /diagrams/requests/:requestId/respond`: Responde a uma solicitação de aprovação.
+
+### Agents
+- `POST /agents/generate`: Processa um arquivo (PDF/MD) e gera um diagrama via IA.
+
+## Arquitetura de agentes
+
+O M2A utiliza uma arquitetura de multi-agentes baseada no `@google/adk`:
+
+- **Software Architect (Orchestrator)**: O agente principal que coordena o fluxo de trabalho.
+- **Transcript Analyzer**: Especialista em extrair contexto técnico e lógico de documentos brutos.
+- **UML Architect**: Especialista em gerar código Mermaid para diagramas UML (Classe, Sequência, Estado, etc.).
+- **C4 Architect**: Especialista em gerar código Mermaid para o modelo C4 (Contexto, Containers, Componentes).
+
+## Licença
+
+MIT

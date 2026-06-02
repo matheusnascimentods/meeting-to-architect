@@ -107,13 +107,7 @@ export class DiagramsService {
     if (error) throw new Error(`Falha ao excluir diagrama: ${error.message}`);
   }
 
-  async save(diagram: {
-    title: string;
-    description: string;
-    mermaid_code: string;
-    created_by: string;
-    type: string;
-  }) {
+  async save(diagram: CreateDiagramDto) {
     const { data, error } = await this.supabase
       .getClient()
       .from('Diagrams')
@@ -289,6 +283,11 @@ export class DiagramsService {
       .single();
 
     if (error || !data) throw new NotFoundException('Time não encontrado');
+    if (data.role !== 'admin')
+      throw new ForbiddenException('Apenas admins podem realizar esta ação');
+  }
+}
+Exception('Time não encontrado');
     if (data.role !== 'admin')
       throw new ForbiddenException('Apenas admins podem realizar esta ação');
   }
