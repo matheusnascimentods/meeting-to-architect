@@ -9,7 +9,7 @@ export class AuthService {
   constructor(
     private readonly supabaseService: SupabaseService,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   async login(email: string, password: string) {
     const { data } = await this.supabaseService
@@ -22,7 +22,8 @@ export class AuthService {
     if (!data) throw new UnauthorizedException('Invalid credentials');
 
     const isPasswordValid = await bcrypt.compare(password, data.password_hash);
-    if (!isPasswordValid) throw new UnauthorizedException('Invalid credentials');
+    if (!isPasswordValid)
+      throw new UnauthorizedException('Invalid credentials');
 
     return {
       message: 'Login successful',
