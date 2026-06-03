@@ -5,15 +5,15 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { SupabaseService } from '../supabase/index.service';
 import * as bcrypt from 'bcrypt';
 import { ChangePasswordDto, UpdateUserDto, User } from './index.schema';
 import { AuthService } from '../auth/index.service';
+import { UsersRepository } from './index.repository';
 
 @Injectable()
 export class UsersService {
   constructor(
-    private readonly supabase: SupabaseService,
+    private readonly repository: UsersRepository,
     private readonly authService: AuthService,
   ) {}
 
@@ -23,21 +23,11 @@ export class UsersService {
 
     const hash = await bcrypt.hash(password, 10);
 
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('Users')
-      .insert([
-        {
-          email,
-          password_hash: hash,
-          name,
-        },
-      ])
-      .select()
-      .single<User>();
-
-    if (error || !data)
-      throw new Error(error?.message || 'Error creating user');
+    const data = await this.repository.create({
+      email,
+      passwordHash: hash,
+      name,
+    });
 
     return {
       message: 'User was created successfully',
@@ -49,39 +39,38 @@ export class UsersService {
   }
 
   async findById(id: string): Promise<User> {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('Users')
-      .select('*')
-      .eq('id', id)
-      .single<User>();
-
-    if (error || !data) throw new NotFoundException('User not found');
-    return data;
+    const data = await this.repository.findById(id);
+    if (!data) throw new NotFoundException('User not found');
+    return {
+      id: data.id,
+      email: data.email,
+      name: data.name,
+      password_hash: data.passwordHash,
+      created_at: data.createdAt.toISOString(),
+    };
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const { data } = await this.supabase
-      .getClient()
-      .from('Users')
-      .select('*')
-      .eq('email', email)
-      .single<User>();
-
-    return data;
+    const data = await this.repository.findByEmail(email);
+    if (!data) return null;
+    return {
+      id: data.id,
+      email: data.email,
+      name: data.name,
+      password_hash: data.passwordHash,
+      created_at: data.createdAt.toISOString(),
+    };
   }
 
   async delete(id: string, requesterId: string): Promise<void> {
     if (id !== requesterId)
       throw new ForbiddenException('You do not have permission to delete this user');
 
-    const { error } = await this.supabase
-      .getClient()
-      .from('Users')
-      .update({ is_active: false, updated_at: new Date().toISOString() })
-      .eq('id', id);
-
-    if (error) throw new Error(`Failed to deactivate user: ${error.message}`);
+    try {
+      await this.repository.delete(id);
+    } catch (error) {
+      throw new Error(`Failed to deactivate user: ${error.message}`);
+    }
   }
 
   async update(
@@ -92,13 +81,11 @@ export class UsersService {
     if (id !== requesterId)
       throw new ForbiddenException('You do not have permission to update this user');
 
-    const { error } = await this.supabase
-      .getClient()
-      .from('Users')
-      .update({ ...dto, updated_at: new Date().toISOString() })
-      .eq('id', id);
-
-    if (error) throw new Error(`Failed to update user: ${error.message}`);
+    try {
+      await this.repository.update(id, dto);
+    } catch (error) {
+      throw new Error(`Failed to update user: ${error.message}`);
+    }
   }
 
   async changePassword(
@@ -111,30 +98,23 @@ export class UsersService {
         'You do not have permission to change this user password',
       );
 
-    const { data, error: findError } = await this.supabase
-      .getClient()
-      .from('Users')
-      .select('password_hash')
-      .eq('id', id)
-      .single();
+    const data = await this.repository.findById(id);
 
-    if (findError || !data)
+    if (!data)
       throw new NotFoundException('User not found');
 
     const isMatch = await bcrypt.compare(
       dto.currentPassword,
-      data.password_hash,
+      data.passwordHash,
     );
     if (!isMatch) throw new UnauthorizedException('Incorrect current password');
 
     const newHash = await bcrypt.hash(dto.newPassword, 10);
 
-    const { error } = await this.supabase
-      .getClient()
-      .from('Users')
-      .update({ password_hash: newHash, updated_at: new Date().toISOString() })
-      .eq('id', id);
-
-    if (error) throw new Error(`Failed to change password: ${error.message}`);
+    try {
+      await this.repository.update(id, { passwordHash: newHash });
+    } catch (error) {
+      throw new Error(`Failed to change password: ${error.message}`);
+    }
   }
 }

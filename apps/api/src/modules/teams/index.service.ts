@@ -3,118 +3,86 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { SupabaseService } from '../supabase/index.service';
-import { CreateTeamDto, UpdateTeamDto, Team } from './index.schema';
+import { CreateTeamDto, UpdateTeamDto } from './index.schema';
+import { TeamsRepository } from './index.repository';
+import { UserRole } from '@prisma/client';
 
 @Injectable()
 export class TeamsService {
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(private readonly repository: TeamsRepository) {}
 
-  async create(dto: CreateTeamDto, userId: string): Promise<Team> {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('Teams')
-      .insert({ name: dto.name, created_by: userId })
-      .select()
-      .single();
-
-    if (error) throw new Error(`Failed to create team: ${error.message}`);
-
-    const { error: memberError } = await this.supabase
-      .getClient()
-      .from('Team_Members')
-      .insert({ team_id: data.id, user_id: userId, role: 'admin' });
-
-    if (memberError) {
-      console.error('Error adding member:', memberError);
-      throw new Error(
-        `Failed to link user to team: ${memberError.message}`,
-      );
+  async create(dto: CreateTeamDto, userId: string) {
+    try {
+      return await this.repository.create(dto.name, userId);
+    } catch (error) {
+      throw new Error(`Failed to create team: ${error.message}`);
     }
-
-    return data;
   }
 
   async findAllByUser(userId: string) {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('Team_Members')
-      .select('team_id, role, Teams (*)')
-      .eq('user_id', userId);
+    try {
+      const data = await this.repository.findAllByUser(userId);
 
-    if (error) {
+      // Map to maintain similar structure as before if needed, 
+      // although the service was returning Team_Members results.
+      // The original code was: .select('team_id, role, Teams (*)')
+      return data.map(item => ({
+        team_id: item.teamId,
+        role: item.role.toLowerCase(),
+        Teams: item.team
+      }));
+    } catch (error) {
       console.error('Error fetching teams:', error);
       throw new Error(`Failed to fetch teams: ${error.message}`);
     }
-
-    if (!data) return [];
-
-    // Filter duplicates by team_id to avoid UI issues with legacy data
-    const uniqueTeams = Array.from(
-      new Map(data.map((item) => [item.team_id, item])).values(),
-    );
-
-    return uniqueTeams;
   }
 
   async findById(id: string, userId: string) {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('Team_Members')
-      .select('role, Teams(*)')
-      .eq('team_id', id)
-      .eq('user_id', userId)
-      .limit(1);
+    const data = await this.repository.findMemberByTeamAndUser(id, userId);
 
-    if (error || !data || data.length === 0)
+    if (!data)
       throw new NotFoundException('Team not found');
-    return data[0];
+    
+    return {
+      role: data.role.toLowerCase(),
+      Teams: data.team
+    };
   }
 
   async update(id: string, userId: string, dto: UpdateTeamDto): Promise<void> {
     await this.verifyAdmin(id, userId);
 
-    const { error } = await this.supabase
-      .getClient()
-      .from('Teams')
-      .update({ ...dto, updated_at: new Date().toISOString() })
-      .eq('id', id);
-
-    if (error) throw new Error(`Failed to update team: ${error.message}`);
+    try {
+      await this.repository.update(id, dto);
+    } catch (error) {
+      throw new Error(`Failed to update team: ${error.message}`);
+    }
   }
 
   async delete(id: string, userId: string): Promise<void> {
     await this.verifyAdmin(id, userId);
 
-    const { error } = await this.supabase
-      .getClient()
-      .from('Teams')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw new Error(`Failed to delete team: ${error.message}`);
+    try {
+      await this.repository.delete(id);
+    } catch (error) {
+      throw new Error(`Failed to delete team: ${error.message}`);
+    }
   }
 
   private async verifyRole(
     teamId: string,
     userId: string,
-    allowedRoles: string[],
+    allowedRoles: UserRole[],
   ): Promise<void> {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('Team_Members')
-      .select('role')
-      .eq('team_id', teamId)
-      .eq('user_id', userId)
-      .limit(1);
+    const role = await this.repository.getMemberRole(teamId, userId);
 
-    if (error || !data || data.length === 0)
+    if (!role)
       throw new NotFoundException('Team not found');
-    if (!allowedRoles.includes(data[0].role))
+    if (!allowedRoles.includes(role))
       throw new ForbiddenException('You do not have permission for this action');
   }
 
   private async verifyAdmin(teamId: string, userId: string): Promise<void> {
-    return this.verifyRole(teamId, userId, ['admin']);
+    return this.verifyRole(teamId, userId, [UserRole.ADMIN]);
   }
 }

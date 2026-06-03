@@ -3,23 +3,29 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { SupabaseService } from '../supabase/index.service';
+import { MembersRepository } from './index.repository';
+import { UserRole } from '@prisma/client';
 
 @Injectable()
 export class MembersService {
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(private readonly repository: MembersRepository) {}
 
   async getMembers(teamId: string, userId: string) {
-    await this.verifyRole(teamId, userId, ['admin', 'maintainer', 'member']);
+    await this.verifyRole(teamId, userId, [UserRole.ADMIN, UserRole.MAINTAINER, UserRole.MEMBER]);
 
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('Team_Members')
-      .select('team_id, user_id, role, joined_at, Users(id, name, email)')
-      .eq('team_id', teamId);
-
-    if (error) throw new Error(`Failed to fetch members: ${error.message}`);
-    return data;
+    try {
+      const data = await this.repository.findMembersByTeam(teamId);
+      // Map to maintain structure: .select('team_id, user_id, role, joined_at, Users(id, name, email)')
+      return data.map(item => ({
+        team_id: item.teamId,
+        user_id: item.userId,
+        role: item.role.toLowerCase(),
+        joined_at: item.joinedAt,
+        Users: item.user
+      }));
+    } catch (error) {
+      throw new Error(`Failed to fetch members: ${error.message}`);
+    }
   }
 
   async updateMemberRole(
@@ -28,16 +34,17 @@ export class MembersService {
     memberUserId: string,
     role: 'admin' | 'member' | 'maintainer',
   ): Promise<void> {
-    await this.verifyRole(teamId, adminId, ['admin']);
+    await this.verifyRole(teamId, adminId, [UserRole.ADMIN]);
 
-    const { error } = await this.supabase
-      .getClient()
-      .from('Team_Members')
-      .update({ role })
-      .eq('team_id', teamId)
-      .eq('user_id', memberUserId);
-
-    if (error) throw new Error(`Failed to update role: ${error.message}`);
+    try {
+      await this.repository.updateRole(
+        teamId, 
+        memberUserId, 
+        role.toUpperCase() as UserRole
+      );
+    } catch (error) {
+      throw new Error(`Failed to update role: ${error.message}`);
+    }
   }
 
   async removeMember(
@@ -45,34 +52,25 @@ export class MembersService {
     adminId: string,
     memberUserId: string,
   ): Promise<void> {
-    await this.verifyRole(teamId, adminId, ['admin']);
+    await this.verifyRole(teamId, adminId, [UserRole.ADMIN]);
 
-    const { error } = await this.supabase
-      .getClient()
-      .from('Team_Members')
-      .delete()
-      .eq('team_id', teamId)
-      .eq('user_id', memberUserId);
-
-    if (error) throw new Error(`Failed to remove member: ${error.message}`);
+    try {
+      await this.repository.removeMember(teamId, memberUserId);
+    } catch (error) {
+      throw new Error(`Failed to remove member: ${error.message}`);
+    }
   }
 
   private async verifyRole(
     teamId: string,
     userId: string,
-    allowedRoles: string[],
+    allowedRoles: UserRole[],
   ): Promise<void> {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('Team_Members')
-      .select('role')
-      .eq('team_id', teamId)
-      .eq('user_id', userId)
-      .limit(1);
+    const role = await this.repository.getMemberRole(teamId, userId);
 
-    if (error || !data || data.length === 0)
+    if (!role)
       throw new NotFoundException('Team not found');
-    if (!allowedRoles.includes(data[0].role))
+    if (!allowedRoles.includes(role))
       throw new ForbiddenException('You do not have permission for this action');
   }
 }

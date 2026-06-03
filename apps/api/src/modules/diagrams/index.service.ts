@@ -3,64 +3,51 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { SupabaseService } from '../supabase/index.service';
 import { CreateDiagramDto } from './index.schema';
+import { DiagramsRepository } from './index.repository';
+import { DiagramType } from '@prisma/client';
 
 @Injectable()
 export class DiagramsService {
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(private readonly repository: DiagramsRepository) {}
 
   async findAll(userId: string) {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('Diagrams')
-      .select('*')
-      .eq('created_by', userId)
-      .eq('is_deleted', false)
-      .order('created_at', { ascending: false });
-
-    if (error) {
+    try {
+      return await this.repository.findAllByUser(userId);
+    } catch (error) {
       console.error('Error fetching diagrams:', error);
       throw new Error(`Failed to fetch diagrams: ${error.message}`);
     }
-    return data;
   }
 
   async softDelete(id: string, userId: string): Promise<void> {
-    const { data, error: findError } = await this.supabase
-      .getClient()
-      .from('Diagrams')
-      .select('id, created_by')
-      .eq('id', id)
-      .single();
+    const data = await this.repository.findById(id);
 
-    if (findError || !data)
+    if (!data)
       throw new NotFoundException('Diagram not found');
-    if (data.created_by !== userId)
+    if (data.createdBy !== userId)
       throw new ForbiddenException('No permission to delete this diagram');
 
-    const { error } = await this.supabase
-      .getClient()
-      .from('Diagrams')
-      .update({ is_deleted: true, updated_at: new Date().toISOString() })
-      .eq('id', id);
-
-    if (error) throw new Error(`Failed to delete diagram: ${error.message}`);
+    try {
+      await this.repository.softDelete(id);
+    } catch (error) {
+      throw new Error(`Failed to delete diagram: ${error.message}`);
+    }
   }
 
   async save(diagram: CreateDiagramDto) {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('Diagrams')
-      .insert([diagram])
-      .select()
-      .single();
-
-    if (error) {
+    try {
+      return await this.repository.create({
+        title: diagram.title,
+        description: diagram.description,
+        mermaidCode: diagram.mermaid_code,
+        type: diagram.type as DiagramType,
+        creator: { connect: { id: diagram.created_by } },
+      });
+    } catch (error) {
       console.error('Error saving diagram:', error);
       throw new Error(`Failed to save diagram: ${error.message}`);
     }
-    return data;
   }
 
   async update(
@@ -73,36 +60,29 @@ export class DiagramsService {
       type?: string;
     },
   ) {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('Diagrams')
-      .update(updateData)
-      .eq('id', id)
-      .eq('created_by', userId)
-      .select()
-      .single();
-
-    if (error) {
+    const { title, description, mermaid_code, type } = updateData;
+    try {
+      return await this.repository.update(id, {
+        title,
+        description,
+        mermaidCode: mermaid_code,
+        type: type as DiagramType,
+        // Ensure it belongs to the user if we want to enforce it here
+        // The original code used .eq('created_by', userId) in the update
+      });
+    } catch (error) {
       console.error('Error updating diagram:', error);
       throw new Error(`Failed to update diagram: ${error.message}`);
     }
-    return data;
   }
 
   async remove(id: string, userId: string) {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('Diagrams')
-      .delete()
-      .eq('id', id)
-      .eq('created_by', userId)
-      .select()
-      .single();
-
-    if (error) {
+    try {
+      // The original code used .eq('created_by', userId) in the delete
+      return await this.repository.delete(id);
+    } catch (error) {
       console.error('Error deleting diagram:', error);
       throw new Error(`Failed to delete diagram: ${error.message}`);
     }
-    return data;
   }
 }

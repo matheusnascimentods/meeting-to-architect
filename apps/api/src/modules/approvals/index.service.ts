@@ -3,38 +3,32 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { SupabaseService } from '../supabase/index.service';
+import { ApprovalsRepository } from './index.repository';
+import { ApprovalStatus, UserRole } from '@prisma/client';
 
 @Injectable()
 export class ApprovalsService {
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(private readonly repository: ApprovalsRepository) {}
 
   async getTeamRequests(teamId: string, userId: string) {
-    const { data: members, error: memberError } = await this.supabase
-      .getClient()
-      .from('Team_Members')
-      .select('role')
-      .eq('team_id', teamId)
-      .eq('user_id', userId)
-      .limit(1);
+    const role = await this.repository.getMemberRole(teamId, userId);
 
-    if (memberError || !members || members.length === 0)
+    if (!role)
       throw new ForbiddenException('You are not a member of this team');
 
-    const member = members[0];
+    if (role !== UserRole.ADMIN && role !== UserRole.MAINTAINER) return [];
 
-    if (member.role !== 'admin' && member.role !== 'maintainer') return [];
-
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('Diagram_Approval_Requests')
-      .select('*, Diagrams(title, type), Users!requested_by(name, email)')
-      .eq('team_id', teamId)
-      .eq('status', 'pending');
-
-    if (error)
+    try {
+      const data = await this.repository.findPendingByTeam(teamId);
+      // Map to maintain structure: Diagrams(title, type), Users!requested_by(name, email)
+      return data.map(item => ({
+        ...item,
+        Diagrams: item.diagram,
+        Users: item.requester
+      }));
+    } catch (error) {
       throw new Error(`Failed to fetch requests: ${error.message}`);
-    return data ?? [];
+    }
   }
 
   async respondRequest(
@@ -42,53 +36,38 @@ export class ApprovalsService {
     adminId: string,
     approve: boolean,
   ): Promise<void> {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('Diagram_Approval_Requests')
-      .select('*')
-      .eq('id', requestId)
-      .single();
+    const data = await this.repository.findById(requestId);
 
-    if (error || !data)
+    if (!data)
       throw new NotFoundException('Request not found');
 
-    await this.verifyRole(data.team_id, adminId, ['admin', 'maintainer']);
+    await this.verifyRole(data.teamId, adminId, [UserRole.ADMIN, UserRole.MAINTAINER]);
 
-    await this.supabase
-      .getClient()
-      .from('Diagram_Approval_Requests')
-      .update({
-        status: approve ? 'approved' : 'rejected',
-        reviewed_by: adminId,
-        reviewed_at: new Date().toISOString(),
-      })
-      .eq('id', requestId);
+    try {
+      await this.repository.updateStatus(
+        requestId,
+        approve ? ApprovalStatus.ACCEPTED : ApprovalStatus.REJECTED,
+        adminId
+      );
 
-    if (approve) {
-      await this.supabase
-        .getClient()
-        .from('Diagrams')
-        .update({ team_id: data.team_id, updated_at: new Date().toISOString() })
-        .eq('id', data.diagram_id);
+      if (approve) {
+        await this.repository.updateDiagramTeam(data.diagramId, data.teamId);
+      }
+    } catch (error) {
+      throw new Error(`Failed to respond to request: ${error.message}`);
     }
   }
 
   private async verifyRole(
     teamId: string,
     userId: string,
-    allowedRoles: string[],
+    allowedRoles: UserRole[],
   ): Promise<void> {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('Team_Members')
-      .select('role')
-      .eq('team_id', teamId)
-      .eq('user_id', userId)
-      .limit(1);
+    const role = await this.repository.getMemberRole(teamId, userId);
 
-    if (error || !data || data.length === 0)
+    if (!role)
       throw new NotFoundException('Team not found');
-    if (!allowedRoles.includes(data[0].role))
+    if (!allowedRoles.includes(role))
       throw new ForbiddenException('You do not have permission for this action');
   }
 }

@@ -1,0 +1,170 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- Enums ---
+
+enum UserRole {
+  ADMIN
+  MEMBER
+  MAINTAINER
+
+  @@map("role")
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+
+  @@map("status")
+}
+
+enum ApprovalStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+
+  @@map("approval_status")
+}
+
+enum DiagramType {
+  // UML Types
+  FLOWCHART
+  SEQUENCE
+  CLASS
+  STATE
+  ENTITY_RELATIONSHIP
+  USER_JOURNEY
+  GANTT
+  PIE_CHART
+  QUADRANT_CHART
+  REQUIREMENT
+  GITGRAPH
+  MINDMAP
+  TIMELINE
+  SANKEY
+  // C4 Types
+  C4_CONTEXT
+  C4_CONTAINER
+  C4_COMPONENT
+  C4_DYNAMIC
+  C4_DEPLOYMENT
+
+  @@map("diagram_type")
+}
+
+// --- Models ---
+
+model User {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  isActive      Boolean   @default(true) @map("is_active")
+  lastLoginAt   DateTime? @map("last_login_at") @db.Timestamptz
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  teamMemberships     TeamMember[]
+  sentInvites         TeamInvite[]      @relation("InvitedBy")
+  receivedInvites     TeamInvite[]      @relation("InvitedUser")
+  createdDiagrams     Diagram[]
+  requestedApprovals  ApprovalRequest[] @relation("RequestedBy")
+  reviewedApprovals   ApprovalRequest[] @relation("ReviewedBy")
+
+  @@map("Users")
+}
+
+model Team {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  members          TeamMember[]
+  invites          TeamInvite[]
+  diagrams         Diagram[]
+  approvalRequests ApprovalRequest[]
+
+  @@map("Teams")
+}
+
+model TeamMember {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  teamId    String   @map("team_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  role      UserRole
+  joinedAt  DateTime @default(now()) @map("joined_at") @db.Timestamptz
+
+  // Relations
+  team Team @relation(fields: [teamId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("Team_Members")
+}
+
+model TeamInvite {
+  id            String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  teamId        String       @map("team_id") @db.Uuid
+  invitedBy     String       @map("invited_by") @db.Uuid
+  invitedUserId String?      @map("invited_user_id") @db.Uuid
+  status        InviteStatus @default(PENDING)
+  createdAt     DateTime?    @default(now()) @map("created_at") @db.Timestamptz
+
+  // Relations
+  team        Team  @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  inviter     User  @relation("InvitedBy", fields: [invitedBy], references: [id])
+  invitedUser User? @relation("InvitedUser", fields: [invitedUserId], references: [id])
+
+  @@map("Team_Invites")
+}
+
+model Diagram {
+  id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title        String
+  description  String
+  type         DiagramType
+  mermaidCode  String      @map("mermaid_code")
+  createdBy    String      @map("created_by") @db.Uuid
+  teamId       String?     @map("team_id") @db.Uuid
+  isDeleted    Boolean     @default(false) @map("is_deleted")
+  createdAt    DateTime    @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  creator          User              @relation(fields: [createdBy], references: [id])
+  team             Team?             @relation(fields: [teamId], references: [id])
+  approvalRequests ApprovalRequest[]
+
+  @@map("Diagrams")
+}
+
+model ApprovalRequest {
+  id          String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  diagramId   String         @map("diagram_id") @db.Uuid
+  teamId      String         @map("team_id") @db.Uuid
+  requestedBy String         @map("requested_by") @db.Uuid
+  reviewedBy  String?        @map("reviewed_by") @db.Uuid
+  status      ApprovalStatus @default(PENDING)
+  requestedAt DateTime       @default(now()) @map("requested_at") @db.Timestamptz
+  reviewedAt  DateTime?      @map("reviewed_at") @db.Timestamptz
+
+  // Relations
+  diagram   Diagram @relation(fields: [diagramId], references: [id])
+  team      Team    @relation(fields: [teamId], references: [id])
+  requester User    @relation("RequestedBy", fields: [requestedBy], references: [id])
+  reviewer  User?   @relation("ReviewedBy", fields: [reviewedBy], references: [id])
+
+  @@map("Diagram_Approval_Requests")
+}

@@ -14,9 +14,9 @@ import {
   DiagramType,
 } from './index.schema';
 import { getFile } from './helpers/file.helper';
-import { SupabaseService } from '../supabase/index.service';
 import { DiagramsService } from '../diagrams/index.service';
 import { createSoftwareArchitectAgent } from './agents/software-architect.agent';
+import { AgentsRepository } from './index.repository';
 
 @Injectable()
 export class AgentService {
@@ -26,7 +26,7 @@ export class AgentService {
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly supabase: SupabaseService,
+    private readonly repository: AgentsRepository,
     private readonly diagramsService: DiagramsService,
   ) {
     setLogLevel(LogLevel.ERROR);
@@ -75,7 +75,14 @@ export class AgentService {
         type: diagramType,
       });
 
-      return data as DiagramResponse;
+      return {
+        id: data.id,
+        title: data.title,
+        description: data.description,
+        mermaid_code: data.mermaidCode,
+        created_by: data.createdBy,
+        type: data.type.toLowerCase() as any,
+      } as DiagramResponse;
     } catch (error) {
       this.logger.error(
         `Failed to parse agent output. Raw response: ${response}`,

@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { InvitesController } from './index.controller';
 import { InvitesService } from './index.service';
-import { SupabaseModule } from '../supabase/index.module';
+import { InvitesRepository } from './index.repository';
 
 @Module({
-  imports: [SupabaseModule],
   controllers: [InvitesController],
-  providers: [InvitesService],
-  exports: [InvitesService],
+  providers: [InvitesService, InvitesRepository],
+  exports: [InvitesService, InvitesRepository],
 })
 export class InvitesModule {}

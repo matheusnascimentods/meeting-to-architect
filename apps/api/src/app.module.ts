@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { SupabaseModule } from './modules/supabase/index.module';
 import { UsersModule } from './modules/users/index.module';
 import { ConfigModule } from '@nestjs/config';
 import { AgentsModule } from './modules/agents/index.module';
@@ -13,13 +12,14 @@ import { MembersModule } from './modules/members/index.module';
 import { ApprovalsModule } from './modules/approvals/index.module';
 import { TrashModule } from './modules/trash/index.module';
 import { TeamDiagramsModule } from './modules/team-diagrams/index.module';
+import { PrismaModule } from './modules/prisma/index.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    SupabaseModule,
+    PrismaModule,
     UsersModule,
     AgentsModule,
     AuthModule,

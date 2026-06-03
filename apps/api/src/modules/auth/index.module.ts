@@ -3,12 +3,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { AuthController } from './index.controller';
 import { AuthService } from './index.service';
-import { SupabaseModule } from '../supabase/index.module';
+import { AuthRepository } from './index.repository';
 
 @Global()
 @Module({
   imports: [
-    SupabaseModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
@@ -18,7 +17,7 @@ import { SupabaseModule } from '../supabase/index.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, AuthRepository],
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

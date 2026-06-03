@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ApprovalsController } from './index.controller';
 import { ApprovalsService } from './index.service';
-import { SupabaseModule } from '../supabase/index.module';
+import { ApprovalsRepository } from './index.repository';
 
 @Module({
-  imports: [SupabaseModule],
   controllers: [ApprovalsController],
-  providers: [ApprovalsService],
-  exports: [ApprovalsService],
+  providers: [ApprovalsService, ApprovalsRepository],
+  exports: [ApprovalsService, ApprovalsRepository],
 })
 export class ApprovalsModule {}

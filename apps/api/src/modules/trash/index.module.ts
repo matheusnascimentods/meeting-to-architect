@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TrashController } from './index.controller';
 import { TrashService } from './index.service';
-import { SupabaseModule } from '../supabase/index.module';
+import { TrashRepository } from './index.repository';
 
 @Module({
-  imports: [SupabaseModule],
   controllers: [TrashController],
-  providers: [TrashService],
-  exports: [TrashService],
+  providers: [TrashService, TrashRepository],
+  exports: [TrashService, TrashRepository],
 })
 export class TrashModule {}
