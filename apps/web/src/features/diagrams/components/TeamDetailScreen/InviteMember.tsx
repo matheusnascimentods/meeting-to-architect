@@ -17,17 +17,17 @@ export function InviteMember({ onInvite }: Props) {
   return (
     <Box sx={{ mb: 4, p: 3, border: '1px solid', borderColor: 'border.default', borderRadius: 2, bg: 'canvas.subtle' }}>
       <Text sx={{ fontWeight: 'bold', fontSize: 1, display: 'block', mb: 2 }}>
-        Convidar membro
+        Invite member
       </Text>
       <Box sx={{ display: 'flex', gap: 2 }}>
         <TextInput
-          placeholder="email@exemplo.com"
+          placeholder="email@example.com"
           value={inviteEmail}
           onChange={(e) => setInviteEmail(e.target.value)}
           sx={{ flex: 1 }}
         />
         <Button variant="primary" onClick={handleInvite}>
-          Convidar
+          Invite
         </Button>
       </Box>
     </Box>

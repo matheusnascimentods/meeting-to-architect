@@ -91,8 +91,8 @@ export function TeamDetailScreen({ team, onBack }: Props) {
 
         {diagrams.length === 0 ? (
           <EmptyState
-            title="This team does not have any formation"
-            description="Formations approved by the admin will appear here."
+            title="This team does not have any diagrams yet"
+            description="Diagrams approved by the admin will appear here."
           />
         ) : (
           <Box

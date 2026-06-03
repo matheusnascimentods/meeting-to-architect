@@ -14,7 +14,7 @@ export function ComingSoon({ icon: Icon, label }: Props) {
           <Icon size={40} />
         </Blankslate.Visual>
         <Blankslate.Heading>{label}</Blankslate.Heading>
-        <Blankslate.Description>Esta funcionalidade estará disponível em breve.</Blankslate.Description>
+        <Blankslate.Description>This feature will be available soon.</Blankslate.Description>
       </Blankslate>
     </Box>
   );

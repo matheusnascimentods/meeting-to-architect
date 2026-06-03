@@ -33,7 +33,7 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
   useEffect(() => {
     if (showAddToTeam) {
       teamService.findAll().then(setUserTeams).catch(() => {
-        setFlashMessage({ text: 'Falha ao carregar times.', variant: 'danger' });
+        setFlashMessage({ text: 'Failed to load teams.', variant: 'danger' });
         setTimeout(() => setFlashMessage(null), 5000);
       });
     }
@@ -57,14 +57,14 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
       await diagramService.addToTeam(diagram.id, selectedTeamId);
       setFlashMessage({
         text: team?.role === 'admin'
-          ? 'Diagrama adicionado ao time com sucesso.'
-          : 'Solicitação enviada. Aguarde a aprovação do admin.',
+          ? 'Diagram successfully added to the team.'
+          : 'Request sent. Wait for admin approval.',
         variant: 'success'
       });
       setShowAddToTeam(false);
       setTimeout(() => setFlashMessage(null), 5000);
     } catch (err) {
-      setFlashMessage({ text: 'Falha ao adicionar ao time.', variant: 'danger' });
+      setFlashMessage({ text: 'Failed to add to the team.', variant: 'danger' });
       setTimeout(() => setFlashMessage(null), 5000);
     }
   };
@@ -154,6 +154,7 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
       {showAddToTeam && (
         <Dialog
           title="Add to Team"
+          width="small"
           onClose={() => setShowAddToTeam(false)}
           footerButtons={[
             { buttonType: 'default', content: COPY.common.cancel, onClick: () => setShowAddToTeam(false) },
@@ -165,13 +166,13 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
           ]}
         >
           <Box sx={{ p: 3 }}>
-            <Text sx={{ display: 'block', mb: 2 }}>Selecione o time:</Text>
+            <Text sx={{ display: 'block', mb: 2 }}>Select team:</Text>
             <Select
               value={selectedTeamId}
               onChange={(e) => setSelectedTeamId(e.target.value)}
               sx={{ width: '100%' }}
             >
-              <Select.Option value="">Selecione um time...</Select.Option>
+              <Select.Option value="">Select a team...</Select.Option>
               {userTeams.map(ut => (
                 <Select.Option key={ut.team_id} value={ut.team_id}>
                   {ut.Teams?.name || ut.teams?.name}

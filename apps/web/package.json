@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@m2a/shared": "workspace:*",
     "@primer/octicons-react": "^19.14.0",
     "@primer/primitives": "^11.9.0",
     "@primer/react": "^37.12.0",

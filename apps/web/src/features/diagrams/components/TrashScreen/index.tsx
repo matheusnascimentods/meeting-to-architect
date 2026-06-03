@@ -96,7 +96,7 @@ export function TrashScreen({ onNavigate }: Props) {
 
       {diagramToDelete && (
         <Dialog
-          title="Excluir permanentemente?"
+          title="Delete permanently?"
           onClose={() => setDiagramToDelete(null)}
           footerButtons={[
             {
@@ -106,14 +106,14 @@ export function TrashScreen({ onNavigate }: Props) {
             },
             {
               buttonType: 'danger',
-              content: isDeleting ? 'Excluindo...' : 'Excluir permanentemente',
+              content: isDeleting ? 'Deleting...' : 'Delete permanently',
               onClick: () => void handlePermanentDelete(diagramToDelete.id),
               disabled: isDeleting,
             },
           ]}
         >
           <Box sx={{ p: 3 }}>
-            <Text>Esta ação não pode ser desfeita. O diagrama <strong>{diagramToDelete.title}</strong> será removido para sempre.</Text>
+            <Text>This action cannot be undone. The diagram <strong>{diagramToDelete.title}</strong> will be removed forever.</Text>
           </Box>
         </Dialog>
       )}

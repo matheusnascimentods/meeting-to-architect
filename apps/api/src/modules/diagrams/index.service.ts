@@ -173,9 +173,9 @@ export class DiagramsService {
       .select('user_id')
       .eq('team_id', teamId)
       .eq('user_id', userId)
-      .single();
+      .limit(1);
 
-    if (!member.data)
+    if (!member.data || member.data.length === 0)
       throw new ForbiddenException('Você não faz parte deste time');
 
     const { data, error } = await this.supabase
@@ -196,15 +196,16 @@ export class DiagramsService {
     teamId: string,
     userId: string,
   ): Promise<void> {
-    const { data: member } = await this.supabase
+    const { data: members } = await this.supabase
       .getClient()
       .from('Team_Members')
       .select('role')
       .eq('team_id', teamId)
       .eq('user_id', userId)
-      .single();
+      .limit(1);
 
-    if (!member) throw new ForbiddenException('Você não faz parte deste time');
+    if (!members || members.length === 0) throw new ForbiddenException('Você não faz parte deste time');
+    const member = members[0];
 
     if (member.role === 'admin') {
       await this.supabase
@@ -226,16 +227,18 @@ export class DiagramsService {
   }
 
   async getTeamRequests(teamId: string, userId: string) {
-    const { data: member, error: memberError } = await this.supabase
+    const { data: members, error: memberError } = await this.supabase
       .getClient()
       .from('Team_Members')
       .select('role')
       .eq('team_id', teamId)
       .eq('user_id', userId)
-      .single();
+      .limit(1);
 
-    if (memberError || !member)
+    if (memberError || !members || members.length === 0)
       throw new ForbiddenException('Você não faz parte deste time');
+
+    const member = members[0];
 
     if (member.role !== 'admin') return [];
 
@@ -292,10 +295,10 @@ export class DiagramsService {
       .select('role')
       .eq('team_id', teamId)
       .eq('user_id', userId)
-      .single();
+      .limit(1);
 
-    if (error || !data) throw new NotFoundException('Time não encontrado');
-    if (data.role !== 'admin')
+    if (error || !data || data.length === 0) throw new NotFoundException('Time não encontrado');
+    if (data[0].role !== 'admin')
       throw new ForbiddenException('Apenas admins podem realizar esta ação');
   }
 }

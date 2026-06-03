@@ -47,7 +47,14 @@ export class TeamsService {
       throw new Error(`Falha ao buscar times: ${error.message}`);
     }
 
-    return data ?? [];
+    if (!data) return [];
+
+    // Filter duplicates by team_id to avoid UI issues with legacy data
+    const uniqueTeams = Array.from(
+      new Map(data.map((item) => [item.team_id, item])).values(),
+    );
+
+    return uniqueTeams;
   }
 
   async findById(id: string, userId: string) {
@@ -57,10 +64,10 @@ export class TeamsService {
       .select('role, Teams(*)')
       .eq('team_id', id)
       .eq('user_id', userId)
-      .single();
+      .limit(1);
 
-    if (error || !data) throw new NotFoundException('Time não encontrado');
-    return data;
+    if (error || !data || data.length === 0) throw new NotFoundException('Time não encontrado');
+    return data[0];
   }
 
   async update(id: string, userId: string, dto: UpdateTeamDto): Promise<void> {
@@ -151,10 +158,20 @@ export class TeamsService {
       .eq('id', inviteId);
 
     if (accept) {
-      await this.supabase
+      const { data: existing } = await this.supabase
         .getClient()
         .from('Team_Members')
-        .insert({ team_id: data.team_id, user_id: userId, role: 'member' });
+        .select('id')
+        .eq('team_id', data.team_id)
+        .eq('user_id', userId)
+        .limit(1);
+
+      if (!existing || existing.length === 0) {
+        await this.supabase
+          .getClient()
+          .from('Team_Members')
+          .insert({ team_id: data.team_id, user_id: userId, role: 'member' });
+      }
     }
   }
 
@@ -165,10 +182,10 @@ export class TeamsService {
       .select('role')
       .eq('team_id', teamId)
       .eq('user_id', userId)
-      .single();
+      .limit(1);
 
-    if (error || !data) throw new NotFoundException('Time não encontrado');
-    if (data.role !== 'admin')
+    if (error || !data || data.length === 0) throw new NotFoundException('Time não encontrado');
+    if (data[0].role !== 'admin')
       throw new ForbiddenException('Apenas admins podem realizar esta ação');
   }
 }

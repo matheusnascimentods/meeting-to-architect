@@ -31,15 +31,15 @@ export function TeamRequests({ requests, onRespond }: Props) {
           <Box>
             <Text sx={{ fontWeight: 'bold', display: 'block' }}>{req.Diagrams?.title}</Text>
             <Text sx={{ color: 'fg.muted', fontSize: 0 }}>
-              Solicitado por {req.Users?.name || req.Users?.email} · {req.Diagrams?.type}
+              Requested by {req.Users?.name || req.Users?.email} · {req.Diagrams?.type}
             </Text>
           </Box>
           <Box sx={{ display: 'flex', gap: 2 }}>
             <Button size="small" variant="primary" onClick={() => onRespond(req.id, true)}>
-              Aprovar
+              Approve
             </Button>
             <Button size="small" variant="danger" onClick={() => onRespond(req.id, false)}>
-              Rejeitar
+              Reject
             </Button>
           </Box>
         </Box>

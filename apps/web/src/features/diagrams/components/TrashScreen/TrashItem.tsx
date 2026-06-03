@@ -43,7 +43,7 @@ export function TrashItem({ diagram, onRestore, onDelete }: Props) {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
             <Label variant="danger" size="small">{diagram.type}</Label>
             <Text sx={{ color: 'fg.muted', fontSize: 0 }}>
-              Excluído em {diagram.updated_at ? new Date(diagram.updated_at).toLocaleDateString('pt-BR') : 'Data desconhecida'}
+              Deleted at {diagram.updated_at ? new Date(diagram.updated_at).toLocaleDateString('en-US') : 'Unknown date'}
             </Text>
           </Box>
         </Box>
@@ -64,7 +64,7 @@ export function TrashItem({ diagram, onRestore, onDelete }: Props) {
             },
           }}
         >
-          Restaurar
+          Restore
         </Button>
         <Button
           size="small"

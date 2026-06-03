@@ -6,7 +6,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:web": "bun run --cwd apps/web dev",
-    "dev:api": "bun run --cwd apps/api/m2a-api --watch src/main.ts"
+    "dev:web": "npm run --prefix apps/web dev",
+    "dev:api": "npm run --prefix apps/api start:dev"
   }
 }

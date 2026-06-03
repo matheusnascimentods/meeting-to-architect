@@ -21,14 +21,14 @@ export function InviteItem({ invite, onRespond }: Props) {
     }}>
       <Box>
         <Text sx={{ fontWeight: 'bold', display: 'block' }}>{invite.Teams?.name}</Text>
-        <Text sx={{ color: 'fg.muted', fontSize: 0 }}>Você foi convidado para este time</Text>
+        <Text sx={{ color: 'fg.muted', fontSize: 0 }}>You have been invited to this team</Text>
       </Box>
       <Box sx={{ display: 'flex', gap: 2 }}>
         <Button size="small" variant="primary" onClick={() => onRespond(invite.id, true)}>
-          Aceitar
+          Accept
         </Button>
         <Button size="small" variant="danger" onClick={() => onRespond(invite.id, false)}>
-          Recusar
+          Decline
         </Button>
       </Box>
     </Box>

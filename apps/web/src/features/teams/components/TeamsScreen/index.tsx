@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Box, Button, CounterLabel, Text } from "@primer/react";
-import { PeopleIcon, PlusIcon } from "@primer/octicons-react";
+import { PeopleIcon, PlusIcon, MailIcon } from "@primer/octicons-react";
 import { NewTeamDialog } from "../NewTeamDialog";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { TeamDetailScreen } from "@/features/diagrams/components/TeamDetailScreen";
@@ -10,7 +10,7 @@ import { ErrorState } from "@/shared/components/ErrorState";
 import { tokens } from "@/shared/styles/tokens";
 import { COPY } from "@/shared/constants/copy";
 import { TeamItem } from "./TeamItem";
-import { InviteItem } from "./InviteItem";
+import { InvitationsDialog } from "./InvitationsDialog";
 
 type TeamsView =
   | { name: 'list' }
@@ -19,6 +19,7 @@ type TeamsView =
 export function TeamsScreen() {
   const { teams, invites, loading, error, refetch, respondInvite } = useTeams();
   const [isOpen, setIsOpen] = useState(false);
+  const [isInvitesOpen, setIsInvitesOpen] = useState(false);
   const [view, setView] = useState<TeamsView>({ name: 'list' });
 
   if (view.name === 'detail') {
@@ -59,18 +60,37 @@ export function TeamsScreen() {
 
       <Box sx={tokens.container.page}>
         {invites.length > 0 && (
-          <Box sx={{ mb: 4 }}>
-            <Text as="h2" sx={{ fontSize: 2, fontWeight: 'bold', mb: 2 }}>
-              {COPY.teams.invites}
-              <CounterLabel sx={{ ml: 2 }}>{invites.length}</CounterLabel>
+          <Box
+            onClick={() => setIsInvitesOpen(true)}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              p: 3,
+              mb: 4,
+              border: '1px solid',
+              borderColor: 'accent.emphasis',
+              borderRadius: 2,
+              bg: 'accent.subtle',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              "&:hover": {
+                bg: 'accent.muted',
+                transform: 'translateY(-1px)',
+                boxShadow: 'shadow.small',
+              },
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <MailIcon size={20} />
+              <Text sx={{ fontWeight: 'bold', fontSize: 2 }}>{COPY.teams.invites}</Text>
+              <CounterLabel sx={{ bg: 'accent.emphasis', color: 'fg.onEmphasis' }}>
+                {invites.length}
+              </CounterLabel>
+            </Box>
+            <Text sx={{ fontSize: 0, fontWeight: 'bold', color: 'accent.fg' }}>
+              View all pending invitations →
             </Text>
-            {invites.map((invite) => (
-              <InviteItem
-                key={invite.id}
-                invite={invite}
-                onRespond={respondInvite}
-              />
-            ))}
           </Box>
         )}
 
@@ -117,6 +137,14 @@ export function TeamsScreen() {
         <NewTeamDialog
           onClose={() => setIsOpen(false)}
           onSuccess={refetch}
+        />
+      )}
+
+      {isInvitesOpen && (
+        <InvitationsDialog
+          invites={invites}
+          onClose={() => setIsInvitesOpen(false)}
+          onRespond={respondInvite}
         />
       )}
     </Box>
