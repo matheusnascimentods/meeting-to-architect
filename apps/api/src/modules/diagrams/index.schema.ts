@@ -15,10 +15,5 @@ export const createDiagramSchema = z.object({
   type: z.string(),
 });
 
-export const addToTeamSchema = z.object({
-  team_id: z.string().uuid(),
-});
-
 export type UpdateDiagramDto = z.infer<typeof UpdateDiagramSchema>;
 export type CreateDiagramDto = z.infer<typeof createDiagramSchema>;
-export type AddToTeamDto = z.infer<typeof addToTeamSchema>;
