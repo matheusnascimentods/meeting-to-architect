@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Box, CounterLabel, IconButton, Text } from "@primer/react";
-import { ArrowLeftIcon } from "@primer/octicons-react";
+import { ArrowLeftIcon, LawIcon } from "@primer/octicons-react";
 import { Diagram } from "../../types";
 import { DiagramCard } from "../DiagramCard";
 import { DiagramDetail } from "../DiagramDetail";
@@ -10,7 +10,7 @@ import { LoadingState } from "@/shared/components/LoadingState";
 import { ErrorState } from "@/shared/components/ErrorState";
 import { tokens } from "@/shared/styles/tokens";
 import { InviteMember } from "./InviteMember";
-import { TeamRequests } from "./TeamRequests";
+import { RequestsDialog } from "./RequestsDialog";
 
 interface Props {
   team: { id: string; name: string };
@@ -20,6 +20,7 @@ interface Props {
 export function TeamDetailScreen({ team, onBack }: Props) {
   const { role, diagrams, requests, loading, error, refetch, inviteMember, respondRequest } = useTeamDetail(team.id);
   const [selectedDiagram, setSelectedDiagram] = useState<Diagram | null>(null);
+  const [isRequestsOpen, setIsRequestsOpen] = useState(false);
   const isAdmin = role === 'admin';
 
   if (selectedDiagram) {
@@ -68,7 +69,7 @@ export function TeamDetailScreen({ team, onBack }: Props) {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
           <IconButton
             icon={ArrowLeftIcon}
-            aria-label="Voltar para times"
+            aria-label="Back to teams"
             variant="invisible"
             onClick={onBack}
           />
@@ -85,8 +86,39 @@ export function TeamDetailScreen({ team, onBack }: Props) {
           <InviteMember onInvite={inviteMember} />
         )}
 
-        {isAdmin && (
-          <TeamRequests requests={requests} onRespond={respondRequest} />
+        {isAdmin && requests.length > 0 && (
+          <Box
+            onClick={() => setIsRequestsOpen(true)}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              p: 3,
+              mb: 4,
+              border: '1px solid',
+              borderColor: 'attention.emphasis',
+              borderRadius: 2,
+              bg: 'attention.subtle',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              "&:hover": {
+                bg: 'attention.muted',
+                transform: 'translateY(-1px)',
+                boxShadow: 'shadow.small',
+              },
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <LawIcon size={20} />
+              <Text sx={{ fontWeight: 'bold', fontSize: 2 }}>Pending Requests</Text>
+              <CounterLabel sx={{ bg: 'attention.emphasis', color: 'fg.onEmphasis' }}>
+                {requests.length}
+              </CounterLabel>
+            </Box>
+            <Text sx={{ fontSize: 0, fontWeight: 'bold', color: 'attention.fg' }}>
+              Review pending diagram additions →
+            </Text>
+          </Box>
         )}
 
         {diagrams.length === 0 ? (
@@ -114,6 +146,14 @@ export function TeamDetailScreen({ team, onBack }: Props) {
           </Box>
         )}
       </Box>
+
+      {isRequestsOpen && (
+        <RequestsDialog
+          requests={requests}
+          onClose={() => setIsRequestsOpen(false)}
+          onRespond={respondRequest}
+        />
+      )}
     </Box>
   );
 }
