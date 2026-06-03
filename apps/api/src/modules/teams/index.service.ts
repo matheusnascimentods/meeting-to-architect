@@ -18,7 +18,7 @@ export class TeamsService {
       .select()
       .single();
 
-    if (error) throw new Error(`Falha ao criar time: ${error.message}`);
+    if (error) throw new Error(`Failed to create team: ${error.message}`);
 
     const { error: memberError } = await this.supabase
       .getClient()
@@ -26,9 +26,9 @@ export class TeamsService {
       .insert({ team_id: data.id, user_id: userId, role: 'admin' });
 
     if (memberError) {
-      console.error('Erro ao adicionar membro:', memberError);
+      console.error('Error adding member:', memberError);
       throw new Error(
-        `Falha ao vincular usuário ao time: ${memberError.message}`,
+        `Failed to link user to team: ${memberError.message}`,
       );
     }
 
@@ -43,8 +43,8 @@ export class TeamsService {
       .eq('user_id', userId);
 
     if (error) {
-      console.error('Erro ao buscar times:', error);
-      throw new Error(`Falha ao buscar times: ${error.message}`);
+      console.error('Error fetching teams:', error);
+      throw new Error(`Failed to fetch teams: ${error.message}`);
     }
 
     if (!data) return [];
@@ -66,7 +66,8 @@ export class TeamsService {
       .eq('user_id', userId)
       .limit(1);
 
-    if (error || !data || data.length === 0) throw new NotFoundException('Time não encontrado');
+    if (error || !data || data.length === 0)
+      throw new NotFoundException('Team not found');
     return data[0];
   }
 
@@ -79,7 +80,7 @@ export class TeamsService {
       .update({ ...dto, updated_at: new Date().toISOString() })
       .eq('id', id);
 
-    if (error) throw new Error(`Falha ao atualizar time: ${error.message}`);
+    if (error) throw new Error(`Failed to update team: ${error.message}`);
   }
 
   async delete(id: string, userId: string): Promise<void> {
@@ -91,91 +92,14 @@ export class TeamsService {
       .delete()
       .eq('id', id);
 
-    if (error) throw new Error(`Falha ao excluir time: ${error.message}`);
+    if (error) throw new Error(`Failed to delete team: ${error.message}`);
   }
 
-  async inviteMember(
+  private async verifyRole(
     teamId: string,
-    invitedEmail: string,
-    adminId: string,
-  ): Promise<void> {
-    await this.verifyAdmin(teamId, adminId);
-
-    const { data: user } = await this.supabase
-      .getClient()
-      .from('Users')
-      .select('id')
-      .eq('email', invitedEmail)
-      .single();
-
-    if (!user)
-      throw new NotFoundException('Usuário não encontrado com este email');
-
-    const { error } = await this.supabase
-      .getClient()
-      .from('Team_Invites')
-      .insert({
-        team_id: teamId,
-        invited_by: adminId,
-        invited_user_id: user.id,
-        status: 'pending',
-      });
-
-    if (error) throw new Error(`Falha ao convidar membro: ${error.message}`);
-  }
-
-  async getMyInvites(userId: string) {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('Team_Invites')
-      .select('*, Teams(name)')
-      .eq('invited_user_id', userId)
-      .eq('status', 'pending');
-
-    if (error) throw new Error(`Falha ao buscar convites: ${error.message}`);
-    return data ?? [];
-  }
-
-  async respondInvite(
-    inviteId: string,
     userId: string,
-    accept: boolean,
+    allowedRoles: string[],
   ): Promise<void> {
-    const { data, error: findError } = await this.supabase
-      .getClient()
-      .from('Team_Invites')
-      .select('*')
-      .eq('id', inviteId)
-      .eq('invited_user_id', userId)
-      .single();
-
-    if (findError || !data) throw new NotFoundException('Convite não encontrado');
-
-    await this.supabase
-      .getClient()
-      .from('Team_Invites')
-      .update({ status: accept ? 'accepted' : 'rejected' })
-      .eq('id', inviteId);
-
-    if (accept) {
-      const { data: existing } = await this.supabase
-        .getClient()
-        .from('Team_Members')
-        .select('id')
-        .eq('team_id', data.team_id)
-        .eq('user_id', userId)
-        .limit(1);
-
-      if (!existing || existing.length === 0) {
-        await this.supabase
-          .getClient()
-          .from('Team_Members')
-          .insert({ team_id: data.team_id, user_id: userId, role: 'member' });
-      }
-    }
-  }
-
-  private async verifyAdmin(teamId: string, userId: string): Promise<void> {
     const { data, error } = await this.supabase
       .getClient()
       .from('Team_Members')
@@ -184,8 +108,13 @@ export class TeamsService {
       .eq('user_id', userId)
       .limit(1);
 
-    if (error || !data || data.length === 0) throw new NotFoundException('Time não encontrado');
-    if (data[0].role !== 'admin')
-      throw new ForbiddenException('Apenas admins podem realizar esta ação');
+    if (error || !data || data.length === 0)
+      throw new NotFoundException('Team not found');
+    if (!allowedRoles.includes(data[0].role))
+      throw new ForbiddenException('You do not have permission for this action');
+  }
+
+  private async verifyAdmin(teamId: string, userId: string): Promise<void> {
+    return this.verifyRole(teamId, userId, ['admin']);
   }
 }

@@ -14,11 +14,8 @@ import { TeamsService } from './index.service';
 import {
   createTeamSchema,
   updateTeamSchema,
-  inviteMemberSchema,
-  respondInviteSchema,
   CreateTeamDto,
   UpdateTeamDto,
-  RespondInviteDto,
 } from './index.schema';
 import { AuthGuard } from '../auth/index.guard';
 import { CurrentUser } from '../auth/index.decorator';
@@ -32,31 +29,6 @@ export class TeamsController {
   create(@Body() body: unknown, @CurrentUser() user: { sub: string }) {
     const dto: CreateTeamDto = createTeamSchema.parse(body);
     return this.teams.create(dto, user.sub);
-  }
-
-  @Get('invites/me')
-  getMyInvites(@CurrentUser() user: { sub: string }) {
-    return this.teams.getMyInvites(user.sub);
-  }
-
-  @Post(':id/invite')
-  invite(
-    @Param('id') id: string,
-    @Body() body: unknown,
-    @CurrentUser() user: { sub: string },
-  ) {
-    const dto = inviteMemberSchema.parse(body);
-    return this.teams.inviteMember(id, dto.email, user.sub);
-  }
-
-  @Patch('invites/:inviteId/respond')
-  respondInvite(
-    @Param('inviteId') inviteId: string,
-    @Body() body: unknown,
-    @CurrentUser() user: { sub: string },
-  ) {
-    const dto = respondInviteSchema.parse(body);
-    return this.teams.respondInvite(inviteId, user.sub, dto.accept);
   }
 
   @Get()
