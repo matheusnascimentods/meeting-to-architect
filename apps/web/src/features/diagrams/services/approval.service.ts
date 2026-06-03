@@ -1,0 +1,14 @@
+import { api } from "@/shared/lib/api";
+
+class ApprovalService {
+  async getTeamRequests(teamId: string): Promise<any[]> {
+    const { data } = await api.get(`/approvals/team/${teamId}`);
+    return data;
+  }
+
+  async respondRequest(requestId: string, approve: boolean): Promise<void> {
+    await api.patch(`/approvals/${requestId}/respond`, { approve });
+  }
+}
+
+export const approvalService = new ApprovalService();

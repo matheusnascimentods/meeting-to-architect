@@ -7,6 +7,7 @@ import { EditDiagramDialog } from "../EditDiagramDialog";
 import { DeleteDiagramDialog } from "@/shared/components/DeleteDiagramDialog";
 import { diagramService } from "../../services/diagram.service";
 import { teamService } from "@/features/teams/services/team.service";
+import { teamDiagramService } from "../../services/team-diagram.service";
 import { COPY } from "@/shared/constants/copy";
 import "./styles.css";
 
@@ -54,7 +55,7 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
     if (!selectedTeamId) return;
     try {
       const team = userTeams.find(t => t.team_id === selectedTeamId);
-      await diagramService.addToTeam(diagram.id, selectedTeamId);
+      await teamDiagramService.addToTeam(diagram.id, selectedTeamId);
       setFlashMessage({
         text: team?.role === 'admin'
           ? 'Diagram successfully added to the team.'

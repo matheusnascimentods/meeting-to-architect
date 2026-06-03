@@ -22,6 +22,7 @@ export function TeamDetailScreen({ team, onBack }: Props) {
   const [selectedDiagram, setSelectedDiagram] = useState<Diagram | null>(null);
   const [isRequestsOpen, setIsRequestsOpen] = useState(false);
   const isAdmin = role === 'admin';
+  const canManageRequests = role === 'admin' || role === 'maintainer';
 
   if (selectedDiagram) {
     return (
@@ -86,7 +87,7 @@ export function TeamDetailScreen({ team, onBack }: Props) {
           <InviteMember onInvite={inviteMember} />
         )}
 
-        {isAdmin && requests.length > 0 && (
+        {canManageRequests && requests.length > 0 && (
           <Box
             onClick={() => setIsRequestsOpen(true)}
             sx={{

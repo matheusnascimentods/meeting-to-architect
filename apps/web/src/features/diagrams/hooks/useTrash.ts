@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { diagramService } from '../services/diagram.service';
+import { trashService } from '../services/trash.service';
 import { Diagram } from '../types';
 import { COPY } from '@/shared/constants/copy';
 
@@ -12,7 +12,7 @@ export function useTrash() {
     setLoading(true);
     setError(null);
     try {
-      const data = await diagramService.getTrash();
+      const data = await trashService.getTrash();
       setItems(data);
     } catch (err) {
       setError(COPY.trash.error);
@@ -26,12 +26,12 @@ export function useTrash() {
   }, [fetchTrash]);
 
   const restore = async (id: string) => {
-    await diagramService.restoreDiagram(id);
+    await trashService.restoreDiagram(id);
     await fetchTrash();
   };
 
   const permanentDelete = async (id: string) => {
-    await diagramService.permanentDeleteDiagram(id);
+    await trashService.permanentDeleteDiagram(id);
     await fetchTrash();
   };
 

@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { teamService } from '@/features/teams/services/team.service';
-import { diagramService } from '@/features/diagrams/services/diagram.service';
+import { inviteService } from '@/features/teams/services/invite.service';
+import { teamDiagramService } from '@/features/diagrams/services/team-diagram.service';
+import { approvalService } from '@/features/diagrams/services/approval.service';
 import { Team } from '@/features/teams/types';
 import { Diagram, DiagramRequest } from '@/features/diagrams/types';
 import { COPY } from '@/shared/constants/copy';
@@ -20,8 +22,8 @@ export function useTeamDetail(teamId: string) {
     try {
       const [teamData, diagramsData, requestsData] = await Promise.all([
         teamService.findById(teamId),
-        diagramService.findByTeam(teamId),
-        diagramService.getTeamRequests(teamId)
+        teamDiagramService.findByTeam(teamId),
+        approvalService.getTeamRequests(teamId)
       ]);
       setTeam(teamData.Teams);
       setRole(teamData.role);
@@ -39,12 +41,12 @@ export function useTeamDetail(teamId: string) {
   }, [fetchData]);
 
   const inviteMember = async (email: string) => {
-    await teamService.invite(teamId, email);
+    await inviteService.invite(teamId, email);
     await fetchData();
   };
 
   const respondRequest = async (requestId: string, approve: boolean) => {
-    await diagramService.respondRequest(requestId, approve);
+    await approvalService.respondRequest(requestId, approve);
     await fetchData();
   };
 
