@@ -73,7 +73,7 @@ export class UsersService {
 
   async delete(id: string, requesterId: string): Promise<void> {
     if (id !== requesterId)
-      throw new ForbiddenException('Sem permissão para excluir este usuário');
+      throw new ForbiddenException('You do not have permission to delete this user');
 
     const { error } = await this.supabase
       .getClient()
@@ -81,7 +81,7 @@ export class UsersService {
       .update({ is_active: false, updated_at: new Date().toISOString() })
       .eq('id', id);
 
-    if (error) throw new Error(`Falha ao desativar usuário: ${error.message}`);
+    if (error) throw new Error(`Failed to deactivate user: ${error.message}`);
   }
 
   async update(
@@ -90,7 +90,7 @@ export class UsersService {
     dto: UpdateUserDto,
   ): Promise<void> {
     if (id !== requesterId)
-      throw new ForbiddenException('Sem permissão para atualizar este usuário');
+      throw new ForbiddenException('You do not have permission to update this user');
 
     const { error } = await this.supabase
       .getClient()
@@ -98,7 +98,7 @@ export class UsersService {
       .update({ ...dto, updated_at: new Date().toISOString() })
       .eq('id', id);
 
-    if (error) throw new Error(`Falha ao atualizar usuário: ${error.message}`);
+    if (error) throw new Error(`Failed to update user: ${error.message}`);
   }
 
   async changePassword(
@@ -108,7 +108,7 @@ export class UsersService {
   ): Promise<void> {
     if (id !== requesterId)
       throw new ForbiddenException(
-        'Sem permissão para alterar a senha deste usuário',
+        'You do not have permission to change this user password',
       );
 
     const { data, error: findError } = await this.supabase
@@ -119,13 +119,13 @@ export class UsersService {
       .single();
 
     if (findError || !data)
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
 
     const isMatch = await bcrypt.compare(
       dto.currentPassword,
       data.password_hash,
     );
-    if (!isMatch) throw new UnauthorizedException('Senha atual incorreta');
+    if (!isMatch) throw new UnauthorizedException('Incorrect current password');
 
     const newHash = await bcrypt.hash(dto.newPassword, 10);
 
@@ -135,6 +135,6 @@ export class UsersService {
       .update({ password_hash: newHash, updated_at: new Date().toISOString() })
       .eq('id', id);
 
-    if (error) throw new Error(`Falha ao alterar senha: ${error.message}`);
+    if (error) throw new Error(`Failed to change password: ${error.message}`);
   }
 }
