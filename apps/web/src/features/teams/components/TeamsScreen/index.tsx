@@ -11,6 +11,10 @@ import { tokens } from "@/shared/styles/tokens";
 import { COPY } from "@/shared/constants/copy";
 import { TeamItem } from "./TeamItem";
 import { InvitationsDialog } from "./InvitationsDialog";
+import { EditTeamDialog } from "./EditTeamDialog";
+import { MembersDialog } from "./MembersDialog";
+import { teamService } from "../../services/team.service";
+import { Team } from "../../types";
 
 type TeamsView =
   | { name: 'list' }
@@ -20,7 +24,19 @@ export function TeamsScreen() {
   const { teams, invites, loading, error, refetch, respondInvite } = useTeams();
   const [isOpen, setIsOpen] = useState(false);
   const [isInvitesOpen, setIsInvitesOpen] = useState(false);
+  const [editingTeam, setEditingTeam] = useState<Team | null>(null);
+  const [membersTeam, setMembersTeam] = useState<Team | null>(null);
   const [view, setView] = useState<TeamsView>({ name: 'list' });
+
+  const handleDeleteTeam = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this team? This action cannot be undone.")) return;
+    try {
+      await teamService.delete(id);
+      refetch();
+    } catch (error) {
+      console.error("Failed to delete team", error);
+    }
+  };
 
   if (view.name === 'detail') {
     return (
@@ -119,16 +135,21 @@ export function TeamsScreen() {
               gridTemplateColumns: ["1fr", "repeat(2, 1fr)", "repeat(3, 1fr)"],
             }}
           >
-            {teams.map((ut) => (
-              <TeamItem
-                key={ut.team_id}
-                userTeam={ut}
-                onClick={() => {
-                  const team = ut.Teams || ut.teams;
-                  if (team) setView({ name: 'detail', team: { id: team.id, name: team.name } });
-                }}
-              />
-            ))}
+            {teams.map((ut) => {
+              const team = ut.Teams || ut.teams;
+              return (
+                <TeamItem
+                  key={ut.team_id}
+                  userTeam={ut}
+                  onClick={() => {
+                    if (team) setView({ name: 'detail', team: { id: team.id, name: team.name } });
+                  }}
+                  onEdit={() => team && setEditingTeam(team)}
+                  onMembers={() => team && setMembersTeam(team)}
+                  onDelete={() => team && handleDeleteTeam(team.id)}
+                />
+              );
+            })}
           </Box>
         )}
       </Box>
@@ -145,6 +166,22 @@ export function TeamsScreen() {
           invites={invites}
           onClose={() => setIsInvitesOpen(false)}
           onRespond={respondInvite}
+        />
+      )}
+
+      {editingTeam && (
+        <EditTeamDialog
+          team={editingTeam}
+          onClose={() => setEditingTeam(null)}
+          onSuccess={refetch}
+        />
+      )}
+
+      {membersTeam && (
+        <MembersDialog
+          teamId={membersTeam.id}
+          teamName={membersTeam.name}
+          onClose={() => setMembersTeam(null)}
         />
       )}
     </Box>

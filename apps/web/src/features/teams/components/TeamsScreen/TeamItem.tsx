@@ -1,27 +1,24 @@
-import { Box, Text, Label } from '@primer/react';
+import { Box, Text, Label, ActionMenu, ActionList, IconButton } from '@primer/react';
+import { KebabHorizontalIcon, PencilIcon, TrashIcon, PeopleIcon } from '@primer/octicons-react';
 import { UserTeam } from '../../types';
 import { tokens } from '@/shared/styles/tokens';
 
 interface Props {
   userTeam: UserTeam;
   onClick: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  onMembers?: () => void;
 }
 
-export function TeamItem({ userTeam, onClick }: Props) {
+export function TeamItem({ userTeam, onClick, onEdit, onDelete, onMembers }: Props) {
   const team = userTeam.Teams || userTeam.teams;
   if (!team) return null;
 
+  const isAdmin = userTeam.role === 'admin';
+
   return (
     <Box
-      onClick={onClick}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e: React.KeyboardEvent) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onClick();
-        }
-      }}
       sx={{
         p: 4,
         borderRadius: 2,
@@ -32,7 +29,7 @@ export function TeamItem({ userTeam, onClick }: Props) {
         flexDirection: "column",
         gap: 3,
         transition: "all 0.2s ease",
-        cursor: 'pointer',
+        position: 'relative',
         "&:hover": {
           borderColor: "accent.emphasis",
           boxShadow: "shadow.medium",
@@ -41,12 +38,65 @@ export function TeamItem({ userTeam, onClick }: Props) {
       }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <Text sx={{ fontWeight: "bold", fontSize: 2, color: 'fg.default' }}>
-          {team.name}
-        </Text>
-        <Label variant={userTeam.role === 'admin' ? 'accent' : 'secondary'} sx={{ textTransform: 'capitalize' }}>
-          {userTeam.role}
-        </Label>
+        <Box 
+          onClick={onClick}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e: React.KeyboardEvent) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onClick();
+            }
+          }}
+          sx={{ cursor: 'pointer', flex: 1 }}
+        >
+          <Text sx={{ fontWeight: "bold", fontSize: 2, color: 'fg.default' }}>
+            {team.name}
+          </Text>
+        </Box>
+        
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Label variant={userTeam.role === 'admin' ? 'accent' : 'secondary'} sx={{ textTransform: 'capitalize' }}>
+            {userTeam.role}
+          </Label>
+          
+          {isAdmin && (
+            <ActionMenu>
+              <ActionMenu.Anchor>
+                <IconButton
+                  icon={KebabHorizontalIcon}
+                  aria-label="Team actions"
+                  variant="invisible"
+                  size="small"
+                />
+              </ActionMenu.Anchor>
+
+              <ActionMenu.Overlay>
+                <ActionList>
+                  <ActionList.Item onClick={onEdit}>
+                    <ActionList.LeadingVisual>
+                      <PencilIcon />
+                    </ActionList.LeadingVisual>
+                    Edit
+                  </ActionList.Item>
+                  <ActionList.Item onClick={onMembers}>
+                    <ActionList.LeadingVisual>
+                      <PeopleIcon />
+                    </ActionList.LeadingVisual>
+                    Members
+                  </ActionList.Item>
+                  <ActionList.Divider />
+                  <ActionList.Item variant="danger" onClick={onDelete}>
+                    <ActionList.LeadingVisual>
+                      <TrashIcon />
+                    </ActionList.LeadingVisual>
+                    Delete
+                  </ActionList.Item>
+                </ActionList>
+              </ActionMenu.Overlay>
+            </ActionMenu>
+          )}
+        </Box>
       </Box>
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>

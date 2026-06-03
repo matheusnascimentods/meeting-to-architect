@@ -9,6 +9,7 @@ interface Props {
 export function InviteItem({ invite, onRespond }: Props) {
   return (
     <Box sx={{
+      flexDirection: "column",
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',

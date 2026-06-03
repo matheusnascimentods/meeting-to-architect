@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { teamService } from '../services/team.service';
+import { inviteService } from '../services/invite.service';
 import { UserTeam, TeamInvite } from '../types';
 import { COPY } from '@/shared/constants/copy';
 
@@ -15,7 +16,7 @@ export function useTeams() {
     try {
       const [teamsData, invitesData] = await Promise.all([
         teamService.findAll(),
-        teamService.getMyInvites()
+        inviteService.getMyInvites()
       ]);
       setTeams(teamsData);
       setInvites(invitesData);
@@ -31,7 +32,7 @@ export function useTeams() {
   }, [fetchData]);
 
   const respondInvite = async (inviteId: string, accept: boolean) => {
-    await teamService.respondInvite(inviteId, accept);
+    await inviteService.respondInvite(inviteId, accept);
     await fetchData();
   };
 

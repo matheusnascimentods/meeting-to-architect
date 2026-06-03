@@ -24,19 +24,6 @@ class TeamService {
   async delete(id: string): Promise<void> {
     await api.delete(`/teams/${id}`);
   }
-
-  async invite(teamId: string, email: string): Promise<void> {
-    await api.post(`/teams/${teamId}/invite`, { email });
-  }
-
-  async getMyInvites(): Promise<any[]> {
-    const { data } = await api.get("/teams/invites/me");
-    return data;
-  }
-
-  async respondInvite(inviteId: string, accept: boolean): Promise<void> {
-    await api.patch(`/teams/invites/${inviteId}/respond`, { accept });
-  }
 }
 
 export const teamService = new TeamService();
