@@ -3,6 +3,7 @@ import { Dialog, Box, Button, Text, FormControl, IconButton, Flash, Spinner } fr
 import * as Icons from "@primer/octicons-react";
 import { DiagramType, Diagram } from "@/features/diagrams/types";
 import { api } from "@/shared/lib/api";
+import { normalizeDiagram } from "@/features/diagrams/utils/normalize-diagram";
 import { DIAGRAM_CATEGORIES, DIAGRAM_TYPES, TYPE_LABELS, DiagramCategory } from "./diagram-types";
 import { COPY } from "@/shared/constants/copy";
 
@@ -32,10 +33,33 @@ export function NewDiagramDialog({ onClose, onSuccess }: Props) {
     if (!canGenerate) return;
     setLoading(true); setError(null);
     const form = new FormData();
-    form.append("file", file); form.append("diagramType", selected);
+    // Map frontend diagram ids to backend-supported diagram type identifiers
+    const mapDiagramType = (t: DiagramType | null) => {
+      if (!t) return '';
+      switch (t) {
+        case 'class': return 'CLASS';
+        case 'component': return 'COMPONENT';
+        case 'object': return 'OBJECT';
+        case 'deployment': return 'DEPLOYMENT';
+        case 'package': return 'PACKAGE';
+        case 'composite': return 'COMPOSITE_STRUCTURE';
+        case 'sequence': return 'SEQUENCE';
+        case 'activity': return 'ACTIVITY';
+        case 'use-case': return 'USE_CASE';
+        case 'state': return 'STATE';
+        case 'communication': return 'COMMUNICATION';
+        case 'timing': return 'TIMING';
+        case 'interaction-overview': return 'INTERACTION_OVERVIEW';
+        case 'c4': return 'C4_CONTEXT';
+        default: return String(t).toUpperCase();
+      }
+    };
+
+    form.append("file", file);
+    form.append("diagramType", mapDiagramType(selected));
     try {
       const { data } = await api.post("/agents/generate", form, { headers: { "Content-Type": "multipart/form-data" } });
-      onSuccess?.(data); onClose();
+      onSuccess?.(normalizeDiagram(data)); onClose();
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'response' in err) {
         const axiosErr = err as { response: { data: { message: string } } };

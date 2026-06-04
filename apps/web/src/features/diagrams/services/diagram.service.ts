@@ -1,18 +1,19 @@
 import { api } from "@/shared/lib/api";
 import { Diagram } from "../types";
+import { normalizeDiagram, normalizeDiagrams } from "../utils/normalize-diagram";
 
 export const diagramService = {
   update: async (id: string, data: Partial<Diagram>) => {
     const response = await api.patch(`/diagrams/${id}`, data);
-    return response.data;
+    return normalizeDiagram(response.data);
   },
 
   deleteDiagram: async (id: string): Promise<void> => {
     await api.delete(`/diagrams/${id}`);
   },
 
-  findAll: async () => {
+  findAll: async (): Promise<Diagram[]> => {
     const response = await api.get("/diagrams");
-    return response.data;
+    return normalizeDiagrams(response.data);
   },
 };

@@ -9,26 +9,41 @@ interface MermaidPreviewProps {
   id: string;
 }
 
+function initMermaid() {
+  if (mermaidInitialized) return;
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: "neutral",
+    securityLevel: "loose",
+  });
+  mermaidInitialized = true;
+}
+
 export function MermaidPreview({ source, id }: MermaidPreviewProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    if (!mermaidInitialized) {
-      mermaid.initialize({ startOnLoad: false, theme: "neutral" });
-      mermaidInitialized = true;
+    const code = source?.trim();
+    if (!code) {
+      setError(true);
+      return;
     }
+
+    initMermaid();
     let cancelled = false;
     setError(false);
     const renderId = `m2a-mermaid-${id}-${Date.now()}`;
+
     mermaid
-      .render(renderId, source)
+      .render(renderId, code)
       .then(({ svg }) => {
         if (!cancelled && ref.current) ref.current.innerHTML = svg;
       })
       .catch(() => {
         if (!cancelled) setError(true);
       });
+
     return () => {
       cancelled = true;
     };
@@ -41,6 +56,7 @@ export function MermaidPreview({ source, id }: MermaidPreviewProps) {
       </div>
     );
   }
+
   return (
     <div
       ref={ref}
