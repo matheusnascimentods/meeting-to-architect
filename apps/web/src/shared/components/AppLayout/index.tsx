@@ -4,8 +4,8 @@ import { useState } from "react";
 
 interface Props {
   children: React.ReactNode;
-  currentPage: 'diagrams' | 'teams' | 'notifications' | 'trash';
-  onNavigate: (page: 'diagrams' | 'teams' | 'notifications' | 'trash') => void;
+  currentPage: 'diagrams' | 'teams' | 'trash';
+  onNavigate: (page: 'diagrams' | 'teams' | 'trash') => void;
   onLogout: () => void;
 }
 

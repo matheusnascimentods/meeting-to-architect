@@ -1,7 +1,6 @@
 import { Box, CounterLabel, IconButton, NavList, Tooltip, Text } from "@primer/react";
 import {
   SignOutIcon,
-  BellIcon,
   SidebarCollapseIcon,
   SidebarExpandIcon,
   FileCodeIcon,
@@ -11,7 +10,7 @@ import {
 import { useState } from "react";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 
-type SidebarPage = 'diagrams' | 'teams' | 'notifications' | 'trash';
+type SidebarPage = 'diagrams' | 'teams' | 'trash';
 
 interface Props {
   currentPage: SidebarPage;
@@ -26,7 +25,6 @@ const fontStack = "system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
 const navItems: { page: SidebarPage; label: string; icon: React.ElementType; counter?: number }[] = [
   { page: 'diagrams', label: 'My Diagrams', icon: FileCodeIcon },
   { page: 'teams', label: 'My Teams', icon: PeopleIcon },
-  { page: 'notifications', label: 'Notifications', icon: BellIcon, counter: 2 },
   { page: 'trash', label: 'Trash', icon: TrashIcon },
 ];
 
