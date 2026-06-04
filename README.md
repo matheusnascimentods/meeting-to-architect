@@ -31,35 +31,149 @@ O M2A (Meeting to Architecture) é uma plataforma desenvolvida para simplificar 
 └── README.md              # Este arquivo
 ```
 
-## Como rodar localmente
+## Como rodar com Docker
+
+Cada camada sobe de forma independente via **profiles** do Docker Compose. O banco executa migrations e seed automaticamente na primeira subida (se já existirem tabelas/dados, nada é recriado).
 
 ### Pré-requisitos
+
+- Docker e Docker Compose v2+
+
+### 1. Configurar variáveis de ambiente
+
+Copie o exemplo e ajuste as chaves:
+
+```bash
+cp apps/api/.env.example apps/api/.env
+```
+
+No `.env` da API, mantenha `DATABASE_URL` apontando para o container do Postgres:
+
+```env
+DATABASE_URL="postgresql://postgres:password@postgres:5432/diagrams_db?schema=public"
+```
+
+Para o frontend em Docker, defina a URL da API (opcional — padrão `http://localhost:3000`):
+
+```bash
+export VITE_API_URL=http://localhost:3000
+```
+
+### 2. Subir o banco de dados
+
+Cria o Postgres, aplica as migrations (tabelas) e insere os dados do `seed.sql` **somente se o banco estiver vazio**.
+
+```bash
+docker compose --profile db up -d --build
+```
+
+| Serviço   | URL / Porta                          |
+|-----------|--------------------------------------|
+| Postgres  | `localhost:5433` (user: `postgres`, senha: `password`, db: `diagrams_db`) |
+| pgAdmin   | http://localhost:8080 (email: `admin@admin.com`, senha: `password`) |
+
+Acompanhe o init:
+
+```bash
+docker compose logs db-init
+```
+
+### 3. Subir a API
+
+Com o banco já em execução:
+
+```bash
+docker compose --profile api up -d --build
+```
+
+API disponível em http://localhost:3000
+
+### 4. Subir o frontend
+
+```bash
+docker compose --profile web up -d --build
+```
+
+Frontend disponível em http://localhost
+
+### Subir tudo de uma vez
+
+```bash
+docker compose --profile db --profile api --profile web up -d --build
+```
+
+### Parar serviços
+
+```bash
+# Parar apenas o banco
+docker compose --profile db down
+
+# Parar apenas a API
+docker compose --profile api down
+
+# Parar apenas o frontend
+docker compose --profile web down
+
+# Parar tudo (mantém volume de dados)
+docker compose --profile db --profile api --profile web down
+
+# Parar tudo e apagar dados do banco
+docker compose --profile db --profile api --profile web down -v
+```
+
+### Credenciais de teste (seed)
+
+Usuários do seed usam a senha **`psg@2026`**. Exemplo:
+
+- Email: `marquinhos@gmail.com`
+- Senha: `psg@2026`
+
+---
+
+## Como rodar localmente (sem Docker)
+
+### Pré-requisitos
+
 - Node.js (v20+)
 - Bun (recomendado) ou npm
+- Postgres local ou container do passo 2 acima
 
 ### Instalação
 
 1. Instale as dependências na raiz:
+
    ```bash
    bun install
    ```
 
 2. Configure as variáveis de ambiente (veja abaixo).
 
-3. Inicie os projetos:
-   - Backend: `cd apps/api/m2a-api && bun run start:dev`
+3. Aplique migrations e seed (se necessário):
+
+   ```bash
+   cd apps/api
+   npx prisma migrate deploy
+   psql "postgresql://postgres:password@localhost:5433/diagrams_db" -f prisma/seed.sql
+   ```
+
+4. Inicie os projetos:
+
+   - Backend: `cd apps/api && bun run start:dev`
    - Frontend: `cd apps/web && bun run dev`
 
 ### Variáveis de ambiente
 
-**`apps/api/m2a-api/.env`**
+**`apps/api/.env`**
+
 - `SUPABASE_URL`: URL do seu projeto Supabase.
 - `SUPABASE_SERVICE_KEY`: Service Role Key do Supabase.
 - `GEMINI_API_KEY`: Chave de API do Google Gemini.
-- `GEMINI_MODEL`: Modelo do Gemini (ex: `gemini-1.5-flash`).
+- `GEMINI_MODEL`: Modelo do Gemini (ex: `gemini-2.5-flash`).
 - `JWT_SECRET`: Segredo para assinatura de tokens JWT.
+- `DATABASE_URL`: URL de conexão PostgreSQL (local: porta `5433`; Docker: host `postgres`).
 
-**`apps/web/.env`**
+**`apps/web/.env`** (opcional em dev)
+
 - `VITE_API_URL`: URL base da API (ex: `http://localhost:3000`).
 
 ## Módulos da API

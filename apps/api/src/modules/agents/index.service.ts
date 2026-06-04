@@ -81,7 +81,7 @@ export class AgentService {
         description: data.description,
         mermaid_code: data.mermaidCode,
         created_by: data.createdBy,
-        type: data.type.toLowerCase() as any,
+        type: data.type,
       } as DiagramResponse;
     } catch (error) {
       this.logger.error(

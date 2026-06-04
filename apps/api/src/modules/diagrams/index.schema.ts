@@ -1,10 +1,11 @@
 import z from 'zod';
+import { DiagramTypeSchema } from '../../shared/diagram-type.schema';
 
 export const UpdateDiagramSchema = z.object({
   title: z.string().optional(),
   description: z.string().optional(),
   mermaid_code: z.string().optional(),
-  type: z.string().optional(),
+  type: DiagramTypeSchema.optional(),
 });
 
 export const createDiagramSchema = z.object({
@@ -12,7 +13,7 @@ export const createDiagramSchema = z.object({
   description: z.string(),
   mermaid_code: z.string(),
   created_by: z.string().uuid(),
-  type: z.string(),
+  type: DiagramTypeSchema,
 });
 
 export type UpdateDiagramDto = z.infer<typeof UpdateDiagramSchema>;

@@ -1,23 +1,8 @@
 import z from 'zod';
+import { DiagramTypeSchema } from '../../shared/diagram-type.schema';
 
-export const DiagramTypeSchema = z.enum([
-  'class',
-  'component',
-  'object',
-  'deployment',
-  'package',
-  'composite',
-  'sequence',
-  'activity',
-  'use-case',
-  'state',
-  'communication',
-  'timing',
-  'interaction-overview',
-  'c4',
-]);
-
-export type DiagramType = z.infer<typeof DiagramTypeSchema>;
+export { DiagramTypeSchema };
+export type { DiagramType } from '../../shared/diagram-type.schema';
 
 export const DiagramResponseSchema = z.object({
   id: z.string().uuid().optional(),

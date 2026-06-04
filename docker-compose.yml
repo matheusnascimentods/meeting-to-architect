@@ -1,37 +1,11 @@
 name: m2a
 
 services:
-  api:
-    build:
-      context: .
-      dockerfile: ./apps/api/Dockerfile
-    restart: unless-stopped
-    env_file: apps/api/.env
-    ports:
-      - "3000:3000"
-    networks:
-      - m2a-network
-    depends_on:
-      - postgres
-
-  web:
-    build:
-      context: .
-      dockerfile: ./apps/web/Dockerfile
-      args:
-        VITE_API_URL: ${VITE_API_URL:-http://localhost:3000}
-    restart: unless-stopped
-    ports:
-      - "80:80"
-    depends_on:
-      - api
-    networks:
-      - m2a-network
-
   postgres:
+    profiles: [db]
     image: postgres:16-alpine
     container_name: diagrams_db
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
@@ -42,18 +16,71 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - m2a-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  db-init:
+    profiles: [db]
+    build:
+      context: .
+      dockerfile: apps/api/prisma/Dockerfile.db-init
+    network_mode: "service:postgres"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: localhost
+      DATABASE_URL: postgresql://postgres:password@localhost:5432/diagrams_db?schema=public
+    restart: "no"
 
   pgadmin:
+    profiles: [db]
     image: dpage/pgadmin4
     container_name: diagrams_pgadmin
-    restart: always
+    restart: unless-stopped
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: password
     ports:
       - "8080:80"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    networks:
+      - m2a-network
+
+  api:
+    profiles: [api]
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile
+    container_name: m2a_api
+    restart: unless-stopped
+    env_file: apps/api/.env
+    ports:
+      - "3000:3000"
+    networks:
+      - m2a-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+        required: false
+
+  web:
+    profiles: [web]
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3000}
+    container_name: m2a_web
+    restart: unless-stopped
+    ports:
+      - "80:80"
     networks:
       - m2a-network
 

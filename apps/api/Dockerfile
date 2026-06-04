@@ -14,5 +14,6 @@ ENV NODE_ENV=production
 COPY --from=builder /app/apps/api/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/api/src/modules/agents/agents/prompts ./dist/modules/agents/agents/prompts
+COPY --from=builder /app/apps/api/prisma ./prisma
 EXPOSE 3000
-CMD ["node", "dist/main.js"]
+CMD npx prisma migrate deploy --schema=./prisma/schema.prisma && node dist/main.js
