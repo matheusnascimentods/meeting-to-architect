@@ -36,6 +36,15 @@ export class MembersController {
     return this.members.updateMemberRole(teamId, user.sub, userId, role);
   }
 
+  @Patch('team/:teamId/roles')
+  updateMembersRoles(
+    @Param('teamId') teamId: string,
+    @Body('updates') updates: { userId: string, role: 'admin' | 'member' | 'maintainer' }[],
+    @CurrentUser() user: { sub: string },
+  ) {
+    return this.members.updateMembersRoles(teamId, user.sub, updates);
+  }
+
   @Delete('team/:teamId/user/:userId')
   @HttpCode(HttpStatus.NO_CONTENT)
   removeMember(

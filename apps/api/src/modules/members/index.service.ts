@@ -47,6 +47,23 @@ export class MembersService {
     }
   }
 
+  async updateMembersRoles(
+    teamId: string,
+    adminId: string,
+    updates: { userId: string, role: 'admin' | 'member' | 'maintainer' }[],
+  ): Promise<void> {
+    await this.verifyRole(teamId, adminId, [UserRole.ADMIN]);
+
+    try {
+      await this.repository.updateMembersRoles(
+        teamId,
+        updates.map(u => ({ userId: u.userId, role: u.role.toUpperCase() as UserRole }))
+      );
+    } catch (error) {
+      throw new Error(`Failed to update members roles: ${error.message}`);
+    }
+  }
+
   async removeMember(
     teamId: string,
     adminId: string,

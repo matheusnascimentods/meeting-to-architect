@@ -13,6 +13,9 @@ type ApiDiagram = {
   updatedAt?: string;
   created_by?: string;
   createdBy?: string;
+  team_id?: string;
+  teamId?: string;
+  creator?: { name: string };
 };
 
 export function normalizeDiagram(raw: ApiDiagram): Diagram {
@@ -25,6 +28,8 @@ export function normalizeDiagram(raw: ApiDiagram): Diagram {
     created_at: raw.created_at ?? raw.createdAt,
     updated_at: raw.updated_at ?? raw.updatedAt,
     created_by: raw.created_by ?? raw.createdBy,
+    team_id: raw.team_id ?? raw.teamId,
+    creator: raw.creator,
   };
 }
 

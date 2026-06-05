@@ -45,6 +45,9 @@ export function SignupStep({
           boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
           width: '100%',
           position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'stretch',
         }}
       >
         <IconButton
@@ -54,10 +57,12 @@ export function SignupStep({
           onClick={onBack}
           sx={{ position: 'absolute', top: 2, left: 2 }}
         />
-        <Text sx={{ fontSize: 2, fontWeight: 'bold', mb: 1, display: 'block', mt: 4 }}>Create your account</Text>
-        <Text sx={{ color: 'fg.muted', fontSize: 1, mb: 4, display: 'block' }}>
-          No account found for this email. Fill in the details below.
-        </Text>
+        <Box sx={{ mt: 4, mb: 4 }}>
+          <Text sx={{ fontSize: 2, fontWeight: 'bold', mb: 1, display: 'block' }}>Create your account</Text>
+          <Text sx={{ color: 'fg.muted', fontSize: 1, display: 'block' }}>
+            No account found for this email. Fill in the details below.
+          </Text>
+        </Box>
 
         <FormControl sx={{ mb: 2 }}>
           <FormControl.Label>Full name</FormControl.Label>
@@ -99,7 +104,7 @@ export function SignupStep({
           {errors.confirmPassword && <FormControl.Validation variant="error">{errors.confirmPassword}</FormControl.Validation>}
         </FormControl>
 
-        <Button variant="primary" block type="submit" loading={loading}>
+        <Button variant="primary" sx={{ width: '100%' }} type="submit" loading={loading}>
           Create account
         </Button>
       </Box>

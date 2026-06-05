@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { ActionMenu, ActionList, IconButton, Label, Dialog, Box, Select, Flash, Text } from "@primer/react";
-import { KebabHorizontalIcon, PencilIcon, TrashIcon, PeopleIcon } from "@primer/octicons-react";
+import { ActionMenu, ActionList, IconButton, Label, Dialog, Box, Select, Text } from "@primer/react";
+import { KebabHorizontalIcon, PencilIcon, TrashIcon, PeopleIcon, CheckIcon } from "@primer/octicons-react";
 import { Diagram } from "../../types";
 import { UserTeam } from "@/features/teams/types";
 import { EditDiagramDialog } from "../EditDiagramDialog";
@@ -9,7 +9,10 @@ import { diagramService } from "../../services/diagram.service";
 import { teamService } from "@/features/teams/services/team.service";
 import { teamDiagramService } from "../../services/team-diagram.service";
 import { COPY } from "@/shared/constants/copy";
+import { formatRelativeTime } from "@/shared/lib/date-utils";
 import "./styles.css";
+
+import { useToast } from "@/shared/hooks/use-toast";
 
 interface DiagramCardProps {
   diagram: Diagram;
@@ -24,21 +27,21 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
   const [showAddToTeam, setShowAddToTeam] = useState(false);
   const [userTeams, setUserTeams] = useState<UserTeam[]>([]);
   const [selectedTeamId, setSelectedTeamId] = useState("");
-  const [flashMessage, setFlashMessage] = useState<{ text: string, variant: 'success' | 'danger' } | null>(null);
+  const [isAddingToTeam, setIsAddingToTeam] = useState(false);
+  const { success, error: toastError } = useToast();
 
   const { title, description } = diagram;
   const type = diagram.type || "Diagram";
   const variant = diagram.variant || "accent";
-  const date = diagram.created_at ? new Date(diagram.created_at).toLocaleDateString() : "Just now";
+  const date = diagram.created_at ? formatRelativeTime(diagram.created_at) : "Just now";
 
   useEffect(() => {
     if (showAddToTeam) {
       teamService.findAll().then(setUserTeams).catch(() => {
-        setFlashMessage({ text: 'Failed to load teams.', variant: 'danger' });
-        setTimeout(() => setFlashMessage(null), 5000);
+        toastError('Failed to load teams.');
       });
     }
-  }, [showAddToTeam]);
+  }, [showAddToTeam, toastError]);
 
   const handleDelete = async () => {
     try {
@@ -52,23 +55,24 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
   };
 
   const handleAddToTeam = async () => {
-    if (!selectedTeamId) return;
+    if (!selectedTeamId || isAddingToTeam) return;
+    setIsAddingToTeam(true);
     try {
       const team = userTeams.find(t => t.team_id === selectedTeamId);
       await teamDiagramService.addToTeam(diagram.id, selectedTeamId);
-      setFlashMessage({
-        text: team?.role === 'admin'
-          ? 'Diagram successfully added to the team.'
-          : 'Request sent. Wait for admin approval.',
-        variant: 'success'
-      });
+      success(team?.role === 'admin'
+        ? 'Diagram successfully added to the team.'
+        : 'Request sent. Wait for admin approval.'
+      );
       setShowAddToTeam(false);
-      setTimeout(() => setFlashMessage(null), 5000);
     } catch (err) {
-      setFlashMessage({ text: 'Failed to add to the team.', variant: 'danger' });
-      setTimeout(() => setFlashMessage(null), 5000);
+      toastError('Failed to add to the team.');
+    } finally {
+      setIsAddingToTeam(false);
     }
   };
+
+  const availableTeams = userTeams.filter(ut => ut.team_id !== diagram.team_id);
 
   return (
     <>
@@ -137,9 +141,10 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
             try {
               const data = await diagramService.update(diagram.id, updated);
               onUpdate?.(data);
+              success('Diagram updated successfully.');
               setIsEditDialogOpen(false);
             } catch (err) {
-              // Silently fail or show error
+              toastError('Failed to update diagram.');
             }
           }}
         />
@@ -155,41 +160,64 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
       {showAddToTeam && (
         <Dialog
           title="Add to Team"
-          width="small"
+          width="medium"
           onClose={() => setShowAddToTeam(false)}
           footerButtons={[
             { buttonType: 'default', content: COPY.common.cancel, onClick: () => setShowAddToTeam(false) },
             {
               buttonType: 'primary',
-              content: 'Add',
-              onClick: handleAddToTeam
+              content: isAddingToTeam ? 'Adding...' : 'Add to Team',
+              onClick: handleAddToTeam,
+              disabled: !selectedTeamId || isAddingToTeam
             }
           ]}
         >
           <Box sx={{ p: 3 }}>
-            <Text sx={{ display: 'block', mb: 2 }}>Select team:</Text>
-            <Select
-              value={selectedTeamId}
-              onChange={(e) => setSelectedTeamId(e.target.value)}
-              sx={{ width: '100%' }}
-            >
-              <Select.Option value="">Select a team...</Select.Option>
-              {userTeams.map(ut => (
-                <Select.Option key={ut.team_id} value={ut.team_id}>
-                  {ut.Teams?.name || ut.teams?.name}
-                </Select.Option>
-              ))}
-            </Select>
+            <Text sx={{ display: 'block', mb: 3, color: 'fg.muted', fontSize: 1 }}>
+              Choose a team to share this diagram with. If you are an admin, it will be added immediately. Otherwise, a request will be sent to the team admins.
+            </Text>
+            
+            <Box sx={{ 
+              border: '1px solid', 
+              borderColor: 'border.default', 
+              borderRadius: 2,
+              maxHeight: '300px',
+              overflowY: 'auto'
+            }}>
+              <ActionList selectionVariant="single">
+                {availableTeams.length === 0 ? (
+                  <ActionList.Item disabled>
+                    <ActionList.LeadingVisual>
+                      <PeopleIcon />
+                    </ActionList.LeadingVisual>
+                    No other teams available
+                  </ActionList.Item>
+                ) : (
+                  availableTeams.map(ut => {
+                    const team = ut.Teams || ut.teams;
+                    const isSelected = selectedTeamId === ut.team_id;
+                    return (
+                      <ActionList.Item 
+                        key={ut.team_id} 
+                        selected={isSelected}
+                        onSelect={() => setSelectedTeamId(ut.team_id)}
+                      >
+                        <ActionList.LeadingVisual>
+                          <PeopleIcon />
+                        </ActionList.LeadingVisual>
+                        {team?.name}
+                        <ActionList.Description variant="inline">
+                          {ut.role.charAt(0).toUpperCase() + ut.role.slice(1)}
+                        </ActionList.Description>
+                        {isSelected && <ActionList.TrailingVisual><CheckIcon /></ActionList.TrailingVisual>}
+                      </ActionList.Item>
+                    );
+                  })
+                )}
+              </ActionList>
+            </Box>
           </Box>
         </Dialog>
-      )}
-
-      {flashMessage && (
-        <Box sx={{ position: 'fixed', bottom: 24, right: 24, zIndex: 100 }}>
-          <Flash variant={flashMessage.variant}>
-            {flashMessage.text}
-          </Flash>
-        </Box>
       )}
     </>
   );

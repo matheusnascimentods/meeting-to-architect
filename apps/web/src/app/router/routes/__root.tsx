@@ -12,6 +12,7 @@ import { Landing } from "@/features/landing/components/Landing";
 import { User } from "@/features/auth/types";
 import { authService } from "@/features/auth/services/auth.service";
 import { AuthContext, AuthContextType } from "@/features/auth/hooks/use-auth";
+import { ToastProvider } from "@/shared/hooks/use-toast";
 
 function NotFoundComponent() {
   return (
@@ -147,9 +148,11 @@ function RootComponent() {
             )
           ) : (
             <AuthContext.Provider value={authValue}>
-              <QueryClientProvider client={queryClient}>
-                <Outlet />
-              </QueryClientProvider>
+              <ToastProvider>
+                <QueryClientProvider client={queryClient}>
+                  <Outlet />
+                </QueryClientProvider>
+              </ToastProvider>
             </AuthContext.Provider>
           )}
         </div>

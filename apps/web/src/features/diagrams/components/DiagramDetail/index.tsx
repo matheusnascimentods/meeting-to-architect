@@ -8,6 +8,9 @@ import { DeleteDiagramDialog } from "@/shared/components/DeleteDiagramDialog";
 import { diagramService } from "@/features/diagrams/services/diagram.service";
 import { MermaidPreview } from "../MermaidPreview";
 import { tokens } from "@/shared/styles/tokens";
+import { formatRelativeTime } from "@/shared/lib/date-utils";
+import { useToast } from "@/shared/hooks/use-toast";
+import mermaid from "mermaid";
 import "./styles.css";
 
 interface DiagramDetailProps {
@@ -19,6 +22,7 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
   const source = diagram.mermaid_code;
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { success, error } = useToast();
 
   const handleDelete = async () => {
     try {
@@ -27,6 +31,34 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
     } catch (err) {
       // Re-throw to be handled by the dialog
       throw err;
+    }
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(source);
+    success("Mermaid code copied to clipboard!");
+  };
+
+  const handleExport = async () => {
+    try {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: "neutral",
+        securityLevel: "loose",
+      });
+      const { svg } = await mermaid.render(`export-${diagram.id.replace(/-/g, '')}`, source);
+      const blob = new Blob([svg], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${diagram.title.toLowerCase().replace(/\s+/g, '-')}.svg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      success("Diagram exported as SVG!");
+    } catch (err) {
+      error("Failed to export diagram.");
     }
   };
 
@@ -42,17 +74,17 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
         <div className="diagram-detail-meta">
           <span className="meta-item">
             <ClockIcon size={14} />
-            <span>{diagram.created_at ? `Generated ${new Date(diagram.created_at).toLocaleDateString()}` : 'Date unknown'}</span>
+            <span>{diagram.created_at ? `Generated ${formatRelativeTime(diagram.created_at)}` : 'Date unknown'}</span>
           </span>
           <span>·</span>
           <span className="meta-item">
             <PersonIcon size={14} />
-            <span>{diagram.created_by || 'System Agent'}</span>
+            <span>{diagram.creator?.name || diagram.created_by || 'System Agent'}</span>
           </span>
         </div>
         <div className="diagram-detail-actions">
-          <Button leadingVisual={CopyIcon} onClick={() => navigator.clipboard.writeText(source)}>Copy Mermaid</Button>
-          <Button leadingVisual={DownloadIcon}>Export</Button>
+          <Button leadingVisual={CopyIcon} onClick={handleCopy}>Copy Mermaid</Button>
+          <Button leadingVisual={DownloadIcon} onClick={handleExport}>Export</Button>
           <Button variant="danger" leadingVisual={TrashIcon} onClick={() => setIsDeleteDialogOpen(true)}>Delete</Button>
         </div>
 
@@ -85,7 +117,7 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
           <PanelBox>
             <PanelHeader
               left={<span className="panel-label">Mermaid Source</span>}
-              right={<IconButton icon={CopyIcon} aria-label="Copy source" variant="invisible" size="small" onClick={() => navigator.clipboard.writeText(source)} />}
+              right={<IconButton icon={CopyIcon} aria-label="Copy source" variant="invisible" size="small" onClick={handleCopy} />}
             />
             <pre className="mermaid-source">
               <code>

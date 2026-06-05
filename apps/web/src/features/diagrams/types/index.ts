@@ -14,6 +14,8 @@ export type Diagram = {
   created_at?: string;
   updated_at?: string;
   created_by?: string;
+  team_id?: string | null;
+  creator?: { name: string };
   variant?: LabelVariant;
 };
 

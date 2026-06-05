@@ -11,6 +11,10 @@ class MemberService {
     await api.patch(`/members/team/${teamId}/user/${userId}/role`, { role });
   }
 
+  async updateMembersRoles(teamId: string, updates: { userId: string, role: string }[]): Promise<void> {
+    await api.patch(`/members/team/${teamId}/roles`, { updates });
+  }
+
   async removeMember(teamId: string, userId: string): Promise<void> {
     await api.delete(`/members/team/${teamId}/user/${userId}`);
   }

@@ -28,6 +28,9 @@ export class TeamDiagramsService {
     teamId: string,
     userId: string,
   ): Promise<void> {
+    const diagram = await this.repository.findDiagram(diagramId);
+    if (!diagram) throw new NotFoundException('Diagram not found');
+
     const role = await this.repository.getMemberRole(teamId, userId);
 
     if (!role)
@@ -40,7 +43,8 @@ export class TeamDiagramsService {
         await this.repository.createApprovalRequest(diagramId, teamId, userId);
       }
     } catch (error) {
-      throw new Error(`Failed to add diagram to team: ${error.message}`);
+      console.error('Error adding diagram to team:', error);
+      throw new Error(`Failed to add diagram to team: ${error.message || 'Unknown error'}`);
     }
   }
 }

@@ -12,8 +12,24 @@ export class TeamDiagramsRepository {
         teamId,
         isDeleted: false,
       },
+      include: {
+        creator: {
+          select: { name: true }
+        }
+      },
       orderBy: {
         createdAt: 'desc',
+      },
+    });
+  }
+
+  async findDiagram(id: string) {
+    return this.prisma.diagram.findUnique({
+      where: { id },
+      include: {
+        creator: {
+          select: { name: true }
+        }
       },
     });
   }
@@ -36,6 +52,11 @@ export class TeamDiagramsRepository {
     return this.prisma.diagram.update({
       where: { id: diagramId },
       data: { teamId },
+      include: {
+        creator: {
+          select: { name: true }
+        }
+      },
     });
   }
 

@@ -25,11 +25,17 @@ export function EmailStep({ email, setEmail, onSubmit, loading, error }: Props) 
           borderRadius: '16px',
           boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
           width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'stretch',
         }}
       >
-        <Text sx={{ fontSize: 3, fontWeight: 'bold', mb: 1, display: 'block' }}>Welcome</Text>
-        <Text sx={{ color: 'fg.muted', fontSize: 1, mb: 4, display: 'block' }}>Enter your email to continue</Text>
+        <Box sx={{ mb: 4 }}>
+          <Text sx={{ fontSize: 3, fontWeight: 'bold', mb: 1, display: 'block' }}>Welcome</Text>
+          <Text sx={{ color: 'fg.muted', fontSize: 1, display: 'block' }}>Enter your email to continue</Text>
+        </Box>
         <FormControl>
+          <FormControl.Label visuallyHidden>Email</FormControl.Label>
           <TextInput
             type="email"
             placeholder="you@company.com"
@@ -39,7 +45,7 @@ export function EmailStep({ email, setEmail, onSubmit, loading, error }: Props) 
           />
           {error && <FormControl.Validation variant="error">{error}</FormControl.Validation>}
         </FormControl>
-        <Button variant="primary" block sx={{ mt: 3 }} type="submit" loading={loading}>
+        <Button variant="primary" sx={{ mt: 3, width: '100%' }} type="submit" loading={loading}>
           Continue
         </Button>
       </Box>

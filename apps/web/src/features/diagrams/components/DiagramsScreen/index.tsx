@@ -5,19 +5,19 @@ import { DiagramCard } from "../DiagramCard";
 import { DiagramDetail } from "../DiagramDetail";
 import { NewDiagramDialog } from "../NewDiagramDialog";
 import { EmptyState } from "@/shared/components/EmptyState";
-import { DeleteSuccessBanner } from "@/shared/components/DeleteSuccessBanner";
+import { useToast } from "@/shared/hooks/use-toast";
 import { useDiagrams } from "../../hooks/useDiagrams";
 import { LoadingState } from "@/shared/components/LoadingState";
 import { ErrorState } from "@/shared/components/ErrorState";
-import { tokens } from "@/shared/styles/tokens";
 import { COPY } from "@/shared/constants/copy";
+import { tokens } from "@/shared/styles/tokens";
 
 type Screen = { name: "list" } | { name: "detail"; diagramId: string };
 
 export function DiagramsScreen() {
   const { diagrams, loading, error, refetch } = useDiagrams();
+  const { success } = useToast();
   const [isOpen, setIsOpen] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [screen, setScreen] = useState<Screen>({ name: "list" });
 
   const activeDiagram = screen.name === "detail" ? diagrams.find((d) => d.id === screen.diagramId) : null;
@@ -27,8 +27,7 @@ export function DiagramsScreen() {
     if (screen.name === "detail") {
       setScreen({ name: "list" });
     }
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 3000);
+    success("Diagram successfully deleted!");
   };
 
   if (loading && diagrams.length === 0) {
@@ -70,7 +69,6 @@ export function DiagramsScreen() {
 
       {screen.name === "list" && (
         <Box sx={tokens.container.page}>
-          {showSuccess && <DeleteSuccessBanner />}
           <Box sx={{ display: "flex", alignItems: "center", gap: 2, marginBottom: 1 }}>
             <Text as="h1" sx={tokens.text.heading}>
               {COPY.diagrams.title}
@@ -116,6 +114,7 @@ export function DiagramsScreen() {
         <NewDiagramDialog 
           onClose={() => setIsOpen(false)} 
           onSuccess={(newDiagram) => {
+            success("Diagram created successfully.");
             refetch();
             setIsOpen(false);
             setScreen({ name: "detail", diagramId: newDiagram.id });

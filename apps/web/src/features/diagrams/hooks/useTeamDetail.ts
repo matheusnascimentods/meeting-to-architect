@@ -7,6 +7,8 @@ import { Team } from '@/features/teams/types';
 import { Diagram, DiagramRequest } from '@/features/diagrams/types';
 import { COPY } from '@/shared/constants/copy';
 
+import { useToast } from '@/shared/hooks/use-toast';
+
 export function useTeamDetail(teamId: string) {
   const [team, setTeam] = useState<Team | null>(null);
   const [role, setRole] = useState<string>('');
@@ -14,6 +16,7 @@ export function useTeamDetail(teamId: string) {
   const [requests, setRequests] = useState<DiagramRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { success, error: toastError } = useToast();
 
   const fetchData = useCallback(async () => {
     if (!teamId) return;
@@ -41,13 +44,23 @@ export function useTeamDetail(teamId: string) {
   }, [fetchData]);
 
   const inviteMember = async (email: string) => {
-    await inviteService.invite(teamId, email);
-    await fetchData();
+    try {
+      await inviteService.invite(teamId, email);
+      success(`Invitation sent to ${email}.`);
+      await fetchData();
+    } catch (err) {
+      toastError('Failed to send invitation.');
+    }
   };
 
   const respondRequest = async (requestId: string, approve: boolean) => {
-    await approvalService.respondRequest(requestId, approve);
-    await fetchData();
+    try {
+      await approvalService.respondRequest(requestId, approve);
+      success(approve ? "Diagram approved." : "Diagram rejected.");
+      await fetchData();
+    } catch (err) {
+      toastError('Failed to respond to request.');
+    }
   };
 
   return { team, role, diagrams, requests, loading, error, refetch: fetchData, inviteMember, respondRequest };

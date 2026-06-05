@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Box, Button, Dialog, FormControl, TextInput } from "@primer/react";
+import { Box, Button, Dialog, FormControl, TextInput, Text } from "@primer/react";
 import { teamService } from "../../services/team.service";
 import { Team } from "../../types";
+import { useToast } from "@/shared/hooks/use-toast";
 
 interface Props {
   team: Team;
@@ -12,6 +13,7 @@ interface Props {
 export function EditTeamDialog({ team, onClose, onSuccess }: Props) {
   const [name, setName] = useState(team.name);
   const [loading, setLoading] = useState(false);
+  const { success, error } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,22 +22,29 @@ export function EditTeamDialog({ team, onClose, onSuccess }: Props) {
     setLoading(true);
     try {
       await teamService.update(team.id, { name });
+      success("Team updated successfully.");
       onSuccess();
       onClose();
-    } catch (error) {
-      console.error("Failed to update team", error);
+    } catch (err) {
+      error("Failed to update team.");
+      console.error("Failed to update team", err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Dialog onClose={onClose} title="Edit Team" width="small">
-      <Box as="form" onSubmit={handleSubmit} sx={{ p: 3 }}>
+    <Dialog onClose={onClose} title="Edit Team">
+      <Box as="form" onSubmit={handleSubmit} sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <Text sx={{ color: 'fg.muted', fontSize: 1 }}>
+          Update your team name. This will be visible to all members.
+        </Text>
+        
         <FormControl>
           <FormControl.Label>Team Name</FormControl.Label>
           <TextInput
             block
+            size="large"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Enter team name"
@@ -44,7 +53,7 @@ export function EditTeamDialog({ team, onClose, onSuccess }: Props) {
           />
         </FormControl>
 
-        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
           <Button onClick={onClose} disabled={loading}>
             Cancel
           </Button>

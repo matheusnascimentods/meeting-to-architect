@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards, ParseUUIDPipe } from '@nestjs/common';
 import { TeamDiagramsService } from './index.service';
 import { addToTeamSchema } from './index.schema';
 import { AuthGuard } from '../auth/index.guard';
@@ -11,7 +11,7 @@ export class TeamDiagramsController {
 
   @Get('team/:teamId')
   findByTeam(
-    @Param('teamId') teamId: string,
+    @Param('teamId', ParseUUIDPipe) teamId: string,
     @CurrentUser() user: { sub: string },
   ) {
     return this.teamDiagramsService.findByTeam(teamId, user.sub);
@@ -19,7 +19,7 @@ export class TeamDiagramsController {
 
   @Post(':id/add-to-team')
   addToTeam(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() body: unknown,
     @CurrentUser() user: { sub: string },
   ) {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Text, Dialog, CounterLabel, Flash } from '@primer/react';
+import { Box, Text, Dialog, CounterLabel } from '@primer/react';
 import { TrashIcon } from '@primer/octicons-react';
 import { Diagram } from '../../types';
 import { EmptyState } from '@/shared/components/EmptyState';
@@ -10,13 +10,15 @@ import { tokens } from '@/shared/styles/tokens';
 import { COPY } from '@/shared/constants/copy';
 import { TrashItem } from './TrashItem';
 
+import { useToast } from '@/shared/hooks/use-toast';
+
 interface Props {
   onNavigate?: (screen: string) => void;
 }
 
 export function TrashScreen({ onNavigate }: Props) {
   const { items, loading, error, restore, permanentDelete } = useTrash();
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const { success } = useToast();
   const [diagramToDelete, setDiagramToDelete] = useState<Diagram | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -24,8 +26,7 @@ export function TrashScreen({ onNavigate }: Props) {
     setIsDeleting(true);
     try {
       await permanentDelete(id);
-      setSuccessMessage(COPY.trash.clearSuccess);
-      setTimeout(() => setSuccessMessage(null), 5000);
+      success(COPY.trash.clearSuccess);
       setDiagramToDelete(null);
     } catch (err) {
       // Error handled by hook
@@ -37,8 +38,7 @@ export function TrashScreen({ onNavigate }: Props) {
   const handleRestore = async (id: string) => {
     try {
       await restore(id);
-      setSuccessMessage(COPY.trash.restoreSuccess);
-      setTimeout(() => setSuccessMessage(null), 5000);
+      success(COPY.trash.restoreSuccess);
     } catch (err) {
       // Error handled by hook
     }
@@ -55,12 +55,6 @@ export function TrashScreen({ onNavigate }: Props) {
   return (
     <Box sx={{ minHeight: '100vh', fontFamily: tokens.layout.fontStack }}>
       <Box sx={tokens.container.page}>
-        {successMessage && (
-          <Flash variant="success" sx={{ mb: 3 }}>
-            {successMessage}
-          </Flash>
-        )}
-
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, marginBottom: 1 }}>
           <Text as="h1" sx={tokens.text.heading}>
             {COPY.trash.title}

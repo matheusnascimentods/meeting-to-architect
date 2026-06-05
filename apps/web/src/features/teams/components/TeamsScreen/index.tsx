@@ -15,6 +15,7 @@ import { EditTeamDialog } from "./EditTeamDialog";
 import { MembersDialog } from "./MembersDialog";
 import { teamService } from "../../services/team.service";
 import { Team } from "../../types";
+import { useToast } from "@/shared/hooks/use-toast";
 
 type TeamsView =
   | { name: 'list' }
@@ -27,14 +28,17 @@ export function TeamsScreen() {
   const [editingTeam, setEditingTeam] = useState<Team | null>(null);
   const [membersTeam, setMembersTeam] = useState<Team | null>(null);
   const [view, setView] = useState<TeamsView>({ name: 'list' });
+  const { success, error: toastError } = useToast();
 
   const handleDeleteTeam = async (id: string) => {
     if (!confirm("Are you sure you want to delete this team? This action cannot be undone.")) return;
     try {
       await teamService.delete(id);
+      success("Team deleted successfully.");
       refetch();
-    } catch (error) {
-      console.error("Failed to delete team", error);
+    } catch (err) {
+      toastError("Failed to delete team.");
+      console.error("Failed to delete team", err);
     }
   };
 
@@ -157,7 +161,10 @@ export function TeamsScreen() {
       {isOpen && (
         <NewTeamDialog
           onClose={() => setIsOpen(false)}
-          onSuccess={refetch}
+          onSuccess={() => {
+            success("Team created successfully.");
+            refetch();
+          }}
         />
       )}
 

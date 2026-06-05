@@ -42,8 +42,32 @@ export class TeamsRepository {
   }
 
   async delete(id: string) {
-    return this.prisma.team.delete({
-      where: { id },
+    return this.prisma.$transaction(async (tx) => {
+      // 1. Clear teamId from all Diagrams associated with this team
+      await tx.diagram.updateMany({
+        where: { teamId: id },
+        data: { teamId: null },
+      });
+
+      // 2. Delete all TeamMember records for this team
+      await tx.teamMember.deleteMany({
+        where: { teamId: id },
+      });
+
+      // 3. Delete all TeamInvite records for this team
+      await tx.teamInvite.deleteMany({
+        where: { teamId: id },
+      });
+
+      // 4. Delete all ApprovalRequest records for this team
+      await tx.approvalRequest.deleteMany({
+        where: { teamId: id },
+      });
+
+      // 5. Finally, delete the Team
+      return tx.team.delete({
+        where: { id },
+      });
     });
   }
 

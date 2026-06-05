@@ -3,12 +3,14 @@ import { teamService } from '../services/team.service';
 import { inviteService } from '../services/invite.service';
 import { UserTeam, TeamInvite } from '../types';
 import { COPY } from '@/shared/constants/copy';
+import { useToast } from '@/shared/hooks/use-toast';
 
 export function useTeams() {
   const [teams, setTeams] = useState<UserTeam[]>([]);
   const [invites, setInvites] = useState<TeamInvite[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { success, error: toastError } = useToast();
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -32,8 +34,13 @@ export function useTeams() {
   }, [fetchData]);
 
   const respondInvite = async (inviteId: string, accept: boolean) => {
-    await inviteService.respondInvite(inviteId, accept);
-    await fetchData();
+    try {
+      await inviteService.respondInvite(inviteId, accept);
+      success(accept ? "Invite accepted." : "Invite rejected.");
+      await fetchData();
+    } catch (err) {
+      toastError("Failed to respond to invite.");
+    }
   };
 
   return { teams, invites, loading, error, refetch: fetchData, respondInvite };

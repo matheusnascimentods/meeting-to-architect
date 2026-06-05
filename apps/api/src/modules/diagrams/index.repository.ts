@@ -12,6 +12,11 @@ export class DiagramsRepository {
         createdBy: userId,
         isDeleted: false,
       },
+      include: {
+        creator: {
+          select: { name: true }
+        }
+      },
       orderBy: {
         createdAt: 'desc',
       },
@@ -21,12 +26,22 @@ export class DiagramsRepository {
   async findById(id: string) {
     return this.prisma.diagram.findUnique({
       where: { id },
+      include: {
+        creator: {
+          select: { name: true }
+        }
+      },
     });
   }
 
   async create(data: Prisma.DiagramCreateInput) {
     return this.prisma.diagram.create({
       data,
+      include: {
+        creator: {
+          select: { name: true }
+        }
+      },
     });
   }
 
@@ -34,6 +49,11 @@ export class DiagramsRepository {
     return this.prisma.diagram.update({
       where: { id },
       data,
+      include: {
+        creator: {
+          select: { name: true }
+        }
+      },
     });
   }
 

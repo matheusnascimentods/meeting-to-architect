@@ -28,6 +28,17 @@ export class MembersRepository {
     });
   }
 
+  async updateMembersRoles(teamId: string, updates: { userId: string, role: UserRole }[]) {
+    return this.prisma.$transaction(
+      updates.map((u) =>
+        this.prisma.teamMember.updateMany({
+          where: { teamId, userId: u.userId },
+          data: { role: u.role },
+        }),
+      ),
+    );
+  }
+
   async removeMember(teamId: string, userId: string) {
     return this.prisma.teamMember.deleteMany({
       where: { teamId, userId },

@@ -28,7 +28,7 @@ export function LoginStep({ currentUser, password, setPassword, onSubmit, onBack
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
+          alignItems: 'stretch',
         }}
       >
         <IconButton
@@ -38,23 +38,25 @@ export function LoginStep({ currentUser, password, setPassword, onSubmit, onBack
           onClick={onBack}
           sx={{ position: 'absolute', top: 2, left: 2 }}
         />
-        <Box
-          sx={{
-            width: 40,
-            height: 40,
-            borderRadius: '50%',
-            bg: 'accent.subtle',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            mb: 2,
-            mt: 2,
-          }}
-        >
-          <Text sx={{ color: 'accent.fg', fontWeight: 'bold' }}>{currentUser?.name?.[0] || '?'}</Text>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 4 }}>
+          <Box
+            sx={{
+              width: 40,
+              height: 40,
+              borderRadius: '50%',
+              bg: 'accent.subtle',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mb: 2,
+              mt: 2,
+            }}
+          >
+            <Text sx={{ color: 'accent.fg', fontWeight: 'bold' }}>{currentUser?.name?.[0] || '?'}</Text>
+          </Box>
+          <Text sx={{ fontWeight: 'bold', fontSize: 2 }}>{currentUser?.name}</Text>
+          <Text sx={{ color: 'fg.muted', fontSize: 1 }}>{currentUser?.email}</Text>
         </Box>
-        <Text sx={{ fontWeight: 'bold', fontSize: 2 }}>{currentUser?.name}</Text>
-        <Text sx={{ color: 'fg.muted', fontSize: 1, mb: 4 }}>{currentUser?.email}</Text>
 
         <FormControl sx={{ width: '100%' }}>
           <FormControl.Label>Password</FormControl.Label>
@@ -68,10 +70,9 @@ export function LoginStep({ currentUser, password, setPassword, onSubmit, onBack
           {error && <FormControl.Validation variant="error">{error}</FormControl.Validation>}
         </FormControl>
 
-        <Button variant="primary" block sx={{ mt: 3 }} type="submit" loading={loading}>
+        <Button variant="primary" sx={{ mt: 3, width: '100%' }} type="submit" loading={loading}>
           Sign in
         </Button>
-        <Text sx={{ color: 'fg.muted', fontSize: 0, mt: 3, cursor: 'pointer' }}>Forgot your password?</Text>
       </Box>
     </Box>
   );
