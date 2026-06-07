@@ -12,6 +12,7 @@ interface Props {
 
 export function EditTeamDialog({ team, onClose, onSuccess }: Props) {
   const [name, setName] = useState(team.name);
+  const [description, setDescription] = useState(team.description || "");
   const [loading, setLoading] = useState(false);
   const { success, error } = useToast();
 
@@ -21,7 +22,7 @@ export function EditTeamDialog({ team, onClose, onSuccess }: Props) {
 
     setLoading(true);
     try {
-      await teamService.update(team.id, { name });
+      await teamService.update(team.id, { name, description });
       success("Team updated successfully.");
       onSuccess();
       onClose();
@@ -37,7 +38,7 @@ export function EditTeamDialog({ team, onClose, onSuccess }: Props) {
     <Dialog onClose={onClose} title="Edit Team">
       <Box as="form" onSubmit={handleSubmit} sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
         <Text sx={{ color: 'fg.muted', fontSize: 1 }}>
-          Update your team name. This will be visible to all members.
+          Update your team details. This will be visible to all members.
         </Text>
         
         <FormControl>
@@ -50,6 +51,17 @@ export function EditTeamDialog({ team, onClose, onSuccess }: Props) {
             placeholder="Enter team name"
             required
             autoFocus
+          />
+        </FormControl>
+
+        <FormControl>
+          <FormControl.Label>Description</FormControl.Label>
+          <TextInput
+            block
+            size="large"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Enter team description"
           />
         </FormControl>
 

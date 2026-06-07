@@ -1,6 +1,7 @@
 export interface Team {
   id: string;
   name: string;
+  description?: string;
   created_by: string;
   created_at?: string;
   updated_at?: string;
@@ -23,10 +24,12 @@ export interface TeamMember {
 
 export interface CreateTeamDto {
   name: string;
+  description?: string;
 }
 
 export interface UpdateTeamDto {
   name?: string;
+  description?: string;
 }
 
 export interface UserTeam {

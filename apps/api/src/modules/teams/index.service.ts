@@ -13,7 +13,7 @@ export class TeamsService {
 
   async create(dto: CreateTeamDto, userId: string) {
     try {
-      return await this.repository.create(dto.name, userId);
+      return await this.repository.create(dto.name, userId, dto.description);
     } catch (error) {
       throw new Error(`Failed to create team: ${error.message}`);
     }

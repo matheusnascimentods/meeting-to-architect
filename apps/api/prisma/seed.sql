@@ -28,10 +28,10 @@ INSERT INTO "Users" (id, name, email, password_hash, is_active, created_at, upda
 -- 2. TEAMS
 -- =============================================================
 
-INSERT INTO "Teams" (id, name, created_at, updated_at) VALUES
-('b1000000-0000-0000-0000-000000000001', 'Core Platform',      NOW() - INTERVAL '80 days', NOW()),
-('b1000000-0000-0000-0000-000000000002', 'Mobile Experience',  NOW() - INTERVAL '70 days', NOW()),
-('b1000000-0000-0000-0000-000000000003', 'Cloud Infrastructure', NOW() - INTERVAL '60 days', NOW());
+INSERT INTO "Teams" (id, name, description, created_at, updated_at) VALUES
+('b1000000-0000-0000-0000-000000000001', 'Core Platform',      'Responsável pela infraestrutura e serviços principais da plataforma.', NOW() - INTERVAL '80 days', NOW()),
+('b1000000-0000-0000-0000-000000000002', 'Mobile Experience',  'Focada na experiência do usuário em dispositivos móveis e aplicativos.', NOW() - INTERVAL '70 days', NOW()),
+('b1000000-0000-0000-0000-000000000003', 'Cloud Infrastructure', 'Gerencia a infraestrutura na nuvem, escalabilidade e resiliência.', NOW() - INTERVAL '60 days', NOW());
 
 -- =============================================================
 -- 3. TEAM MEMBERS

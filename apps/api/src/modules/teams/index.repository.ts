@@ -6,10 +6,11 @@ import { Prisma, UserRole } from '@prisma/client';
 export class TeamsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(name: string, userId: string) {
+  async create(name: string, userId: string, description?: string) {
     return this.prisma.team.create({
       data: {
         name,
+        description,
         members: {
           create: {
             userId,

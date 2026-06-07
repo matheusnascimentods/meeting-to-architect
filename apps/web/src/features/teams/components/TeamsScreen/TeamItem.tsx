@@ -100,8 +100,20 @@ export function TeamItem({ userTeam, onClick, onEdit, onDelete, onMembers }: Pro
       </Box>
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Text sx={{ fontSize: 0, color: "fg.muted" }}>
-          Description: This team is for architecture diagrams!
+        <Text
+          sx={{
+            fontSize: 0,
+            color: "fg.muted",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            lineHeight: 1.5,
+            minHeight: "3em",
+          }}
+        >
+          {team.description || "No description provided."}
         </Text>
       </Box>
 

@@ -11,6 +11,7 @@ interface Props {
 
 export function NewTeamDialog({ onClose, onSuccess }: Props) {
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,7 +22,7 @@ export function NewTeamDialog({ onClose, onSuccess }: Props) {
     setError(null);
 
     try {
-      const team = await teamService.create({ name });
+      const team = await teamService.create({ name, description });
       onSuccess?.(team);
       onClose();
     } catch (err: unknown) {
@@ -75,6 +76,20 @@ export function NewTeamDialog({ onClose, onSuccess }: Props) {
           />
           <FormControl.Caption>
             Give your team a name that everyone will recognize.
+          </FormControl.Caption>
+        </FormControl>
+
+        <FormControl sx={{ mt: 3 }}>
+          <FormControl.Label>Description</FormControl.Label>
+          <TextInput
+            placeholder="Describe what this team does..."
+            block
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            disabled={loading}
+          />
+          <FormControl.Caption>
+            A brief description of the team's purpose.
           </FormControl.Caption>
         </FormControl>
       </Box>

@@ -17,8 +17,8 @@ interface Props {
   onBack: () => void;
 }
 
-export function TeamDetailScreen({ team, onBack }: Props) {
-  const { role, diagrams, requests, loading, error, refetch, inviteMember, respondRequest } = useTeamDetail(team.id);
+export function TeamDetailScreen({ team: teamSummary, onBack }: Props) {
+  const { team, role, diagrams, requests, loading, error, refetch, inviteMember, respondRequest } = useTeamDetail(teamSummary.id);
   const [selectedDiagram, setSelectedDiagram] = useState<Diagram | null>(null);
   const [isRequestsOpen, setIsRequestsOpen] = useState(false);
   const isAdmin = role === 'admin';
@@ -75,12 +75,12 @@ export function TeamDetailScreen({ team, onBack }: Props) {
             onClick={onBack}
           />
           <Text as="h1" sx={tokens.text.heading}>
-            {team.name}
+            {team?.name || teamSummary.name}
           </Text>
           <CounterLabel>{diagrams.length}</CounterLabel>
         </Box>
         <Text as="p" sx={{ ...tokens.text.muted, marginBottom: 4 }}>
-          This team is for architecture diagrams.
+          {team?.description || "This team is for architecture diagrams."}
         </Text>
 
         {isAdmin && (
