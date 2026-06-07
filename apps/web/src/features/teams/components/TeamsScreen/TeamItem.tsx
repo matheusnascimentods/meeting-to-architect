@@ -2,6 +2,7 @@ import { Box, Text, Label, ActionMenu, ActionList, IconButton } from '@primer/re
 import { KebabHorizontalIcon, PencilIcon, TrashIcon, PeopleIcon } from '@primer/octicons-react';
 import { UserTeam } from '../../types';
 import { tokens } from '@/shared/styles/tokens';
+import { formatRelativeTime } from '@/shared/lib/date-utils';
 
 interface Props {
   userTeam: UserTeam;
@@ -16,6 +17,7 @@ export function TeamItem({ userTeam, onClick, onEdit, onDelete, onMembers }: Pro
   if (!team) return null;
 
   const isAdmin = userTeam.role === 'admin';
+  const createdAt = (team as any).created_at || (team as any).createdAt;
 
   return (
     <Box
@@ -119,7 +121,7 @@ export function TeamItem({ userTeam, onClick, onEdit, onDelete, onMembers }: Pro
 
       <Box sx={{ mt: 'auto', pt: 2, borderTop: '1px solid', borderColor: 'border.subtle' }}>
         <Text sx={{ fontSize: 0, color: 'fg.subtle' }}>
-          Created at {team.created_at ? new Date(team.created_at).toLocaleDateString() : 'N/A'}
+          {createdAt ? formatRelativeTime(createdAt) : 'Just now'}
         </Text>
       </Box>
     </Box>
