@@ -54,4 +54,14 @@ export class MembersController {
   ) {
     return this.members.removeMember(teamId, user.sub, userId);
   }
+
+  @Delete('team/:teamId/batch')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  removeMembers(
+    @Param('teamId') teamId: string,
+    @Body('userIds') userIds: string[],
+    @CurrentUser() user: { sub: string },
+  ) {
+    return this.members.removeMembers(teamId, user.sub, userIds);
+  }
 }

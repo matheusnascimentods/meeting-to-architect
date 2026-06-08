@@ -18,6 +18,10 @@ class MemberService {
   async removeMember(teamId: string, userId: string): Promise<void> {
     await api.delete(`/members/team/${teamId}/user/${userId}`);
   }
+
+  async removeMembers(teamId: string, userIds: string[]): Promise<void> {
+    await api.delete(`/members/team/${teamId}/batch`, { data: { userIds } });
+  }
 }
 
 export const memberService = new MemberService();

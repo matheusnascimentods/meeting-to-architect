@@ -45,6 +45,15 @@ export class MembersRepository {
     });
   }
 
+  async removeMembers(teamId: string, userIds: string[]) {
+    return this.prisma.teamMember.deleteMany({
+      where: {
+        teamId,
+        userId: { in: userIds },
+      },
+    });
+  }
+
   async getMemberRole(teamId: string, userId: string) {
     const member = await this.prisma.teamMember.findFirst({
       where: { teamId, userId },

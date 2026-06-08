@@ -78,6 +78,20 @@ export class MembersService {
     }
   }
 
+  async removeMembers(
+    teamId: string,
+    adminId: string,
+    userIds: string[],
+  ): Promise<void> {
+    await this.verifyRole(teamId, adminId, [UserRole.ADMIN]);
+
+    try {
+      await this.repository.removeMembers(teamId, userIds);
+    } catch (error) {
+      throw new Error(`Failed to remove members: ${error.message}`);
+    }
+  }
+
   private async verifyRole(
     teamId: string,
     userId: string,

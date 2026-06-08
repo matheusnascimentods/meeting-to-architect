@@ -20,12 +20,14 @@ export function MembersDialog({ teamId, teamName, onClose }: Props) {
   
   // Track local role changes before saving
   const [roleChanges, setRoleChanges] = useState<Record<string, 'admin' | 'member' | 'maintainer'>>({});
+  const [membersToRemove, setMembersToRemove] = useState<string[]>([]);
 
   const fetchMembers = async () => {
     try {
       const data = await memberService.getMembers(teamId);
       setMembers(data);
       setRoleChanges({}); // Clear changes on fresh fetch
+      setMembersToRemove([]);
     } catch (error) {
       console.error("Failed to fetch members", error);
     } finally {
@@ -41,42 +43,44 @@ export function MembersDialog({ teamId, teamName, onClose }: Props) {
     setRoleChanges(prev => ({ ...prev, [userId]: role }));
   };
 
-  const handleSaveRoles = async () => {
-    const updates = Object.entries(roleChanges).map(([userId, role]) => ({ userId, role }));
-    if (updates.length === 0) return;
+  const toggleRemoveMember = (userId: string) => {
+    setMembersToRemove(prev => 
+      prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
+    );
+  };
+
+  const handleSaveChanges = async () => {
+    const roleUpdates = Object.entries(roleChanges)
+      .filter(([userId]) => !membersToRemove.includes(userId))
+      .map(([userId, role]) => ({ userId, role }));
 
     setSaving(true);
     try {
-      await memberService.updateMembersRoles(teamId, updates);
-      success("Members roles updated successfully.");
+      if (roleUpdates.length > 0) {
+        await memberService.updateMembersRoles(teamId, roleUpdates);
+      }
+      
+      if (membersToRemove.length > 0) {
+        await memberService.removeMembers(teamId, membersToRemove);
+      }
+
+      success("Changes saved successfully.");
       await fetchMembers();
     } catch (error) {
-      toastError("Failed to update members roles.");
-      console.error("Failed to update roles", error);
+      toastError("Failed to save changes.");
+      console.error("Failed to save changes", error);
     } finally {
       setSaving(false);
     }
   };
 
-  const handleRemoveMember = async (memberUserId: string) => {
-    if (!confirm("Are you sure you want to remove this member?")) return;
-    try {
-      await memberService.removeMember(teamId, memberUserId);
-      success("Member removed successfully.");
-      fetchMembers();
-    } catch (error) {
-      toastError("Failed to remove member.");
-      console.error("Failed to remove member", error);
-    }
-  };
-
-  const hasChanges = Object.keys(roleChanges).length > 0;
+  const hasChanges = Object.keys(roleChanges).length > 0 || membersToRemove.length > 0;
 
   return (
     <Dialog onClose={onClose} title={`Members of ${teamName}`} width="large">
       <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 3 }}>
         <Text sx={{ color: 'fg.muted', fontSize: 1, mb: 2 }}>
-          Manage your team members and their roles. Changes to roles will be applied after clicking 'Save Changes'.
+          Manage your team members and their roles. Changes will be applied after clicking 'Save Changes'.
         </Text>
 
         {loading ? (
@@ -94,22 +98,35 @@ export function MembersDialog({ teamId, teamName, onClose }: Props) {
               <tbody>
                 {members.map((member) => {
                   const currentRole = roleChanges[member.user_id] || member.role;
-                  const isChanged = !!roleChanges[member.user_id];
+                  const isRoleChanged = !!roleChanges[member.user_id];
+                  const isMarkedForRemoval = membersToRemove.includes(member.user_id);
                   
                   return (
                     <Box as="tr" key={member.user_id} sx={{ 
                       borderBottom: '1px solid', 
                       borderColor: 'border.subtle',
-                      bg: isChanged ? 'accent.subtle' : 'transparent',
-                      '&:last-child': { borderBottom: 'none' }
+                      bg: isMarkedForRemoval ? 'danger.subtle' : (isRoleChanged ? 'accent.subtle' : 'transparent'),
+                      opacity: isMarkedForRemoval ? 0.6 : 1,
+                      '&:last-child': { borderBottom: 'none' },
+                      transition: 'all 0.2s ease'
                     }}>
                       <Box as="td" sx={{ p: 3 }}>
-                        <Text sx={{ fontWeight: 'bold', display: 'block' }}>{member.Users?.name}</Text>
+                        <Text sx={{ 
+                          fontWeight: 'bold', 
+                          display: 'block',
+                          textDecoration: isMarkedForRemoval ? 'line-through' : 'none'
+                        }}>
+                          {member.Users?.name}
+                        </Text>
                         <Text sx={{ fontSize: 0, color: 'fg.muted' }}>{member.Users?.email}</Text>
                       </Box>
                       <Box as="td" sx={{ p: 3 }}>
                         <ActionMenu>
-                          <ActionMenu.Button size="small" sx={{ textTransform: 'capitalize', minWidth: '100px', textAlign: 'left' }}>
+                          <ActionMenu.Button 
+                            size="small" 
+                            disabled={isMarkedForRemoval}
+                            sx={{ textTransform: 'capitalize', minWidth: '100px', textAlign: 'left' }}
+                          >
                             {currentRole}
                           </ActionMenu.Button>
                           <ActionMenu.Overlay>
@@ -120,15 +137,21 @@ export function MembersDialog({ teamId, teamName, onClose }: Props) {
                             </ActionList>
                           </ActionMenu.Overlay>
                         </ActionMenu>
-                        {isChanged && <Text sx={{ fontSize: 0, ml: 2, color: 'accent.fg', fontStyle: 'italic' }}>(Pending)</Text>}
+                        {isRoleChanged && !isMarkedForRemoval && (
+                          <Text sx={{ fontSize: 0, ml: 2, color: 'accent.fg', fontStyle: 'italic' }}>(Role change)</Text>
+                        )}
+                        {isMarkedForRemoval && (
+                          <Text sx={{ fontSize: 0, ml: 2, color: 'danger.fg', fontWeight: 'bold' }}>(To be removed)</Text>
+                        )}
                       </Box>
                       <Box as="td" sx={{ p: 3, textAlign: 'right' }}>
                         <IconButton
                           icon={TrashIcon}
-                          aria-label="Remove member"
-                          variant="danger"
+                          aria-label={isMarkedForRemoval ? "Undo removal" : "Remove member"}
+                          variant={isMarkedForRemoval ? "default" : "danger"}
                           size="small"
-                          onClick={() => handleRemoveMember(member.user_id)}
+                          onClick={() => toggleRemoveMember(member.user_id)}
+                          sx={isMarkedForRemoval ? { bg: 'canvas.default' } : {}}
                         />
                       </Box>
                     </Box>
@@ -143,7 +166,7 @@ export function MembersDialog({ teamId, teamName, onClose }: Props) {
           <Button onClick={onClose} disabled={saving}>Close</Button>
           <Button 
             variant="primary" 
-            onClick={handleSaveRoles} 
+            onClick={handleSaveChanges} 
             disabled={!hasChanges || saving}
             leadingVisual={saving ? Spinner : CheckIcon}
           >
