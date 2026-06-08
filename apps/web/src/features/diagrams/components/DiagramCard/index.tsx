@@ -9,6 +9,7 @@ import { diagramService } from "../../services/diagram.service";
 import { teamService } from "@/features/teams/services/team.service";
 import { teamDiagramService } from "../../services/team-diagram.service";
 import { approvalService } from "../../services/approval.service";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { COPY } from "@/shared/constants/copy";
 import { formatRelativeTime } from "@/shared/lib/date-utils";
 import "./styles.css";
@@ -32,11 +33,17 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete, userTeams: pr
   const [isAddingToTeam, setIsAddingToTeam] = useState(false);
   const [pendingTeamIds, setPendingTeamIds] = useState<string[]>([]);
   const { success, error: toastError } = useToast();
+  const { user } = useAuth();
 
   const { title, description } = diagram;
   const type = diagram.type || "Diagram";
   const variant = diagram.variant || "accent";
   const date = diagram.created_at ? formatRelativeTime(diagram.created_at) : "Just now";
+
+  const isCreator = user?.id === diagram.created_by;
+  const teamMembership = userTeams.find(t => t.team_id === diagram.team_id);
+  const isTeamAdmin = teamMembership?.role === 'admin';
+  const canEdit = isCreator || isTeamAdmin;
 
   useEffect(() => {
     if (propUserTeams) {
@@ -124,36 +131,42 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete, userTeams: pr
         <div className="diagram-card-footer">
           <span className="diagram-card-date">{date}</span>
           <span onClick={(e) => e.stopPropagation()}>
-            <ActionMenu>
-              <ActionMenu.Anchor>
-                <IconButton icon={KebabHorizontalIcon} aria-label="Options" variant="invisible" size="small" />
-              </ActionMenu.Anchor>
-              <ActionMenu.Overlay>
-                <ActionList>
-                  <ActionList.Item onSelect={() => setIsEditDialogOpen(true)}>
-                  <ActionList.LeadingVisual>
-                    <PencilIcon />
-                  </ActionList.LeadingVisual>
-                  Edit
-                  </ActionList.Item>
-                  {!diagram.team_id && availableTeams.length > 0 && (
-                  <ActionList.Item onSelect={() => setShowAddToTeam(true)}>
-                    <ActionList.LeadingVisual>
-                      <PeopleIcon />
-                    </ActionList.LeadingVisual>
-                    Add to Team
-                  </ActionList.Item>
-                  )}
+            {((!diagram.team_id && availableTeams.length > 0) || canEdit) && (
+              <ActionMenu>
+                <ActionMenu.Anchor>
+                  <IconButton icon={KebabHorizontalIcon} aria-label="Options" variant="invisible" size="small" />
+                </ActionMenu.Anchor>
+                <ActionMenu.Overlay>
+                  <ActionList>
+                    {canEdit && (
+                      <ActionList.Item onSelect={() => setIsEditDialogOpen(true)}>
+                        <ActionList.LeadingVisual>
+                          <PencilIcon />
+                        </ActionList.LeadingVisual>
+                        Edit
+                      </ActionList.Item>
+                    )}
+                    {!diagram.team_id && availableTeams.length > 0 && (
+                    <ActionList.Item onSelect={() => setShowAddToTeam(true)}>
+                      <ActionList.LeadingVisual>
+                        <PeopleIcon />
+                      </ActionList.LeadingVisual>
+                      Add to Team
+                    </ActionList.Item>
+                    )}
 
-                  <ActionList.Item variant="danger" onSelect={() => setIsDeleteDialogOpen(true)}>
-                    <ActionList.LeadingVisual>
-                      <TrashIcon />
-                    </ActionList.LeadingVisual>
-                    Delete
-                  </ActionList.Item>
-                </ActionList>
-              </ActionMenu.Overlay>
-            </ActionMenu>
+                    {canEdit && (
+                      <ActionList.Item variant="danger" onSelect={() => setIsDeleteDialogOpen(true)}>
+                        <ActionList.LeadingVisual>
+                          <TrashIcon />
+                        </ActionList.LeadingVisual>
+                        Delete
+                      </ActionList.Item>
+                    )}
+                  </ActionList>
+                </ActionMenu.Overlay>
+              </ActionMenu>
+            )}
           </span>
         </div>
       </div>

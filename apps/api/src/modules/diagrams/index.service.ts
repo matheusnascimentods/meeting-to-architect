@@ -5,11 +5,15 @@ import {
 } from '@nestjs/common';
 import { CreateDiagramDto } from './index.schema';
 import { DiagramsRepository } from './index.repository';
-import { DiagramType } from '@prisma/client';
+import { TeamsRepository } from '../teams/index.repository';
+import { DiagramType, UserRole } from '@prisma/client';
 
 @Injectable()
 export class DiagramsService {
-  constructor(private readonly repository: DiagramsRepository) {}
+  constructor(
+    private readonly repository: DiagramsRepository,
+    private readonly teamsRepository: TeamsRepository,
+  ) {}
 
   async findAll(userId: string) {
     try {
@@ -20,13 +24,22 @@ export class DiagramsService {
     }
   }
 
-  async softDelete(id: string, userId: string): Promise<void> {
-    const data = await this.repository.findById(id);
+  private async checkPermissions(diagramId: string, userId: string) {
+    const diagram = await this.repository.findById(diagramId);
+    if (!diagram) throw new NotFoundException('Diagram not found');
 
-    if (!data)
-      throw new NotFoundException('Diagram not found');
-    if (data.createdBy !== userId)
-      throw new ForbiddenException('No permission to delete this diagram');
+    if (diagram.createdBy === userId) return;
+
+    if (diagram.teamId) {
+      const role = await this.teamsRepository.getMemberRole(diagram.teamId, userId);
+      if (role === UserRole.ADMIN) return;
+    }
+
+    throw new ForbiddenException('You do not have permission to modify this diagram');
+  }
+
+  async softDelete(id: string, userId: string): Promise<void> {
+    await this.checkPermissions(id, userId);
 
     try {
       await this.repository.softDelete(id);
@@ -60,6 +73,8 @@ export class DiagramsService {
       type?: string;
     },
   ) {
+    await this.checkPermissions(id, userId);
+    
     const { title, description, mermaid_code, type } = updateData;
     try {
       return await this.repository.update(id, {
@@ -67,8 +82,6 @@ export class DiagramsService {
         description,
         mermaidCode: mermaid_code,
         type: type as DiagramType,
-        // Ensure it belongs to the user if we want to enforce it here
-        // The original code used .eq('created_by', userId) in the update
       });
     } catch (error) {
       console.error('Error updating diagram:', error);

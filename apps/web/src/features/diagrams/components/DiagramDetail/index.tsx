@@ -6,6 +6,8 @@ import { PanelBox } from "@/shared/components/PanelBox";
 import { PanelHeader } from "@/shared/components/PanelHeader";
 import { DeleteDiagramDialog } from "@/shared/components/DeleteDiagramDialog";
 import { diagramService } from "@/features/diagrams/services/diagram.service";
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import { useTeams } from "@/features/teams/hooks/useTeams";
 import { MermaidPreview } from "../MermaidPreview";
 import { tokens } from "@/shared/styles/tokens";
 import { formatRelativeTime } from "@/shared/lib/date-utils";
@@ -23,6 +25,13 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { success, error } = useToast();
+  const { user } = useAuth();
+  const { teams } = useTeams();
+
+  const isCreator = user?.id === diagram.created_by;
+  const teamMembership = teams.find(t => t.team_id === diagram.team_id);
+  const isTeamAdmin = teamMembership?.role === 'admin';
+  const canDelete = isCreator || isTeamAdmin;
 
   const handleDelete = async () => {
     try {
@@ -85,7 +94,9 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
         <div className="diagram-detail-actions">
           <Button leadingVisual={CopyIcon} onClick={handleCopy}>Copy Mermaid</Button>
           <Button leadingVisual={DownloadIcon} onClick={handleExport}>Export</Button>
-          <Button variant="danger" leadingVisual={TrashIcon} onClick={() => setIsDeleteDialogOpen(true)}>Delete</Button>
+          {canDelete && (
+            <Button variant="danger" leadingVisual={TrashIcon} onClick={() => setIsDeleteDialogOpen(true)}>Delete</Button>
+          )}
         </div>
 
         <div className="m2a-detail-grid">
