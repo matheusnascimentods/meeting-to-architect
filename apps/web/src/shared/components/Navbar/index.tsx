@@ -45,7 +45,6 @@ export function Navbar({ showBack, onBack, showNewButton, onNewClick, user, onLo
             />
             <ActionMenu>
               <ActionMenu.Anchor>
-...
               <Box
                 sx={{
                   width: 32,
@@ -82,6 +81,7 @@ export function Navbar({ showBack, onBack, showNewButton, onNewClick, user, onLo
               </ActionList>
             </ActionMenu.Overlay>
           </ActionMenu>
+          </>
         )}
       </Box>
     </nav>

@@ -61,6 +61,12 @@ services:
     container_name: m2a_api
     restart: unless-stopped
     env_file: apps/api/.env
+    environment:
+      # Usa a porta publicada do Postgres no host — mais confiável que postgres:5432
+      # em ambientes onde a comunicação entre containers na bridge falha.
+      DATABASE_URL: postgresql://postgres:password@host.docker.internal:5433/diagrams_db?schema=public
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "3000:3000"
     networks:

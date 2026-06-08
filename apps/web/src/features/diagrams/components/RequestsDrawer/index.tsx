@@ -55,11 +55,11 @@ export function RequestsDrawer({ onClose }: RequestsDrawerProps) {
   const getStatusIcon = (status: string) => {
     switch (status.toUpperCase()) {
       case "ACCEPTED":
-        return <CheckCircleIcon size={20} color="success.fg" />;
+        return <Box sx={{ color: 'success.fg', display: 'inline-flex' }}><CheckCircleIcon size={20} /></Box>;
       case "REJECTED":
-        return <XCircleIcon size={20} color="danger.fg" />;
+        return <Box sx={{ color: 'danger.fg', display: 'inline-flex' }}><XCircleIcon size={20} /></Box>;
       case "PENDING":
-        return <ClockIcon size={20} color="attention.fg" />;
+        return <Box sx={{ color: 'attention.fg', display: 'inline-flex' }}><ClockIcon size={20} /></Box>;
       default:
         return null;
     }
