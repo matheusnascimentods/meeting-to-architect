@@ -79,7 +79,7 @@ export function DiagramsScreen() {
             {COPY.diagrams.subtitle}
           </Text>
 
-          <PendingRequests onCancel={handleCancelRequest} />
+          <PendingRequests onClick={() => setShowRequests(true)} />
 
           {diagrams.length === 0 ? (
             <EmptyState onAction={() => setIsOpen(true)} />

@@ -1,12 +1,17 @@
 import { useState, useEffect } from "react";
-import { Box, Text, IconButton } from "@primer/react";
-import { XIcon, ClockIcon } from "@primer/octicons-react";
+import { Box, Text, CounterLabel } from "@primer/react";
+import { LawIcon } from "@primer/octicons-react";
 import { approvalService } from "../../services/approval.service";
-import { useToast } from "@/shared/hooks/use-toast";
 
-export function PendingRequests({ diagramId, onCancel }: { diagramId?: string; onCancel?: () => void }) {
+export function PendingRequests({ 
+  diagramId, 
+  onClick 
+}: { 
+  diagramId?: string; 
+  onCancel?: () => void;
+  onClick?: () => void;
+}) {
   const [requests, setRequests] = useState<any[]>([]);
-  const { success, error: toastError } = useToast();
 
   const fetchRequests = async () => {
     try {
@@ -28,59 +33,49 @@ export function PendingRequests({ diagramId, onCancel }: { diagramId?: string; o
     return () => clearInterval(interval);
   }, [diagramId]);
 
-  const handleCancel = async (id: string) => {
-    try {
-      await approvalService.cancelRequest(id);
-      setRequests((prev) => prev.filter((r) => r.id !== id));
-      success("Request cancelled successfully.");
-      onCancel?.();
-    } catch (err) {
-      toastError("Failed to cancel request.");
-    }
-  };
-
   if (requests.length === 0) return null;
 
+  const pendingCount = requests.filter(r => r.status.toUpperCase() === 'PENDING').length;
+
   return (
-    <Box sx={{ mb: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {requests.map((request) => (
-        <Box
-          key={request.id}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            p: 3,
-            bg: "attention.subtle",
-            border: "1px solid",
-            borderColor: "attention.muted",
-            borderRadius: 2,
-            color: "attention.fg"
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-            <ClockIcon size={20} />
-            <Box>
-              <Text sx={{ fontWeight: 'bold', display: 'block' }}>
-                Pending Approval: {request.Diagrams?.title}
-              </Text>
-              <Text sx={{ fontSize: 0 }}>
-                Waiting for team <strong>{request.Teams?.name}</strong> to accept this diagram.
-              </Text>
-            </Box>
-          </Box>
-          <IconButton
-            icon={XIcon}
-            aria-label="Cancel request"
-            variant="invisible"
-            onClick={(e) => {
-                e.stopPropagation();
-                handleCancel(request.id);
-            }}
-            sx={{ color: "attention.fg" }}
-          />
-        </Box>
-      ))}
+    <Box
+      onClick={onClick}
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        p: 3,
+        mb: 4,
+        border: '1px solid',
+        borderColor: 'attention.emphasis',
+        borderRadius: 2,
+        bg: 'attention.subtle',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        "&:hover": {
+          bg: 'attention.muted',
+          transform: 'translateY(-1px)',
+          boxShadow: 'shadow.small',
+        },
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <LawIcon size={20} />
+        <Text sx={{ fontWeight: 'bold', fontSize: 2 }}>My Requests</Text>
+        <CounterLabel sx={{ bg: 'attention.emphasis', color: 'fg.onEmphasis' }}>
+          {requests.length}
+        </CounterLabel>
+      </Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        {pendingCount > 0 && (
+            <Text sx={{ fontSize: 0, color: 'attention.fg' }}>
+                {pendingCount} pending
+            </Text>
+        )}
+        <Text sx={{ fontSize: 0, fontWeight: 'bold', color: 'attention.fg' }}>
+            Review your diagram requests →
+        </Text>
+      </Box>
     </Box>
   );
 }
