@@ -7,6 +7,7 @@ import { NewDiagramDialog } from "../NewDiagramDialog";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { useToast } from "@/shared/hooks/use-toast";
 import { useDiagrams } from "../../hooks/useDiagrams";
+import { useTeams } from "@/features/teams/hooks/useTeams";
 import { LoadingState } from "@/shared/components/LoadingState";
 import { ErrorState } from "@/shared/components/ErrorState";
 import { COPY } from "@/shared/constants/copy";
@@ -15,27 +16,30 @@ import { tokens } from "@/shared/styles/tokens";
 type Screen = { name: "list" } | { name: "detail"; diagramId: string };
 
 export function DiagramsScreen() {
-  const { diagrams, loading, error, refetch } = useDiagrams();
+  const { diagrams, loading: loadingDiagrams, error: errorDiagrams, refetch: refetchDiagrams } = useDiagrams();
+  const { teams: userTeams, loading: loadingTeams } = useTeams();
   const { success } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [screen, setScreen] = useState<Screen>({ name: "list" });
 
+  const diagramsLoading = loadingDiagrams && diagrams.length === 0;
+
   const activeDiagram = screen.name === "detail" ? diagrams.find((d) => d.id === screen.diagramId) : null;
 
   const handleDelete = () => {
-    refetch();
+    refetchDiagrams();
     if (screen.name === "detail") {
       setScreen({ name: "list" });
     }
     success("Diagram successfully deleted!");
   };
 
-  if (loading && diagrams.length === 0) {
+  if (diagramsLoading) {
     return <LoadingState message={COPY.diagrams.loading} />;
   }
 
-  if (error) {
-    return <ErrorState message={error} />;
+  if (errorDiagrams) {
+    return <ErrorState message={errorDiagrams} />;
   }
 
   return (
@@ -93,8 +97,9 @@ export function DiagramsScreen() {
                 <DiagramCard
                   key={d.id}
                   diagram={d}
+                  userTeams={userTeams}
                   onOpen={() => setScreen({ name: "detail", diagramId: d.id })}
-                  onUpdate={refetch}
+                  onUpdate={refetchDiagrams}
                   onDelete={handleDelete}
                 />
               ))}
@@ -115,7 +120,7 @@ export function DiagramsScreen() {
           onClose={() => setIsOpen(false)} 
           onSuccess={(newDiagram) => {
             success("Diagram created successfully.");
-            refetch();
+            refetchDiagrams();
             setIsOpen(false);
             setScreen({ name: "detail", diagramId: newDiagram.id });
           }}

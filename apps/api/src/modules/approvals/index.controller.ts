@@ -17,6 +17,11 @@ export class ApprovalsController {
     return this.approvals.getTeamRequests(teamId, user.sub);
   }
 
+  @Get('diagram/:diagramId')
+  getPendingByDiagram(@Param('diagramId') diagramId: string) {
+    return this.approvals.getPendingByDiagram(diagramId);
+  }
+
   @Patch(':id/respond')
   respondRequest(
     @Param('id') id: string,

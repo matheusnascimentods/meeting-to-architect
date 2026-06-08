@@ -8,6 +8,7 @@ import { DeleteDiagramDialog } from "@/shared/components/DeleteDiagramDialog";
 import { diagramService } from "../../services/diagram.service";
 import { teamService } from "@/features/teams/services/team.service";
 import { teamDiagramService } from "../../services/team-diagram.service";
+import { approvalService } from "../../services/approval.service";
 import { COPY } from "@/shared/constants/copy";
 import { formatRelativeTime } from "@/shared/lib/date-utils";
 import "./styles.css";
@@ -19,15 +20,17 @@ interface DiagramCardProps {
   onOpen: () => void;
   onUpdate?: (updated: Diagram) => void;
   onDelete?: (id: string) => void;
+  userTeams?: UserTeam[];
 }
 
-export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCardProps) {
+export function DiagramCard({ diagram, onOpen, onUpdate, onDelete, userTeams: propUserTeams }: DiagramCardProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [showAddToTeam, setShowAddToTeam] = useState(false);
-  const [userTeams, setUserTeams] = useState<UserTeam[]>([]);
+  const [userTeams, setUserTeams] = useState<UserTeam[]>(propUserTeams || []);
   const [selectedTeamId, setSelectedTeamId] = useState("");
   const [isAddingToTeam, setIsAddingToTeam] = useState(false);
+  const [pendingTeamIds, setPendingTeamIds] = useState<string[]>([]);
   const { success, error: toastError } = useToast();
 
   const { title, description } = diagram;
@@ -36,12 +39,28 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
   const date = diagram.created_at ? formatRelativeTime(diagram.created_at) : "Just now";
 
   useEffect(() => {
-    if (showAddToTeam) {
-      teamService.findAll().then(setUserTeams).catch(() => {
-        toastError('Failed to load teams.');
-      });
+    if (propUserTeams) {
+      setUserTeams(propUserTeams);
     }
-  }, [showAddToTeam, toastError]);
+  }, [propUserTeams]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const fetchTeams = !propUserTeams ? teamService.findAll() : Promise.resolve(propUserTeams);
+        const [teams, pending] = await Promise.all([
+          fetchTeams,
+          approvalService.getPendingByDiagram(diagram.id)
+        ]);
+        setUserTeams(teams);
+        setPendingTeamIds(pending.map(p => p.teamId));
+      } catch (err) {
+        console.error('Failed to load teams or pending requests');
+      }
+    };
+
+    fetchData();
+  }, [diagram.id, propUserTeams]);
 
   const handleDelete = async () => {
     try {
@@ -72,7 +91,9 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
     }
   };
 
-  const availableTeams = userTeams.filter(ut => ut.team_id !== diagram.team_id);
+  const availableTeams = userTeams.filter(ut => 
+    ut.team_id !== diagram.team_id && !pendingTeamIds.includes(ut.team_id)
+  );
 
   return (
     <>
@@ -110,17 +131,20 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete }: DiagramCard
               <ActionMenu.Overlay>
                 <ActionList>
                   <ActionList.Item onSelect={() => setIsEditDialogOpen(true)}>
-                    <ActionList.LeadingVisual>
-                      <PencilIcon />
-                    </ActionList.LeadingVisual>
-                    Edit
+                  <ActionList.LeadingVisual>
+                    <PencilIcon />
+                  </ActionList.LeadingVisual>
+                  Edit
                   </ActionList.Item>
+                  {!diagram.team_id && availableTeams.length > 0 && (
                   <ActionList.Item onSelect={() => setShowAddToTeam(true)}>
                     <ActionList.LeadingVisual>
                       <PeopleIcon />
                     </ActionList.LeadingVisual>
                     Add to Team
                   </ActionList.Item>
+                  )}
+
                   <ActionList.Item variant="danger" onSelect={() => setIsDeleteDialogOpen(true)}>
                     <ActionList.LeadingVisual>
                       <TrashIcon />

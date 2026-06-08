@@ -12,26 +12,26 @@ BEGIN;
 -- =============================================================
 
 INSERT INTO "Users" (id, name, email, password_hash, is_active, created_at, updated_at) VALUES
-('a1000000-0000-0000-0000-000000000001', 'Gianluigi Donnarumma', 'donnarumma@gmail.com',    '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '90 days', NOW()),
-('a1000000-0000-0000-0000-000000000002', 'Achraf Hakimi',        'hakimi@gmail.com',         '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '85 days', NOW()),
-('a1000000-0000-0000-0000-000000000003', 'Marquinhos',           'marquinhos@gmail.com',     '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '80 days', NOW()),
-('a1000000-0000-0000-0000-000000000004', 'Willian Pacho',        'pacho@gmail.com',          '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '75 days', NOW()),
-('a1000000-0000-0000-0000-000000000005', 'Nuno Mendes',          'nuno.mendes@gmail.com',    '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '70 days', NOW()),
-('a1000000-0000-0000-0000-000000000006', 'Vitinha',              'vitinha@gmail.com',        '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '65 days', NOW()),
-('a1000000-0000-0000-0000-000000000007', 'João Neves',           'joao.neves@gmail.com',     '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '60 days', NOW()),
-('a1000000-0000-0000-0000-000000000008', 'Fabian Ruiz',          'fabian.ruiz@gmail.com',    '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '55 days', NOW()),
-('a1000000-0000-0000-0000-000000000009', 'Ousmane Dembélé',      'dembele@gmail.com',        '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '50 days', NOW()),
-('a1000000-0000-0000-0000-000000000010', 'Bradley Barcola',      'barcola@gmail.com',        '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '45 days', NOW()),
-('a1000000-0000-0000-0000-000000000011', 'Gonçalo Ramos',        'goncalo.ramos@gmail.com',  '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '40 days', NOW());
+('a1000000-0000-4000-8000-000000000001', 'Gianluigi Donnarumma', 'donnarumma@gmail.com',    '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '90 days', NOW()),
+('a1000000-0000-4000-8000-000000000002', 'Achraf Hakimi',        'hakimi@gmail.com',         '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '85 days', NOW()),
+('a1000000-0000-4000-8000-000000000003', 'Marquinhos',           'marquinhos@gmail.com',     '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '80 days', NOW()),
+('a1000000-0000-4000-8000-000000000004', 'Willian Pacho',        'pacho@gmail.com',          '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '75 days', NOW()),
+('a1000000-0000-4000-8000-000000000005', 'Nuno Mendes',          'nuno.mendes@gmail.com',    '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '70 days', NOW()),
+('a1000000-0000-4000-8000-000000000006', 'Vitinha',              'vitinha@gmail.com',        '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '65 days', NOW()),
+('a1000000-0000-4000-8000-000000000007', 'João Neves',           'joao.neves@gmail.com',     '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '60 days', NOW()),
+('a1000000-0000-4000-8000-000000000008', 'Fabian Ruiz',          'fabian.ruiz@gmail.com',    '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '55 days', NOW()),
+('a1000000-0000-4000-8000-000000000009', 'Ousmane Dembélé',      'dembele@gmail.com',        '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '50 days', NOW()),
+('a1000000-0000-4000-8000-000000000010', 'Bradley Barcola',      'barcola@gmail.com',        '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '45 days', NOW()),
+('a1000000-0000-4000-8000-000000000011', 'Gonçalo Ramos',        'goncalo.ramos@gmail.com',  '$2b$10$1IUWHpsLeVIxgC1qS18a2uYpN6yR9gUn8sGOzNOd6JVFtcjoeFdJa', true, NOW() - INTERVAL '40 days', NOW());
 
 -- =============================================================
 -- 2. TEAMS
 -- =============================================================
 
 INSERT INTO "Teams" (id, name, description, created_at, updated_at) VALUES
-('b1000000-0000-0000-0000-000000000001', 'Core Platform',      'Responsável pela infraestrutura e serviços principais da plataforma.', NOW() - INTERVAL '80 days', NOW()),
-('b1000000-0000-0000-0000-000000000002', 'Mobile Experience',  'Focada na experiência do usuário em dispositivos móveis e aplicativos.', NOW() - INTERVAL '70 days', NOW()),
-('b1000000-0000-0000-0000-000000000003', 'Cloud Infrastructure', 'Gerencia a infraestrutura na nuvem, escalabilidade e resiliência.', NOW() - INTERVAL '60 days', NOW());
+('b1000000-0000-4000-8000-000000000001', 'Core Platform',      'Responsável pela infraestrutura e serviços principais da plataforma.', NOW() - INTERVAL '80 days', NOW()),
+('b1000000-0000-4000-8000-000000000002', 'Mobile Experience',  'Focada na experiência do usuário em dispositivos móveis e aplicativos.', NOW() - INTERVAL '70 days', NOW()),
+('b1000000-0000-4000-8000-000000000003', 'Cloud Infrastructure', 'Gerencia a infraestrutura na nuvem, escalabilidade e resiliência.', NOW() - INTERVAL '60 days', NOW());
 
 -- =============================================================
 -- 3. TEAM MEMBERS
@@ -39,27 +39,27 @@ INSERT INTO "Teams" (id, name, description, created_at, updated_at) VALUES
 
 -- Core Platform: Marquinhos (ADMIN), Vitinha (ADMIN), Hakimi, João Neves, Fabian, Dembélé
 INSERT INTO "Team_Members" (id, team_id, user_id, role, joined_at) VALUES
-('c1000000-0000-0000-0000-000000000001', 'b1000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000003', 'ADMIN',  NOW() - INTERVAL '79 days'),
-('c1000000-0000-0000-0000-000000000002', 'b1000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000006', 'ADMIN',  NOW() - INTERVAL '79 days'),
-('c1000000-0000-0000-0000-000000000003', 'b1000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000002', 'MEMBER', NOW() - INTERVAL '75 days'),
-('c1000000-0000-0000-0000-000000000004', 'b1000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000007', 'MEMBER', NOW() - INTERVAL '70 days'),
-('c1000000-0000-0000-0000-000000000005', 'b1000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000008', 'MEMBER', NOW() - INTERVAL '65 days'),
-('c1000000-0000-0000-0000-000000000006', 'b1000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000009', 'MEMBER', NOW() - INTERVAL '60 days'),
+('c1000000-0000-4000-8000-000000000001', 'b1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000003', 'ADMIN',  NOW() - INTERVAL '79 days'),
+('c1000000-0000-4000-8000-000000000002', 'b1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000006', 'ADMIN',  NOW() - INTERVAL '79 days'),
+('c1000000-0000-4000-8000-000000000003', 'b1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000002', 'MEMBER', NOW() - INTERVAL '75 days'),
+('c1000000-0000-4000-8000-000000000004', 'b1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000007', 'MEMBER', NOW() - INTERVAL '70 days'),
+('c1000000-0000-4000-8000-000000000005', 'b1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000008', 'MEMBER', NOW() - INTERVAL '65 days'),
+('c1000000-0000-4000-8000-000000000006', 'b1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000009', 'MEMBER', NOW() - INTERVAL '60 days'),
 
 -- Mobile Experience: Donnarumma (ADMIN), Barcola (MAINTAINER), Nuno Mendes, Pacho, Ramos
-('c1000000-0000-0000-0000-000000000007', 'b1000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000001', 'ADMIN',      NOW() - INTERVAL '69 days'),
-('c1000000-0000-0000-0000-000000000008', 'b1000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000010', 'MAINTAINER', NOW() - INTERVAL '68 days'),
-('c1000000-0000-0000-0000-000000000009', 'b1000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000005', 'MEMBER',     NOW() - INTERVAL '65 days'),
-('c1000000-0000-0000-0000-000000000010', 'b1000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000004', 'MEMBER',     NOW() - INTERVAL '60 days'),
-('c1000000-0000-0000-0000-000000000011', 'b1000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000011', 'MEMBER',     NOW() - INTERVAL '55 days'),
+('c1000000-0000-4000-8000-000000000007', 'b1000000-0000-4000-8000-000000000002', 'a1000000-0000-4000-8000-000000000001', 'ADMIN',      NOW() - INTERVAL '69 days'),
+('c1000000-0000-4000-8000-000000000008', 'b1000000-0000-4000-8000-000000000002', 'a1000000-0000-4000-8000-000000000010', 'MAINTAINER', NOW() - INTERVAL '68 days'),
+('c1000000-0000-4000-8000-000000000009', 'b1000000-0000-4000-8000-000000000002', 'a1000000-0000-4000-8000-000000000005', 'MEMBER',     NOW() - INTERVAL '65 days'),
+('c1000000-0000-4000-8000-000000000010', 'b1000000-0000-4000-8000-000000000002', 'a1000000-0000-4000-8000-000000000004', 'MEMBER',     NOW() - INTERVAL '60 days'),
+('c1000000-0000-4000-8000-000000000011', 'b1000000-0000-4000-8000-000000000002', 'a1000000-0000-4000-8000-000000000011', 'MEMBER',     NOW() - INTERVAL '55 days'),
 
 -- Cloud Infrastructure: Vitinha (ADMIN), Fabian (MAINTAINER), Hakimi, Dembélé, Barcola, Ramos
-('c1000000-0000-0000-0000-000000000012', 'b1000000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000006', 'ADMIN',      NOW() - INTERVAL '59 days'),
-('c1000000-0000-0000-0000-000000000013', 'b1000000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000008', 'MAINTAINER', NOW() - INTERVAL '58 days'),
-('c1000000-0000-0000-0000-000000000014', 'b1000000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000002', 'MEMBER',     NOW() - INTERVAL '55 days'),
-('c1000000-0000-0000-0000-000000000015', 'b1000000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000009', 'MEMBER',     NOW() - INTERVAL '50 days'),
-('c1000000-0000-0000-0000-000000000016', 'b1000000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000010', 'MEMBER',     NOW() - INTERVAL '45 days'),
-('c1000000-0000-0000-0000-000000000017', 'b1000000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000011', 'MEMBER',     NOW() - INTERVAL '40 days');
+('c1000000-0000-4000-8000-000000000012', 'b1000000-0000-4000-8000-000000000003', 'a1000000-0000-4000-8000-000000000006', 'ADMIN',      NOW() - INTERVAL '59 days'),
+('c1000000-0000-4000-8000-000000000013', 'b1000000-0000-4000-8000-000000000003', 'a1000000-0000-4000-8000-000000000008', 'MAINTAINER', NOW() - INTERVAL '58 days'),
+('c1000000-0000-4000-8000-000000000014', 'b1000000-0000-4000-8000-000000000003', 'a1000000-0000-4000-8000-000000000002', 'MEMBER',     NOW() - INTERVAL '55 days'),
+('c1000000-0000-4000-8000-000000000015', 'b1000000-0000-4000-8000-000000000003', 'a1000000-0000-4000-8000-000000000009', 'MEMBER',     NOW() - INTERVAL '50 days'),
+('c1000000-0000-4000-8000-000000000016', 'b1000000-0000-4000-8000-000000000003', 'a1000000-0000-4000-8000-000000000010', 'MEMBER',     NOW() - INTERVAL '45 days'),
+('c1000000-0000-4000-8000-000000000017', 'b1000000-0000-4000-8000-000000000003', 'a1000000-0000-4000-8000-000000000011', 'MEMBER',     NOW() - INTERVAL '40 days');
 
 -- =============================================================
 -- 4. TEAM INVITES
@@ -67,16 +67,16 @@ INSERT INTO "Team_Members" (id, team_id, user_id, role, joined_at) VALUES
 
 INSERT INTO "Team_Invites" (id, team_id, invited_by, invited_user_id, status, created_at) VALUES
 -- Pending invites
-('d1000000-0000-0000-0000-000000000001', 'b1000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000001', 'PENDING',  NOW() - INTERVAL '10 days'),
-('d1000000-0000-0000-0000-000000000002', 'b1000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000006', 'a1000000-0000-0000-0000-000000000005', 'PENDING',  NOW() - INTERVAL '8 days'),
-('d1000000-0000-0000-0000-000000000003', 'b1000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000007', 'PENDING',  NOW() - INTERVAL '6 days'),
-('d1000000-0000-0000-0000-000000000004', 'b1000000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000006', 'a1000000-0000-0000-0000-000000000003', 'PENDING',  NOW() - INTERVAL '4 days'),
-('d1000000-0000-0000-0000-000000000005', 'b1000000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000006', 'a1000000-0000-0000-0000-000000000004', 'PENDING',  NOW() - INTERVAL '2 days'),
+('d1000000-0000-4000-8000-000000000001', 'b1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000003', 'a1000000-0000-4000-8000-000000000001', 'PENDING',  NOW() - INTERVAL '10 days'),
+('d1000000-0000-4000-8000-000000000002', 'b1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000006', 'a1000000-0000-4000-8000-000000000005', 'PENDING',  NOW() - INTERVAL '8 days'),
+('d1000000-0000-4000-8000-000000000003', 'b1000000-0000-4000-8000-000000000002', 'a1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000007', 'PENDING',  NOW() - INTERVAL '6 days'),
+('d1000000-0000-4000-8000-000000000004', 'b1000000-0000-4000-8000-000000000003', 'a1000000-0000-4000-8000-000000000006', 'a1000000-0000-4000-8000-000000000003', 'PENDING',  NOW() - INTERVAL '4 days'),
+('d1000000-0000-4000-8000-000000000005', 'b1000000-0000-4000-8000-000000000003', 'a1000000-0000-4000-8000-000000000006', 'a1000000-0000-4000-8000-000000000004', 'PENDING',  NOW() - INTERVAL '2 days'),
 -- Accepted invites
-('d1000000-0000-0000-0000-000000000006', 'b1000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000009', 'ACCEPTED', NOW() - INTERVAL '60 days'),
-('d1000000-0000-0000-0000-000000000007', 'b1000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000010', 'ACCEPTED', NOW() - INTERVAL '67 days'),
+('d1000000-0000-4000-8000-000000000006', 'b1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000003', 'a1000000-0000-4000-8000-000000000009', 'ACCEPTED', NOW() - INTERVAL '60 days'),
+('d1000000-0000-4000-8000-000000000007', 'b1000000-0000-4000-8000-000000000002', 'a1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000010', 'ACCEPTED', NOW() - INTERVAL '67 days'),
 -- Rejected invite
-('d1000000-0000-0000-0000-000000000008', 'b1000000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000006', 'a1000000-0000-0000-0000-000000000007', 'REJECTED', NOW() - INTERVAL '30 days');
+('d1000000-0000-4000-8000-000000000008', 'b1000000-0000-4000-8000-000000000003', 'a1000000-0000-4000-8000-000000000006', 'a1000000-0000-4000-8000-000000000007', 'REJECTED', NOW() - INTERVAL '30 days');
 
 -- =============================================================
 -- 5. DIAGRAMS — 17 types (13 UML + 4 C4), distributed across users and teams
@@ -85,7 +85,7 @@ INSERT INTO "Team_Invites" (id, team_id, invited_by, invited_user_id, status, cr
 INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, team_id, is_deleted, created_at, updated_at) VALUES
 
 -- CLASS — Hakimi
-('e1000000-0000-0000-0000-000000000001',
+('e1000000-0000-4000-8000-000000000001',
  'Arquitetura de pagamentos de alta disponibilidade',
  'Esta arquitetura aplica os princípios de Ports and Adapters para garantir um sistema de pagamentos desacoplado e resiliente, utilizando o **PaymentService** como orquestrador central que interage apenas com abstrações. Ao delegar a implementação de gateways e repositórios a interfaces e ao padrão Factory, o design assegura a escalabilidade necessária para integrar múltiplos provedores de pagamento e tecnologias de persistência sem comprometer a integridade das regras de negócio.',
  'CLASS',
@@ -126,12 +126,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     PaymentService --> IPaymentGateway
     PaymentService ..> Payment
     PaymentGatewayFactory ..> IPaymentGateway : creates',
- 'a1000000-0000-0000-0000-000000000002',
- 'b1000000-0000-0000-0000-000000000001',
+ 'a1000000-0000-4000-8000-000000000002',
+ 'b1000000-0000-4000-8000-000000000001',
  false, NOW() - INTERVAL '60 days', NOW() - INTERVAL '60 days'),
 
 -- CLASS — Marquinhos
-('e1000000-0000-0000-0000-000000000002',
+('e1000000-0000-4000-8000-000000000002',
  'Arquitetura de Notificação via E-mail',
  'Esta arquitetura segue o padrão de Ports and Adapters para criar um sistema de disparo de e-mails agnóstico, onde o EmailService coordena a lógica de envio utilizando interfaces para abstrair provedores (como SendGrid, AWS SES ou Mailgun) e mecanismos de log. A utilização de uma EmailProviderFactory permite alternar ou combinar serviços de e-mail dinamicamente, enquanto o uso de repositórios garante que o histórico de disparos e status sejam persistidos de forma desacoplada, assegurando alta rastreabilidade e facilidade na manutenção da infraestrutura de comunicação.',
  'CLASS',
@@ -165,12 +165,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     EmailService --> IEmailProvider
     EmailService --> IEmailLogRepository
     EmailProviderFactory ..> IEmailProvider : creates',
- 'a1000000-0000-0000-0000-000000000003',
- 'b1000000-0000-0000-0000-000000000001',
+ 'a1000000-0000-4000-8000-000000000003',
+ 'b1000000-0000-4000-8000-000000000001',
  false, NOW() - INTERVAL '55 days', NOW() - INTERVAL '55 days'),
 
 -- CLASS — Vitinha
-('e1000000-0000-0000-0000-000000000003',
+('e1000000-0000-4000-8000-000000000003',
  'Arquitetura de Resolução de Questões com Google AI SDK',
  'Visão macro da plataforma M2A mostrando todos os atores externos, sistemas de terceiros integrados e os limites do sistema principal.',
  'CLASS',
@@ -210,12 +210,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     QuizService --> IAIModelProvider
     QuizService --> IQuizRepository
     AIProviderFactory ..> IAIModelProvider : creates',
- 'a1000000-0000-0000-0000-000000000006',
- 'b1000000-0000-0000-0000-000000000001',
+ 'a1000000-0000-4000-8000-000000000006',
+ 'b1000000-0000-4000-8000-000000000001',
  false, NOW() - INTERVAL '50 days', NOW() - INTERVAL '50 days'),
 
 -- C4_CONTAINER — João Neves
-('e1000000-0000-0000-0000-000000000004',
+('e1000000-0000-4000-8000-000000000004',
  'M2A Container Architecture',
  'Detalhamento dos containers internos da plataforma M2A: frontend React, backend NestJS, banco PostgreSQL e a camada de agentes ADK.',
  'C4_CONTAINER',
@@ -234,12 +234,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     Rel(api, agents, "Triggers generation")
     Rel(agents, gemini, "Sends prompts", "HTTPS")
     Rel(api, db, "Reads and writes", "Prisma ORM")',
- 'a1000000-0000-0000-0000-000000000007',
- 'b1000000-0000-0000-0000-000000000001',
+ 'a1000000-0000-4000-8000-000000000007',
+ 'b1000000-0000-4000-8000-000000000001',
  false, NOW() - INTERVAL '48 days', NOW() - INTERVAL '48 days'),
 
 -- ACTIVITY — Fabian Ruiz
-('e1000000-0000-0000-0000-000000000005',
+('e1000000-0000-4000-8000-000000000005',
  'CI/CD Pipeline — Core Platform',
  'Fluxo completo do pipeline de integração e entrega contínua do Core Platform, desde o push até o deploy em produção com rollback automático.',
  'ACTIVITY',
@@ -263,12 +263,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     P --> Q{Healthy?}
     Q -- No --> R[Auto Rollback Production]
     Q -- Yes --> S[Release Complete]',
- 'a1000000-0000-0000-0000-000000000008',
- 'b1000000-0000-0000-0000-000000000003',
+ 'a1000000-0000-4000-8000-000000000008',
+ 'b1000000-0000-4000-8000-000000000003',
  false, NOW() - INTERVAL '45 days', NOW() - INTERVAL '45 days'),
 
 -- STATE — Donnarumma
-('e1000000-0000-0000-0000-000000000006',
+('e1000000-0000-4000-8000-000000000006',
  'Diagram Lifecycle State Machine',
  'Máquina de estados descrevendo o ciclo de vida completo de um diagrama na plataforma M2A, incluindo geração, aprovação por time e exclusão com recuperação.',
  'STATE',
@@ -285,12 +285,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     Active --> Deleted : Soft delete
     Deleted --> Active : Restored from trash
     Deleted --> [*] : Permanent delete',
- 'a1000000-0000-0000-0000-000000000001',
- 'b1000000-0000-0000-0000-000000000002',
+ 'a1000000-0000-4000-8000-000000000001',
+ 'b1000000-0000-4000-8000-000000000002',
  false, NOW() - INTERVAL '42 days', NOW() - INTERVAL '42 days'),
 
 -- CLASS — Barcola
-('e1000000-0000-0000-0000-000000000007',
+('e1000000-0000-4000-8000-000000000007',
  'M2A Database Domain Model',
  'Modelo de domínio completo do banco de dados da plataforma M2A, mapeando todas as entidades e suas relações de associação.',
  'CLASS',
@@ -346,12 +346,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     Teams "1" -- "0..*" Diagrams : owns
     Diagrams "1" -- "0..*" Diagram_Approval_Requests : subject of
     Teams "1" -- "0..*" Team_Invites : sends',
- 'a1000000-0000-0000-0000-000000000010',
- 'b1000000-0000-0000-0000-000000000002',
+ 'a1000000-0000-4000-8000-000000000010',
+ 'b1000000-0000-4000-8000-000000000002',
  false, NOW() - INTERVAL '38 days', NOW() - INTERVAL '38 days'),
 
 -- USE_CASE — Nuno Mendes
-('e1000000-0000-0000-0000-000000000008',
+('e1000000-0000-4000-8000-000000000008',
  'M2A Core Platform Use Cases',
  'Diagrama de casos de uso detalhando as principais interações dos engenheiros e arquitetos com as funcionalidades centrais da plataforma M2A.',
  'USE_CASE',
@@ -371,12 +371,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     Engineer --> UC4
     Architect --> UC3
     Architect --> UC4',
- 'a1000000-0000-0000-0000-000000000005',
- 'b1000000-0000-0000-0000-000000000003',
+ 'a1000000-0000-4000-8000-000000000005',
+ 'b1000000-0000-4000-8000-000000000003',
  false, NOW() - INTERVAL '35 days', NOW() - INTERVAL '35 days'),
 
 -- COMPONENT — Pacho
-('e1000000-0000-0000-0000-000000000009',
+('e1000000-0000-4000-8000-000000000009',
  'M2A System Component Architecture',
  'Diagrama de componentes UML detalhando os principais módulos internos da plataforma M2A e suas dependências técnicas.',
  'COMPONENT',
@@ -396,12 +396,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     API --> Auth
     API --> Agent
     API --> DB',
- 'a1000000-0000-0000-0000-000000000004',
- 'b1000000-0000-0000-0000-000000000002',
+ 'a1000000-0000-4000-8000-000000000004',
+ 'b1000000-0000-4000-8000-000000000002',
  false, NOW() - INTERVAL '32 days', NOW() - INTERVAL '32 days'),
 
 -- ACTIVITY — Gonçalo Ramos
-('e1000000-0000-0000-0000-000000000010',
+('e1000000-0000-4000-8000-000000000010',
  'Engineer Onboarding Activity Flow',
  'Fluxo de atividades detalhando os passos que um novo engenheiro segue ao entrar na plataforma, do cadastro à primeira colaboração.',
  'ACTIVITY',
@@ -414,12 +414,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     Share -- Yes --> RequestApproval[Request Admin Approval]
     Share -- No --> End([End Onboarding])
     RequestApproval --> End',
- 'a1000000-0000-0000-0000-000000000011',
- 'b1000000-0000-0000-0000-000000000002',
+ 'a1000000-0000-4000-8000-000000000011',
+ 'b1000000-0000-4000-8000-000000000002',
  false, NOW() - INTERVAL '28 days', NOW() - INTERVAL '28 days'),
 
 -- DEPLOYMENT — Dembélé
-('e1000000-0000-0000-0000-000000000011',
+('e1000000-0000-4000-8000-000000000011',
  'M2A Staging Environment Infrastructure',
  'Diagrama de implantação UML detalhando a topologia do ambiente de homologação (staging), incluindo servidores e conexões de rede.',
  'DEPLOYMENT',
@@ -439,12 +439,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     end
     App -- HTTPS --> Server
     Server -- TCP/IP --> Database',
- 'a1000000-0000-0000-0000-000000000009',
- 'b1000000-0000-0000-0000-000000000003',
+ 'a1000000-0000-4000-8000-000000000009',
+ 'b1000000-0000-4000-8000-000000000003',
  false, NOW() - INTERVAL '25 days', NOW() - INTERVAL '25 days'),
 
 -- SEQUENCE — Hakimi (personal, no team)
-('e1000000-0000-0000-0000-000000000012',
+('e1000000-0000-4000-8000-000000000012',
  'Invite Member Interaction Flow',
  'Diagrama de sequência detalhando a interação entre o remetente, o sistema e o destinatário durante o processo de convite para time.',
  'SEQUENCE',
@@ -458,12 +458,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     R->>SYS: Accepts Invitation
     SYS->>SYS: Updates Team Role
     SYS-->>S: Invitation Accepted',
- 'a1000000-0000-0000-0000-000000000002',
+ 'a1000000-0000-4000-8000-000000000002',
  NULL,
  false, NOW() - INTERVAL '20 days', NOW() - INTERVAL '20 days'),
 
 -- STATE — Marquinhos
-('e1000000-0000-0000-0000-000000000013',
+('e1000000-0000-4000-8000-000000000013',
  'Team Invite Lifecycle State Machine',
  'Diagrama de estados descrevendo os possíveis status de um convite de time, desde a criação até a aceitação ou expiração.',
  'STATE',
@@ -475,12 +475,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     ACCEPTED --> [*]
     REJECTED --> [*]
     EXPIRED --> [*]',
- 'a1000000-0000-0000-0000-000000000003',
- 'b1000000-0000-0000-0000-000000000001',
+ 'a1000000-0000-4000-8000-000000000003',
+ 'b1000000-0000-4000-8000-000000000001',
  false, NOW() - INTERVAL '15 days', NOW() - INTERVAL '15 days'),
 
 -- COMPONENT — Vitinha
-('e1000000-0000-0000-0000-000000000014',
+('e1000000-0000-4000-8000-000000000014',
  'M2A Security Components',
  'Diagrama de componentes focando na segurança do sistema, detalhando os módulos de criptografia, autorização e gerenciamento de segredos.',
  'COMPONENT',
@@ -496,12 +496,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     JWT -- sign --> BCrypt
     ACL -- verify --> JWT
     BCrypt -- stores --> DB',
- 'a1000000-0000-0000-0000-000000000006',
- 'b1000000-0000-0000-0000-000000000001',
+ 'a1000000-0000-4000-8000-000000000006',
+ 'b1000000-0000-4000-8000-000000000001',
  false, NOW() - INTERVAL '10 days', NOW() - INTERVAL '10 days'),
 
 -- USE_CASE — Donnarumma (personal)
-('e1000000-0000-0000-0000-000000000015',
+('e1000000-0000-4000-8000-000000000015',
  'Team Management Use Cases',
  'Diagrama de casos de uso focado na gestão de times, incluindo convites, papéis de usuários e fluxos de aprovação de diagramas.',
  'USE_CASE',
@@ -518,12 +518,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     Admin --> UC1
     Admin --> UC2
     Member --> UC3',
- 'a1000000-0000-0000-0000-000000000001',
+ 'a1000000-0000-4000-8000-000000000001',
  NULL,
  false, NOW() - INTERVAL '7 days', NOW() - INTERVAL '7 days'),
 
 -- DEPLOYMENT — João Neves
-('e1000000-0000-0000-0000-000000000016',
+('e1000000-0000-4000-8000-000000000016',
  'M2A Production Network Topology',
  'Diagrama de implantação UML mostrando a topologia de rede de produção, com foco no balanceamento de carga e isolamento de banco de dados.',
  'DEPLOYMENT',
@@ -545,12 +545,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     LB -- Round Robin --> Node2
     Node1 -- write --> DB_Master
     Node2 -- read --> DB_Replica',
- 'a1000000-0000-0000-0000-000000000007',
- 'b1000000-0000-0000-0000-000000000003',
+ 'a1000000-0000-4000-8000-000000000007',
+ 'b1000000-0000-4000-8000-000000000003',
  false, NOW() - INTERVAL '5 days', NOW() - INTERVAL '5 days'),
 
 -- C4_COMPONENT — Fabian (personal)
-('e1000000-0000-0000-0000-000000000017',
+('e1000000-0000-4000-8000-000000000017',
  'API Server Component Diagram',
  'Diagrama de componentes C4 detalhando a estrutura interna do servidor NestJS, mostrando os módulos, guards, repositories e suas dependências.',
  'C4_COMPONENT',
@@ -571,12 +571,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     Rel(teamMod, prismaService, "Queries via repository")
     Rel(agentMod, gemini, "Sends prompts", "HTTPS")
     Rel(prismaService, db, "Reads and writes")',
- 'a1000000-0000-0000-0000-000000000008',
+ 'a1000000-0000-4000-8000-000000000008',
  NULL,
  false, NOW() - INTERVAL '3 days', NOW() - INTERVAL '3 days'),
 
 -- C4_CODE — Barcola
-('e1000000-0000-0000-0000-000000000018',
+('e1000000-0000-4000-8000-000000000018',
  'Diagrams Module Code Structure',
  'Diagrama C4 Code detalhando as classes internas do módulo de diagramas: service, repository, controller e suas dependências.',
  'C4_CODE',
@@ -591,12 +591,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     Rel(diagramCtrl, diagramSvc, "Calls")
     Rel(diagramSvc, diagramRepo, "Uses")
     Rel(diagramRepo, prisma, "Queries")',
- 'a1000000-0000-0000-0000-000000000010',
- 'b1000000-0000-0000-0000-000000000002',
+ 'a1000000-0000-4000-8000-000000000010',
+ 'b1000000-0000-4000-8000-000000000002',
  false, NOW() - INTERVAL '2 days', NOW() - INTERVAL '2 days'),
 
 -- PACKAGE — Nuno Mendes
-('e1000000-0000-0000-0000-000000000019',
+('e1000000-0000-4000-8000-000000000019',
  'M2A Backend Package Structure',
  'Diagrama de pacotes UML organizando os módulos NestJS da API M2A e suas dependências entre camadas.',
  'PACKAGE',
@@ -618,12 +618,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     users --> prisma
     auth --> users
     auth --> guards',
- 'a1000000-0000-0000-0000-000000000005',
- 'b1000000-0000-0000-0000-000000000003',
+ 'a1000000-0000-4000-8000-000000000005',
+ 'b1000000-0000-4000-8000-000000000003',
  false, NOW() - INTERVAL '1 days', NOW() - INTERVAL '1 days'),
 
 -- OBJECT — Pacho
-('e1000000-0000-0000-0000-000000000021',
+('e1000000-0000-4000-8000-000000000021',
  'Order Processing Object Snapshot',
  'Diagrama de objetos UML mostrando instâncias concretas de Order, Payment e Customer em runtime.',
  'OBJECT',
@@ -633,12 +633,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     pay1["payment: Payment\namount=150.00\nmethod=PIX"]
     cust1 --> ord1
     ord1 --> pay1',
- 'a1000000-0000-0000-0000-000000000004',
- 'b1000000-0000-0000-0000-000000000002',
+ 'a1000000-0000-4000-8000-000000000004',
+ 'b1000000-0000-4000-8000-000000000002',
  false, NOW() - INTERVAL '4 days', NOW() - INTERVAL '4 days'),
 
 -- COMPOSITE_STRUCTURE — Dembélé
-('e1000000-0000-0000-0000-000000000022',
+('e1000000-0000-4000-8000-000000000022',
  'Auth Module Composite Structure',
  'Diagrama de estrutura composta UML do módulo de autenticação, mostrando partes internas e conectores.',
  'COMPOSITE_STRUCTURE',
@@ -653,12 +653,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
         end
         GuardPart --> ServicePart
     end',
- 'a1000000-0000-0000-0000-000000000009',
- 'b1000000-0000-0000-0000-000000000001',
+ 'a1000000-0000-4000-8000-000000000009',
+ 'b1000000-0000-4000-8000-000000000001',
  false, NOW() - INTERVAL '3 days', NOW() - INTERVAL '3 days'),
 
 -- COMMUNICATION — Hakimi
-('e1000000-0000-0000-0000-000000000023',
+('e1000000-0000-4000-8000-000000000023',
  'Team Invite Communication Flow',
  'Diagrama de comunicação UML mostrando objetos e mensagens numeradas no fluxo de convite para time.',
  'COMMUNICATION',
@@ -667,12 +667,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     System -- "2: notify()" --> Recipient[":User"]
     Recipient -- "3: accept()" --> System
     System -- "4: confirm()" --> Admin',
- 'a1000000-0000-0000-0000-000000000002',
- 'b1000000-0000-0000-0000-000000000001',
+ 'a1000000-0000-4000-8000-000000000002',
+ 'b1000000-0000-4000-8000-000000000001',
  false, NOW() - INTERVAL '2 days', NOW() - INTERVAL '2 days'),
 
 -- INTERACTION_OVERVIEW — Vitinha
-('e1000000-0000-0000-0000-000000000024',
+('e1000000-0000-4000-8000-000000000024',
  'Diagram Generation Interaction Overview',
  'Visão geral de interação UML combinando fluxo de atividades com referências a diagramas de sequência.',
  'INTERACTION_OVERVIEW',
@@ -684,12 +684,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     E --> F[ref: Generate Diagram]
     F --> G[Save to Database]
     G --> H[Render Preview]',
- 'a1000000-0000-0000-0000-000000000006',
- 'b1000000-0000-0000-0000-000000000003',
+ 'a1000000-0000-4000-8000-000000000006',
+ 'b1000000-0000-4000-8000-000000000003',
  false, NOW() - INTERVAL '1 days', NOW() - INTERVAL '1 days'),
 
 -- TIMING — Fabian
-('e1000000-0000-0000-0000-000000000025',
+('e1000000-0000-4000-8000-000000000025',
  'JWT Token Lifecycle Timing',
  'Diagrama de tempo UML mostrando estados do token JWT ao longo do tempo e pontos de expiração.',
  'TIMING',
@@ -700,12 +700,12 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
         T2["t=7d: expired"]
     end
     T0 --> T1 --> T2',
- 'a1000000-0000-0000-0000-000000000008',
+ 'a1000000-0000-4000-8000-000000000008',
  NULL,
  false, NOW() - INTERVAL '1 days', NOW() - INTERVAL '1 days'),
 
 -- Soft-deleted diagram — Gonçalo Ramos
-('e1000000-0000-0000-0000-000000000020',
+('e1000000-0000-4000-8000-000000000020',
  'Old Auth Flow — Deprecated',
  'Fluxo de autenticação antigo baseado em sessões, substituído pelo modelo JWT. Mantido na lixeira para referência histórica.',
  'SEQUENCE',
@@ -718,7 +718,7 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
     DB-->>S: User found
     S->>S: Create session
     S-->>C: Set-Cookie: session_id',
- 'a1000000-0000-0000-0000-000000000011',
+ 'a1000000-0000-4000-8000-000000000011',
  NULL,
  true, NOW() - INTERVAL '30 days', NOW() - INTERVAL '5 days');
 
@@ -729,67 +729,67 @@ INSERT INTO "Diagrams" (id, title, description, type, mermaid_code, created_by, 
 INSERT INTO "Diagram_Approval_Requests" (id, diagram_id, team_id, requested_by, reviewed_by, status, requested_at, reviewed_at) VALUES
 
 -- PENDING requests
-('f1000000-0000-0000-0000-000000000001',
- 'e1000000-0000-0000-0000-000000000012',
- 'b1000000-0000-0000-0000-000000000001',
- 'a1000000-0000-0000-0000-000000000002',
+('f1000000-0000-4000-8000-000000000001',
+ 'e1000000-0000-4000-8000-000000000012',
+ 'b1000000-0000-4000-8000-000000000001',
+ 'a1000000-0000-4000-8000-000000000002',
  NULL,
  'PENDING',
  NOW() - INTERVAL '3 days',
  NULL),
 
-('f1000000-0000-0000-0000-000000000002',
- 'e1000000-0000-0000-0000-000000000015',
- 'b1000000-0000-0000-0000-000000000002',
- 'a1000000-0000-0000-0000-000000000001',
+('f1000000-0000-4000-8000-000000000002',
+ 'e1000000-0000-4000-8000-000000000015',
+ 'b1000000-0000-4000-8000-000000000002',
+ 'a1000000-0000-4000-8000-000000000001',
  NULL,
  'PENDING',
  NOW() - INTERVAL '2 days',
  NULL),
 
-('f1000000-0000-0000-0000-000000000003',
- 'e1000000-0000-0000-0000-000000000017',
- 'b1000000-0000-0000-0000-000000000003',
- 'a1000000-0000-0000-0000-000000000008',
+('f1000000-0000-4000-8000-000000000003',
+ 'e1000000-0000-4000-8000-000000000017',
+ 'b1000000-0000-4000-8000-000000000003',
+ 'a1000000-0000-4000-8000-000000000008',
  NULL,
  'PENDING',
  NOW() - INTERVAL '1 days',
  NULL),
 
 -- ACCEPTED requests
-('f1000000-0000-0000-0000-000000000004',
- 'e1000000-0000-0000-0000-000000000001',
- 'b1000000-0000-0000-0000-000000000001',
- 'a1000000-0000-0000-0000-000000000002',
- 'a1000000-0000-0000-0000-000000000003',
+('f1000000-0000-4000-8000-000000000004',
+ 'e1000000-0000-4000-8000-000000000001',
+ 'b1000000-0000-4000-8000-000000000001',
+ 'a1000000-0000-4000-8000-000000000002',
+ 'a1000000-0000-4000-8000-000000000003',
  'ACCEPTED',
  NOW() - INTERVAL '58 days',
  NOW() - INTERVAL '57 days'),
 
-('f1000000-0000-0000-0000-000000000005',
- 'e1000000-0000-0000-0000-000000000005',
- 'b1000000-0000-0000-0000-000000000003',
- 'a1000000-0000-0000-0000-000000000008',
- 'a1000000-0000-0000-0000-000000000006',
+('f1000000-0000-4000-8000-000000000005',
+ 'e1000000-0000-4000-8000-000000000005',
+ 'b1000000-0000-4000-8000-000000000003',
+ 'a1000000-0000-4000-8000-000000000008',
+ 'a1000000-0000-4000-8000-000000000006',
  'ACCEPTED',
  NOW() - INTERVAL '43 days',
  NOW() - INTERVAL '42 days'),
 
-('f1000000-0000-0000-0000-000000000006',
- 'e1000000-0000-0000-0000-000000000008',
- 'b1000000-0000-0000-0000-000000000003',
- 'a1000000-0000-0000-0000-000000000005',
- 'a1000000-0000-0000-0000-000000000006',
+('f1000000-0000-4000-8000-000000000006',
+ 'e1000000-0000-4000-8000-000000000008',
+ 'b1000000-0000-4000-8000-000000000003',
+ 'a1000000-0000-4000-8000-000000000005',
+ 'a1000000-0000-4000-8000-000000000006',
  'ACCEPTED',
  NOW() - INTERVAL '33 days',
  NOW() - INTERVAL '32 days'),
 
 -- REJECTED request
-('f1000000-0000-0000-0000-000000000007',
- 'e1000000-0000-0000-0000-000000000020',
- 'b1000000-0000-0000-0000-000000000001',
- 'a1000000-0000-0000-0000-000000000011',
- 'a1000000-0000-0000-0000-000000000003',
+('f1000000-0000-4000-8000-000000000007',
+ 'e1000000-0000-4000-8000-000000000020',
+ 'b1000000-0000-4000-8000-000000000001',
+ 'a1000000-0000-4000-8000-000000000011',
+ 'a1000000-0000-4000-8000-000000000003',
  'REJECTED',
  NOW() - INTERVAL '28 days',
  NOW() - INTERVAL '27 days');

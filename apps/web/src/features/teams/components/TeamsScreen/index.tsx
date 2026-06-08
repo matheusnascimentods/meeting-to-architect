@@ -13,6 +13,7 @@ import { TeamItem } from "./TeamItem";
 import { InvitationsDialog } from "./InvitationsDialog";
 import { EditTeamDialog } from "./EditTeamDialog";
 import { MembersDialog } from "./MembersDialog";
+import { DeleteTeamDialog } from "@/shared/components/DeleteTeamDialog";
 import { teamService } from "../../services/team.service";
 import { Team } from "../../types";
 import { useToast } from "@/shared/hooks/use-toast";
@@ -27,18 +28,20 @@ export function TeamsScreen() {
   const [isInvitesOpen, setIsInvitesOpen] = useState(false);
   const [editingTeam, setEditingTeam] = useState<Team | null>(null);
   const [membersTeam, setMembersTeam] = useState<Team | null>(null);
+  const [deletingTeam, setDeletingTeam] = useState<Team | null>(null);
   const [view, setView] = useState<TeamsView>({ name: 'list' });
   const { success, error: toastError } = useToast();
 
   const handleDeleteTeam = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this team? This action cannot be undone.")) return;
     try {
       await teamService.delete(id);
       success("Team deleted successfully.");
+      setDeletingTeam(null);
       refetch();
     } catch (err) {
       toastError("Failed to delete team.");
       console.error("Failed to delete team", err);
+      throw err;
     }
   };
 
@@ -150,7 +153,7 @@ export function TeamsScreen() {
                   }}
                   onEdit={() => team && setEditingTeam(team)}
                   onMembers={() => team && setMembersTeam(team)}
-                  onDelete={() => team && handleDeleteTeam(team.id)}
+                  onDelete={() => team && setDeletingTeam(team)}
                 />
               );
             })}
@@ -189,6 +192,14 @@ export function TeamsScreen() {
           teamId={membersTeam.id}
           teamName={membersTeam.name}
           onClose={() => setMembersTeam(null)}
+        />
+      )}
+
+      {deletingTeam && (
+        <DeleteTeamDialog
+          team={deletingTeam}
+          onClose={() => setDeletingTeam(null)}
+          onConfirm={() => handleDeleteTeam(deletingTeam.id)}
         />
       )}
     </Box>

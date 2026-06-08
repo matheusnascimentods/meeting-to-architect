@@ -23,6 +23,18 @@ export class ApprovalsRepository {
     });
   }
 
+  async findPendingByDiagram(diagramId: string) {
+    return this.prisma.approvalRequest.findMany({
+      where: {
+        diagramId,
+        status: ApprovalStatus.PENDING,
+      },
+      select: {
+        teamId: true,
+      },
+    });
+  }
+
   async findById(id: string) {
     return this.prisma.approvalRequest.findUnique({
       where: { id },

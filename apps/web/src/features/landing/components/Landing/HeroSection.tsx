@@ -19,9 +19,6 @@ export function HeroSection({ onStart, onSeeHow }: HeroSectionProps) {
     }}>
       <div className="m2a-hero-grid" style={{ maxWidth: 1200, margin: "0 auto", width: "100%" }}>
         <div>
-          <div style={{ marginBottom: 20 }}>
-            <Label variant="accent">Powered by Gemini AI</Label>
-          </div>
           <h1 className="m2a-hero-title" style={{ fontWeight: 700, margin: 0 }}>
             Your meetings deserve better than forgotten decisions.
           </h1>

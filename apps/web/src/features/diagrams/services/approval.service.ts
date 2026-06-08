@@ -6,6 +6,11 @@ class ApprovalService {
     return data;
   }
 
+  async getPendingByDiagram(diagramId: string): Promise<{ teamId: string }[]> {
+    const { data } = await api.get(`/approvals/diagram/${diagramId}`);
+    return data;
+  }
+
   async respondRequest(requestId: string, approve: boolean): Promise<void> {
     await api.patch(`/approvals/${requestId}/respond`, { approve });
   }

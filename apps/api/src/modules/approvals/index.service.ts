@@ -31,6 +31,14 @@ export class ApprovalsService {
     }
   }
 
+  async getPendingByDiagram(diagramId: string) {
+    try {
+      return await this.repository.findPendingByDiagram(diagramId);
+    } catch (error) {
+      throw new Error(`Failed to fetch pending requests for diagram: ${error.message}`);
+    }
+  }
+
   async respondRequest(
     requestId: string,
     adminId: string,
