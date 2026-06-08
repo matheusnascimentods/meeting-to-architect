@@ -48,7 +48,7 @@ export class TeamDiagramsRepository {
     return member?.role;
   }
 
-  async updateDiagramTeam(diagramId: string, teamId: string) {
+  async updateDiagramTeam(diagramId: string, teamId: string | null) {
     return this.prisma.diagram.update({
       where: { id: diagramId },
       data: { teamId },

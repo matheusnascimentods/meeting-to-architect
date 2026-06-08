@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards, ParseUUIDPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards, ParseUUIDPipe } from '@nestjs/common';
 import { TeamDiagramsService } from './index.service';
 import { addToTeamSchema } from './index.schema';
 import { AuthGuard } from '../auth/index.guard';
@@ -25,5 +25,12 @@ export class TeamDiagramsController {
   ) {
     const dto = addToTeamSchema.parse(body);
     return this.teamDiagramsService.addToTeam(id, dto.team_id, user.sub);
+  }
+  @Delete(':id/remove-from-team')
+  removeFromTeam(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: { sub: string },
+  ) {
+    return this.teamDiagramsService.removeFromTeam(id, user.sub);
   }
 }

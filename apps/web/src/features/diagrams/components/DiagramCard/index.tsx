@@ -23,9 +23,10 @@ interface DiagramCardProps {
   onDelete?: (id: string) => void;
   userTeams?: UserTeam[];
   refreshKey?: number;
+  isTeamView?: boolean;
 }
 
-export function DiagramCard({ diagram, onOpen, onUpdate, onDelete, userTeams: propUserTeams, refreshKey }: DiagramCardProps) {
+export function DiagramCard({ diagram, onOpen, onUpdate, onDelete, userTeams: propUserTeams, refreshKey, isTeamView = false }: DiagramCardProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [showAddToTeam, setShowAddToTeam] = useState(false);
@@ -44,6 +45,7 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete, userTeams: pr
   const isCreator = user?.id === diagram.created_by;
   const teamMembership = userTeams.find(t => t.team_id === diagram.team_id);
   const canEdit = isCreator || teamMembership?.role === 'admin' || teamMembership?.role === 'maintainer';
+  const isAdmin = teamMembership?.role === 'admin';
 
   useEffect(() => {
     if (propUserTeams) {
@@ -95,6 +97,16 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete, userTeams: pr
       toastError('Failed to add to the team.');
     } finally {
       setIsAddingToTeam(false);
+    }
+  };
+
+  const handleRemoveFromTeam = async () => {
+    try {
+      await teamDiagramService.removeFromTeam(diagram.id);
+      onUpdate?.({ ...diagram, team_id: null });
+      success('Diagram removed from the team.');
+    } catch (err) {
+      toastError('Failed to remove diagram from the team.');
     }
   };
 
@@ -159,6 +171,15 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete, userTeams: pr
                       </ActionList.LeadingVisual>
                       Add to Team
                     </ActionList.Item>
+                    )}
+
+                    {diagram.team_id && isAdmin && isTeamView && (
+                      <ActionList.Item variant="danger" onSelect={handleRemoveFromTeam}>
+                        <ActionList.LeadingVisual>
+                          <PeopleIcon />
+                        </ActionList.LeadingVisual>
+                        Remove from Team
+                      </ActionList.Item>
                     )}
 
                     {canEdit && (

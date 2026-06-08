@@ -142,6 +142,7 @@ export function TeamDetailScreen({ team: teamSummary, onBack }: Props) {
                 onOpen={() => setSelectedDiagram(d)}
                 onUpdate={refetch}
                 onDelete={refetch}
+                isTeamView={true}
               />
             ))}
           </Box>

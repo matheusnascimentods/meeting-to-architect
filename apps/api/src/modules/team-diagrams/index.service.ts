@@ -71,4 +71,28 @@ export class TeamDiagramsService {
       throw new Error(`Failed to add diagram to team: ${error.message || 'Unknown error'}`);
     }
   }
+
+  async removeFromTeam(diagramId: string, userId: string): Promise<void> {
+    const diagram = await this.repository.findDiagram(diagramId);
+    if (!diagram) throw new NotFoundException('Diagram not found');
+    if (!diagram.teamId)
+      throw new ForbiddenException('Diagram is not associated with any team');
+
+    const role = await this.repository.getMemberRole(diagram.teamId, userId);
+
+    if (role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Only team admins can remove diagrams from the team',
+      );
+    }
+
+    try {
+      await this.repository.updateDiagramTeam(diagramId, null);
+    } catch (error) {
+      console.error('Error removing diagram from team:', error);
+      throw new Error(
+        `Failed to remove diagram from team: ${error.message || 'Unknown error'}`,
+      );
+    }
+  }
 }

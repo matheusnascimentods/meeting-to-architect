@@ -11,4 +11,8 @@ export const teamDiagramService = {
   addToTeam: async (diagramId: string, teamId: string): Promise<void> => {
     await api.post(`/team-diagrams/${diagramId}/add-to-team`, { team_id: teamId });
   },
+
+  removeFromTeam: async (diagramId: string): Promise<void> => {
+    await api.delete(`/team-diagrams/${diagramId}/remove-from-team`);
+  },
 };
