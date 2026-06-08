@@ -75,14 +75,18 @@ export class AgentService {
         type: diagramType,
       });
 
+      if (!data) {
+        throw new BadRequestException('Failed to save diagram.');
+      }
+
       return {
         id: data.id,
         title: data.title,
         description: data.description,
-        mermaid_code: data.mermaidCode,
-        created_by: data.createdBy,
+        mermaid_code: data.mermaid_code,
+        created_by: data.created_by,
         type: data.type,
-      } as DiagramResponse;
+      };
     } catch (error) {
       this.logger.error(
         `Failed to parse agent output. Raw response: ${response}`,

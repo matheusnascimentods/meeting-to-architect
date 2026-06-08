@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ActionMenu, ActionList, IconButton, Label, Dialog, Box, Select, Text } from "@primer/react";
-import { KebabHorizontalIcon, PencilIcon, TrashIcon, PeopleIcon, CheckIcon } from "@primer/octicons-react";
+import { KebabHorizontalIcon, PencilIcon, TrashIcon, PeopleIcon, CheckIcon, ClockIcon } from "@primer/octicons-react";
 import { Diagram } from "../../types";
 import { UserTeam } from "@/features/teams/types";
 import { EditDiagramDialog } from "../EditDiagramDialog";
@@ -22,9 +22,10 @@ interface DiagramCardProps {
   onUpdate?: (updated: Diagram) => void;
   onDelete?: (id: string) => void;
   userTeams?: UserTeam[];
+  refreshKey?: number;
 }
 
-export function DiagramCard({ diagram, onOpen, onUpdate, onDelete, userTeams: propUserTeams }: DiagramCardProps) {
+export function DiagramCard({ diagram, onOpen, onUpdate, onDelete, userTeams: propUserTeams, refreshKey }: DiagramCardProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [showAddToTeam, setShowAddToTeam] = useState(false);
@@ -42,8 +43,7 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete, userTeams: pr
 
   const isCreator = user?.id === diagram.created_by;
   const teamMembership = userTeams.find(t => t.team_id === diagram.team_id);
-  const isTeamAdmin = teamMembership?.role === 'admin';
-  const canEdit = isCreator || isTeamAdmin;
+  const canEdit = isCreator || teamMembership?.role === 'admin' || teamMembership?.role === 'maintainer';
 
   useEffect(() => {
     if (propUserTeams) {
@@ -67,7 +67,7 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete, userTeams: pr
     };
 
     fetchData();
-  }, [diagram.id, propUserTeams]);
+  }, [diagram.id, propUserTeams, refreshKey]);
 
   const handleDelete = async () => {
     try {
@@ -126,6 +126,12 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete, userTeams: pr
           <div className="m2a-clamp diagram-card-description">
             {description}
           </div>
+          {pendingTeamIds.length > 0 && (
+            <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1, color: 'attention.fg' }}>
+              <ClockIcon size={14} />
+              <Text sx={{ fontSize: 0, fontWeight: 'bold' }}>Pending approval</Text>
+            </Box>
+          )}
         </div>
         <div className="diagram-card-divider" />
         <div className="diagram-card-footer">
@@ -146,7 +152,7 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete, userTeams: pr
                         Edit
                       </ActionList.Item>
                     )}
-                    {!diagram.team_id && availableTeams.length > 0 && (
+                    {!diagram.team_id && pendingTeamIds.length === 0 && availableTeams.length > 0 && (
                     <ActionList.Item onSelect={() => setShowAddToTeam(true)}>
                       <ActionList.LeadingVisual>
                         <PeopleIcon />

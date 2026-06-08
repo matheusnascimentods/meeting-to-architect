@@ -8,7 +8,9 @@ import { ApprovalStatus, UserRole } from '@prisma/client';
 
 @Injectable()
 export class ApprovalsService {
-  constructor(private readonly repository: ApprovalsRepository) {}
+  constructor(
+    private readonly repository: ApprovalsRepository,
+  ) {}
 
   async getTeamRequests(teamId: string, userId: string) {
     const role = await this.repository.getMemberRole(teamId, userId);
@@ -36,6 +38,35 @@ export class ApprovalsService {
       return await this.repository.findPendingByDiagram(diagramId);
     } catch (error) {
       throw new Error(`Failed to fetch pending requests for diagram: ${error.message}`);
+    }
+  }
+
+  async getMyRequests(userId: string) {
+    try {
+      const data = await this.repository.findPendingByRequester(userId);
+      return data.map(item => ({
+        ...item,
+        Diagrams: item.diagram,
+        Teams: item.team
+      }));
+    } catch (error) {
+      throw new Error(`Failed to fetch my requests: ${error.message}`);
+    }
+  }
+
+  async cancelRequest(requestId: string, userId: string): Promise<void> {
+    const data = await this.repository.findById(requestId);
+
+    if (!data)
+      throw new NotFoundException('Request not found');
+
+    if (data.requestedBy !== userId)
+      throw new ForbiddenException('You can only cancel your own requests');
+
+    try {
+      await this.repository.remove(requestId);
+    } catch (error) {
+      throw new Error(`Failed to cancel request: ${error.message}`);
     }
   }
 

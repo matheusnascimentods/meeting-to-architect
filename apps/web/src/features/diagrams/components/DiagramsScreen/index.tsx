@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Box, Button, CounterLabel, IconButton, Text } from "@primer/react";
 import { ArrowLeftIcon, PlusIcon } from "@primer/octicons-react";
 import { DiagramCard } from "../DiagramCard";
+import { PendingRequests } from "../PendingRequests";
 import { DiagramDetail } from "../DiagramDetail";
 import { NewDiagramDialog } from "../NewDiagramDialog";
 import { EmptyState } from "@/shared/components/EmptyState";
@@ -21,6 +22,7 @@ export function DiagramsScreen() {
   const { success } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [screen, setScreen] = useState<Screen>({ name: "list" });
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const diagramsLoading = loadingDiagrams && diagrams.length === 0;
 
@@ -32,6 +34,10 @@ export function DiagramsScreen() {
       setScreen({ name: "list" });
     }
     success("Diagram successfully deleted!");
+  };
+
+  const handleCancelRequest = () => {
+    setRefreshKey((prev) => prev + 1);
   };
 
   if (diagramsLoading) {
@@ -83,6 +89,8 @@ export function DiagramsScreen() {
             {COPY.diagrams.subtitle}
           </Text>
 
+          <PendingRequests onCancel={handleCancelRequest} />
+
           {diagrams.length === 0 ? (
             <EmptyState onAction={() => setIsOpen(true)} />
           ) : (
@@ -98,6 +106,7 @@ export function DiagramsScreen() {
                   key={d.id}
                   diagram={d}
                   userTeams={userTeams}
+                  refreshKey={refreshKey}
                   onOpen={() => setScreen({ name: "detail", diagramId: d.id })}
                   onUpdate={refetchDiagrams}
                   onDelete={handleDelete}

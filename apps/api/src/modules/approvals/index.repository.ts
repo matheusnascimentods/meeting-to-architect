@@ -35,6 +35,23 @@ export class ApprovalsRepository {
     });
   }
 
+  async findPendingByRequester(userId: string) {
+    return this.prisma.approvalRequest.findMany({
+      where: {
+        requestedBy: userId,
+        status: ApprovalStatus.PENDING,
+      },
+      include: {
+        diagram: {
+          select: { title: true, type: true },
+        },
+        team: {
+          select: { name: true },
+        },
+      },
+    });
+  }
+
   async findById(id: string) {
     return this.prisma.approvalRequest.findUnique({
       where: { id },
@@ -56,6 +73,12 @@ export class ApprovalsRepository {
     return this.prisma.diagram.update({
       where: { id: diagramId },
       data: { teamId },
+    });
+  }
+
+  async remove(id: string) {
+    return this.prisma.approvalRequest.delete({
+      where: { id },
     });
   }
 

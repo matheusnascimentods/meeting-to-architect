@@ -77,7 +77,7 @@ export function MembersDialog({ teamId, teamName, onClose }: Props) {
   const hasChanges = Object.keys(roleChanges).length > 0 || membersToRemove.length > 0;
 
   return (
-    <Dialog onClose={onClose} title={`Members of ${teamName}`} width="550px">
+    <Dialog onClose={onClose} title={`Members of ${teamName}`} width="large">
       <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 3 }}>
         <Text sx={{ color: 'fg.muted', fontSize: 1, mb: 2 }}>
           Manage your team members and their roles. Changes will be applied after clicking 'Save Changes'.

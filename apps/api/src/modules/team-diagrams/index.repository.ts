@@ -70,4 +70,13 @@ export class TeamDiagramsRepository {
       },
     });
   }
+
+  async findPendingByDiagram(diagramId: string) {
+    return this.prisma.approvalRequest.findMany({
+      where: {
+        diagramId,
+        status: ApprovalStatus.PENDING,
+      },
+    });
+  }
 }

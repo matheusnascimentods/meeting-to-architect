@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Label, Button, IconButton, Box } from "@primer/react";
-import { ClockIcon, PersonIcon, CopyIcon, DownloadIcon, TrashIcon, ScreenFullIcon, XIcon } from "@primer/octicons-react";
+import { ClockIcon, PersonIcon, CopyIcon, DownloadIcon, TrashIcon, ScreenFullIcon, XIcon, PencilIcon } from "@primer/octicons-react";
+import { PendingRequests } from "../PendingRequests";
 import { Diagram } from "@/features/diagrams/types";
 import { PanelBox } from "@/shared/components/PanelBox";
 import { PanelHeader } from "@/shared/components/PanelHeader";
 import { DeleteDiagramDialog } from "@/shared/components/DeleteDiagramDialog";
+import { EditDiagramDialog } from "../EditDiagramDialog";
 import { diagramService } from "@/features/diagrams/services/diagram.service";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useTeams } from "@/features/teams/hooks/useTeams";
@@ -21,21 +23,22 @@ interface DiagramDetailProps {
 }
 
 export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
-  const source = diagram.mermaid_code;
+  const [source, setSource] = useState(diagram.mermaid_code);
+  const [currentDiagram, setCurrentDiagram] = useState(diagram);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const { success, error } = useToast();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const { success, error: toastError } = useToast();
   const { user } = useAuth();
   const { teams } = useTeams();
 
-  const isCreator = user?.id === diagram.created_by;
-  const teamMembership = teams.find(t => t.team_id === diagram.team_id);
-  const isTeamAdmin = teamMembership?.role === 'admin';
-  const canDelete = isCreator || isTeamAdmin;
+  const isCreator = user?.id === currentDiagram.created_by;
+  const teamMembership = teams.find(t => t.team_id === currentDiagram.team_id);
+  const canManage = isCreator || teamMembership?.role === 'admin' || teamMembership?.role === 'maintainer';
 
   const handleDelete = async () => {
     try {
-      await diagramService.deleteDiagram(diagram.id);
+      await diagramService.deleteDiagram(currentDiagram.id);
       onDelete?.();
     } catch (err) {
       // Re-throw to be handled by the dialog
@@ -55,47 +58,51 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
         theme: "neutral",
         securityLevel: "loose",
       });
-      const { svg } = await mermaid.render(`export-${diagram.id.replace(/-/g, '')}`, source);
+      const { svg } = await mermaid.render(`export-${currentDiagram.id.replace(/-/g, '')}`, source);
       const blob = new Blob([svg], { type: 'image/svg+xml' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${diagram.title.toLowerCase().replace(/\s+/g, '-')}.svg`;
+      a.download = `${currentDiagram.title.toLowerCase().replace(/\s+/g, '-')}.svg`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       success("Diagram exported as SVG!");
     } catch (err) {
-      error("Failed to export diagram.");
+      toastError("Failed to export diagram.");
     }
   };
 
   return (
     <>
       <div className="diagram-detail-container">
+        <PendingRequests diagramId={currentDiagram.id} />
         <div className="diagram-detail-type">
-          <Label variant={diagram.variant || "accent"}>{diagram.type || "Sequence"}</Label>
+          <Label variant={currentDiagram.variant || "accent"}>{currentDiagram.type || "Sequence"}</Label>
         </div>
         <h1 className="diagram-detail-title">
-          {diagram.title}
+          {currentDiagram.title}
         </h1>
         <div className="diagram-detail-meta">
           <span className="meta-item">
             <ClockIcon size={14} />
-            <span>{diagram.created_at ? `Generated ${formatRelativeTime(diagram.created_at)}` : 'Date unknown'}</span>
+            <span>{currentDiagram.created_at ? `Generated ${formatRelativeTime(currentDiagram.created_at)}` : 'Date unknown'}</span>
           </span>
           <span>·</span>
           <span className="meta-item">
             <PersonIcon size={14} />
-            <span>{diagram.creator?.name || diagram.created_by || 'System Agent'}</span>
+            <span>{currentDiagram.creator?.name || currentDiagram.created_by || 'System Agent'}</span>
           </span>
         </div>
         <div className="diagram-detail-actions">
           <Button leadingVisual={CopyIcon} onClick={handleCopy}>Copy Mermaid</Button>
           <Button leadingVisual={DownloadIcon} onClick={handleExport}>Export</Button>
-          {canDelete && (
-            <Button variant="danger" leadingVisual={TrashIcon} onClick={() => setIsDeleteDialogOpen(true)}>Delete</Button>
+          {canManage && (
+            <>
+              <Button leadingVisual={PencilIcon} onClick={() => setIsEditDialogOpen(true)}>Edit</Button>
+              <Button variant="danger" leadingVisual={TrashIcon} onClick={() => setIsDeleteDialogOpen(true)}>Delete</Button>
+            </>
           )}
         </div>
 
@@ -121,7 +128,7 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
               onClick={() => setIsFullscreen(true)}
               title="Click to expand"
             >
-              <MermaidPreview source={source} id={String(diagram.id)} />
+              <MermaidPreview source={source} id={String(currentDiagram.id)} />
             </div>
           </PanelBox>
 
@@ -142,7 +149,7 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
       {isFullscreen && (
         <div className="diagram-fullscreen-overlay" onClick={() => setIsFullscreen(false)}>
           <div className="diagram-fullscreen-header">
-            <span className="diagram-fullscreen-title">{diagram.title}</span>
+            <span className="diagram-fullscreen-title">{currentDiagram.title}</span>
             <IconButton
               icon={XIcon}
               aria-label="Close fullscreen"
@@ -153,14 +160,32 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
             />
           </div>
           <div className="diagram-fullscreen-content" onClick={(e) => e.stopPropagation()}>
-            <MermaidPreview source={source} id={`${diagram.id}-fullscreen`} />
+            <MermaidPreview source={source} id={`${currentDiagram.id}-fullscreen`} />
           </div>
         </div>
       )}
 
+      {isEditDialogOpen && (
+        <EditDiagramDialog
+          diagram={currentDiagram}
+          onClose={() => setIsEditDialogOpen(false)}
+          onSave={async (updated) => {
+            try {
+              const data = await diagramService.update(currentDiagram.id, updated);
+              setCurrentDiagram(data);
+              setSource(data.mermaid_code);
+              success('Diagram updated successfully.');
+              setIsEditDialogOpen(false);
+            } catch (err) {
+              toastError('Failed to update diagram.');
+            }
+          }}
+        />
+      )}
+
       {isDeleteDialogOpen && (
         <DeleteDiagramDialog
-          diagram={diagram}
+          diagram={currentDiagram}
           onClose={() => setIsDeleteDialogOpen(false)}
           onConfirm={handleDelete}
         />

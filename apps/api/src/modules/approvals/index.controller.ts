@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Delete, Body, Param, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApprovalsService } from './index.service';
 import { respondApprovalSchema } from './index.schema';
 import { AuthGuard } from '../auth/index.guard';
@@ -20,6 +20,20 @@ export class ApprovalsController {
   @Get('diagram/:diagramId')
   getPendingByDiagram(@Param('diagramId') diagramId: string) {
     return this.approvals.getPendingByDiagram(diagramId);
+  }
+
+  @Get('my-requests')
+  getMyRequests(@CurrentUser() user: { sub: string }) {
+    return this.approvals.getMyRequests(user.sub);
+  }
+
+  @Delete(':id/cancel')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  cancelRequest(
+    @Param('id') id: string,
+    @CurrentUser() user: { sub: string },
+  ) {
+    return this.approvals.cancelRequest(id, user.sub);
   }
 
   @Patch(':id/respond')

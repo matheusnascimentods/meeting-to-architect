@@ -15,9 +15,27 @@ export class DiagramsService {
     private readonly teamsRepository: TeamsRepository,
   ) {}
 
+  private mapToFrontend(diagram: any) {
+    if (!diagram) return null;
+    return {
+      id: diagram.id,
+      title: diagram.title,
+      description: diagram.description,
+      type: diagram.type,
+      mermaid_code: diagram.mermaidCode,
+      created_by: diagram.createdBy,
+      team_id: diagram.teamId,
+      is_deleted: diagram.isDeleted,
+      created_at: diagram.createdAt,
+      updated_at: diagram.updatedAt,
+      creator: diagram.creator,
+    };
+  }
+
   async findAll(userId: string) {
     try {
-      return await this.repository.findAllByUser(userId);
+      const data = await this.repository.findAllByUser(userId);
+      return data.map((d) => this.mapToFrontend(d));
     } catch (error) {
       console.error('Error fetching diagrams:', error);
       throw new Error(`Failed to fetch diagrams: ${error.message}`);
@@ -32,7 +50,7 @@ export class DiagramsService {
 
     if (diagram.teamId) {
       const role = await this.teamsRepository.getMemberRole(diagram.teamId, userId);
-      if (role === UserRole.ADMIN) return;
+      if (role === UserRole.ADMIN || role === UserRole.MAINTAINER) return;
     }
 
     throw new ForbiddenException('You do not have permission to modify this diagram');
@@ -50,13 +68,14 @@ export class DiagramsService {
 
   async save(diagram: CreateDiagramDto) {
     try {
-      return await this.repository.create({
+      const data = await this.repository.create({
         title: diagram.title,
         description: diagram.description,
         mermaidCode: diagram.mermaid_code,
         type: diagram.type as DiagramType,
         creator: { connect: { id: diagram.created_by } },
       });
+      return this.mapToFrontend(data);
     } catch (error) {
       console.error('Error saving diagram:', error);
       throw new Error(`Failed to save diagram: ${error.message}`);
@@ -77,12 +96,13 @@ export class DiagramsService {
     
     const { title, description, mermaid_code, type } = updateData;
     try {
-      return await this.repository.update(id, {
+      const data = await this.repository.update(id, {
         title,
         description,
         mermaidCode: mermaid_code,
         type: type as DiagramType,
       });
+      return this.mapToFrontend(data);
     } catch (error) {
       console.error('Error updating diagram:', error);
       throw new Error(`Failed to update diagram: ${error.message}`);
