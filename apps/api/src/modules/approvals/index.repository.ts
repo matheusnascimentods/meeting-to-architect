@@ -35,11 +35,10 @@ export class ApprovalsRepository {
     });
   }
 
-  async findPendingByRequester(userId: string) {
+  async findAllByRequester(userId: string) {
     return this.prisma.approvalRequest.findMany({
       where: {
         requestedBy: userId,
-        status: ApprovalStatus.PENDING,
       },
       include: {
         diagram: {
@@ -48,6 +47,9 @@ export class ApprovalsRepository {
         team: {
           select: { name: true },
         },
+      },
+      orderBy: {
+        requestedAt: 'desc',
       },
     });
   }

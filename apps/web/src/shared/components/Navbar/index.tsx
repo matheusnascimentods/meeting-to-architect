@@ -1,5 +1,5 @@
-import { Button, IconButton, ActionMenu, Box, Text, ActionList } from "@primer/react";
-import { ArrowLeftIcon, PlusIcon, PersonIcon, SignOutIcon } from "@primer/octicons-react";
+import { Button, IconButton, ActionMenu, Box, Text, ActionList, CounterLabel } from "@primer/react";
+import { ArrowLeftIcon, PlusIcon, PersonIcon, SignOutIcon, InboxIcon } from "@primer/octicons-react";
 import "./styles.css";
 import { User } from "@/features/auth/types";
 
@@ -10,9 +10,10 @@ interface NavbarProps {
   onNewClick?: () => void;
   user?: User | null;
   onLogout?: () => void;
+  onRequestsClick?: () => void;
 }
 
-export function Navbar({ showBack, onBack, showNewButton, onNewClick, user, onLogout }: NavbarProps) {
+export function Navbar({ showBack, onBack, showNewButton, onNewClick, user, onLogout, onRequestsClick }: NavbarProps) {
   return (
     <nav className="navbar">
       <div className="navbar-left">
@@ -33,11 +34,18 @@ export function Navbar({ showBack, onBack, showNewButton, onNewClick, user, onLo
         {showNewButton && (
           <Button variant="primary" leadingVisual={PlusIcon} onClick={onNewClick}>New Diagram</Button>
         )}
-        
+
         {user && (
-          <ActionMenu>
-            <ActionMenu.Anchor>
-              {/* Using a custom anchor for the avatar style */}
+          <>
+            <IconButton 
+              icon={InboxIcon} 
+              aria-label="Requests" 
+              variant="invisible" 
+              onClick={onRequestsClick}
+            />
+            <ActionMenu>
+              <ActionMenu.Anchor>
+...
               <Box
                 sx={{
                   width: 32,

@@ -43,7 +43,7 @@ export class ApprovalsService {
 
   async getMyRequests(userId: string) {
     try {
-      const data = await this.repository.findPendingByRequester(userId);
+      const data = await this.repository.findAllByRequester(userId);
       return data.map(item => ({
         ...item,
         Diagrams: item.diagram,

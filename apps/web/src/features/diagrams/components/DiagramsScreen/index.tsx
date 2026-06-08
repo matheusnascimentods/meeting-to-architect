@@ -3,10 +3,13 @@ import { Box, Button, CounterLabel, IconButton, Text } from "@primer/react";
 import { ArrowLeftIcon, PlusIcon } from "@primer/octicons-react";
 import { DiagramCard } from "../DiagramCard";
 import { PendingRequests } from "../PendingRequests";
+import { RequestsDrawer } from "../RequestsDrawer";
 import { DiagramDetail } from "../DiagramDetail";
 import { NewDiagramDialog } from "../NewDiagramDialog";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { useToast } from "@/shared/hooks/use-toast";
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import { Navbar } from "@/shared/components/Navbar";
 import { useDiagrams } from "../../hooks/useDiagrams";
 import { useTeams } from "@/features/teams/hooks/useTeams";
 import { LoadingState } from "@/shared/components/LoadingState";
@@ -20,7 +23,9 @@ export function DiagramsScreen() {
   const { diagrams, loading: loadingDiagrams, error: errorDiagrams, refetch: refetchDiagrams } = useDiagrams();
   const { teams: userTeams, loading: loadingTeams } = useTeams();
   const { success } = useToast();
+  const { user, onLogout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [showRequests, setShowRequests] = useState(false);
   const [screen, setScreen] = useState<Screen>({ name: "list" });
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -50,32 +55,17 @@ export function DiagramsScreen() {
 
   return (
     <Box sx={{ minHeight: "100vh", fontFamily: tokens.layout.fontStack }}>
-      <Box
-        as="nav"
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: screen.name === "detail" ? "space-between" : "flex-end",
-          padding: "16px 32px",
-          background: "canvas.default",
-          borderBottom: "1px solid",
-          borderColor: "border.default",
-        }}
-      >
-        {screen.name === "detail" && (
-          <IconButton
-            icon={ArrowLeftIcon}
-            aria-label="Back to list"
-            variant="invisible"
-            onClick={() => setScreen({ name: "list" })}
-          />
-        )}
-        {screen.name === "list" && (
-          <Button variant="primary" leadingVisual={PlusIcon} onClick={() => setIsOpen(true)}>
-            {COPY.diagrams.empty.action}
-          </Button>
-        )}
-      </Box>
+      <Navbar
+        user={user}
+        onLogout={onLogout}
+        showBack={screen.name === "detail"}
+        onBack={() => setScreen({ name: "list" })}
+        showNewButton={screen.name === "list"}
+        onNewClick={() => setIsOpen(true)}
+        onRequestsClick={() => setShowRequests(true)}
+      />
+
+      {showRequests && <RequestsDrawer onClose={() => setShowRequests(false)} />}
 
       {screen.name === "list" && (
         <Box sx={tokens.container.page}>
