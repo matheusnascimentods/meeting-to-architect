@@ -62,7 +62,6 @@ export function DiagramsScreen() {
         onBack={() => setScreen({ name: "list" })}
         showNewButton={screen.name === "list"}
         onNewClick={() => setIsOpen(true)}
-        onRequestsClick={() => setShowRequests(true)}
       />
 
       {showRequests && <RequestsDrawer onClose={() => setShowRequests(false)} />}

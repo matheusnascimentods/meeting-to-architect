@@ -10,10 +10,9 @@ interface NavbarProps {
   onNewClick?: () => void;
   user?: User | null;
   onLogout?: () => void;
-  onRequestsClick?: () => void;
 }
 
-export function Navbar({ showBack, onBack, showNewButton, onNewClick, user, onLogout, onRequestsClick }: NavbarProps) {
+export function Navbar({ showBack, onBack, showNewButton, onNewClick, user, onLogout }: NavbarProps) {
   return (
     <nav className="navbar">
       <div className="navbar-left">
@@ -37,12 +36,6 @@ export function Navbar({ showBack, onBack, showNewButton, onNewClick, user, onLo
 
         {user && (
           <>
-            <IconButton 
-              icon={InboxIcon} 
-              aria-label="Requests" 
-              variant="invisible" 
-              onClick={onRequestsClick}
-            />
             <ActionMenu>
               <ActionMenu.Anchor>
               <Box
