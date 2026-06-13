@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Label, Button, IconButton, Box } from "@primer/react";
 import { ClockIcon, PersonIcon, CopyIcon, DownloadIcon, TrashIcon, ScreenFullIcon, XIcon, PencilIcon } from "@primer/octicons-react";
-import { PendingRequests } from "../PendingRequests";
 import { Diagram } from "@/features/diagrams/types";
 import { PanelBox } from "@/shared/components/PanelBox";
 import { PanelHeader } from "@/shared/components/PanelHeader";
@@ -77,7 +76,6 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
   return (
     <>
       <div className="diagram-detail-container">
-        <PendingRequests diagramId={currentDiagram.id} />
         <div className="diagram-detail-type">
           <Label variant={currentDiagram.variant || "accent"}>{currentDiagram.type || "Sequence"}</Label>
         </div>
