@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Box, Button, Dialog, FormControl, TextInput, Text } from "@primer/react";
-import { teamService } from "../../services/team.service";
-import { Team } from "../../types";
+import { teamService } from "../../../services/team.service";
+import { Team } from "../../../types";
 import { useToast } from "@/shared/hooks/use-toast";
 
 interface Props {

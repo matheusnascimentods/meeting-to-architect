@@ -4,17 +4,17 @@ import { ClockIcon, PersonIcon, CopyIcon, DownloadIcon, TrashIcon, ScreenFullIco
 import { Diagram } from "@/features/diagrams/types";
 import { PanelBox } from "@/shared/components/PanelBox";
 import { PanelHeader } from "@/shared/components/PanelHeader";
-import { DeleteDiagramDialog } from "@/shared/components/DeleteDiagramDialog";
+import { DeleteDiagramDialog } from "@/features/diagrams/components/DeleteDiagramDialog";
 import { EditDiagramDialog } from "../EditDiagramDialog";
 import { diagramService } from "@/features/diagrams/services/diagram.service";
 import { useAuth } from "@/features/auth/hooks/use-auth";
-import { useTeams } from "@/features/teams/hooks/useTeams";
+import { useTeams } from "@/features/teams/hooks/use-teams";
 import { MermaidPreview } from "../MermaidPreview";
 import { tokens } from "@/shared/styles/tokens";
 import { formatRelativeTime } from "@/shared/lib/date-utils";
 import { useToast } from "@/shared/hooks/use-toast";
 import mermaid from "mermaid";
-import "./styles.css";
+import styles from "./index.module.css";
 
 interface DiagramDetailProps {
   diagram: Diagram;
@@ -75,25 +75,25 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
 
   return (
     <>
-      <div className="diagram-detail-container">
-        <div className="diagram-detail-type">
+      <div className={styles['diagram-detail-container']}>
+        <div className={styles['diagram-detail-type']}>
           <Label variant={currentDiagram.variant || "accent"}>{currentDiagram.type || "Sequence"}</Label>
         </div>
-        <h1 className="diagram-detail-title">
+        <h1 className={styles['diagram-detail-title']}>
           {currentDiagram.title}
         </h1>
-        <div className="diagram-detail-meta">
-          <span className="meta-item">
+        <div className={styles['diagram-detail-meta']}>
+          <span className={styles['meta-item']}>
             <ClockIcon size={14} />
             <span>{currentDiagram.created_at ? `Generated ${formatRelativeTime(currentDiagram.created_at)}` : 'Date unknown'}</span>
           </span>
           <span>·</span>
-          <span className="meta-item">
+          <span className={styles['meta-item']}>
             <PersonIcon size={14} />
             <span>{currentDiagram.creator?.name || currentDiagram.created_by || 'System Agent'}</span>
           </span>
         </div>
-        <div className="diagram-detail-actions">
+        <div className={styles['diagram-detail-actions']}>
           <Button leadingVisual={CopyIcon} onClick={handleCopy}>Copy Mermaid</Button>
           <Button leadingVisual={DownloadIcon} onClick={handleExport}>Export</Button>
           {canManage && (
@@ -122,7 +122,7 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
               }
             />
             <div
-              className="diagram-preview-clickable"
+              className={styles['diagram-preview-clickable']}
               onClick={() => setIsFullscreen(true)}
               title="Click to expand"
             >
@@ -135,7 +135,7 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
               left={<span className="panel-label">Mermaid Source</span>}
               right={<IconButton icon={CopyIcon} aria-label="Copy source" variant="invisible" size="small" onClick={handleCopy} />}
             />
-            <pre className="mermaid-source">
+            <pre className={styles['mermaid-source']}>
               <code>
                 {source}
               </code>
@@ -145,9 +145,9 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
       </div>
 
       {isFullscreen && (
-        <div className="diagram-fullscreen-overlay" onClick={() => setIsFullscreen(false)}>
-          <div className="diagram-fullscreen-header">
-            <span className="diagram-fullscreen-title">{currentDiagram.title}</span>
+        <div className={styles['diagram-fullscreen-overlay']} onClick={() => setIsFullscreen(false)}>
+          <div className={styles['diagram-fullscreen-header']}>
+            <span className={styles['diagram-fullscreen-title']}>{currentDiagram.title}</span>
             <IconButton
               icon={XIcon}
               aria-label="Close fullscreen"
@@ -157,7 +157,7 @@ export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
               sx={{ color: '#fff' }}
             />
           </div>
-          <div className="diagram-fullscreen-content" onClick={(e) => e.stopPropagation()}>
+          <div className={styles['diagram-fullscreen-content']} onClick={(e) => e.stopPropagation()}>
             <MermaidPreview source={source} id={`${currentDiagram.id}-fullscreen`} />
           </div>
         </div>

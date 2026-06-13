@@ -1,7 +1,7 @@
 import { Box, Text, FormControl, TextInput, Button, IconButton } from '@primer/react';
 import { ArrowLeftIcon } from '@primer/octicons-react';
 import React from 'react';
-import { User } from '../../types';
+import { User } from '../../../types';
 
 interface Props {
   currentUser: User | null;

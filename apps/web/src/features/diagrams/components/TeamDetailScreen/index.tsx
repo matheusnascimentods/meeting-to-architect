@@ -5,7 +5,7 @@ import { Diagram } from "../../types";
 import { DiagramCard } from "../DiagramCard";
 import { DiagramDetail } from "../DiagramDetail";
 import { EmptyState } from "@/shared/components/EmptyState";
-import { useTeamDetail } from "../../hooks/useTeamDetail";
+import { useTeamDetail } from "../../hooks/use-team-detail";
 import { LoadingState } from "@/shared/components/LoadingState";
 import { ErrorState } from "@/shared/components/ErrorState";
 import { tokens } from "@/shared/styles/tokens";

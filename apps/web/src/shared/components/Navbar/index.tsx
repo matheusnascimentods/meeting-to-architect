@@ -1,6 +1,6 @@
 import { Button, IconButton, ActionMenu, Box, Text, ActionList, CounterLabel } from "@primer/react";
 import { ArrowLeftIcon, PlusIcon, PersonIcon, SignOutIcon, InboxIcon } from "@primer/octicons-react";
-import "./styles.css";
+import styles from "./index.module.css";
 import { User } from "@/features/auth/types";
 
 interface NavbarProps {
@@ -14,8 +14,8 @@ interface NavbarProps {
 
 export function Navbar({ showBack, onBack, showNewButton, onNewClick, user, onLogout }: NavbarProps) {
   return (
-    <nav className="navbar">
-      <div className="navbar-left">
+    <nav className={styles.navbar}>
+      <div className={styles['navbar-left']}>
         {showBack && (
           <IconButton
             icon={ArrowLeftIcon}
@@ -24,16 +24,16 @@ export function Navbar({ showBack, onBack, showNewButton, onNewClick, user, onLo
             onClick={onBack}
           />
         )}
-        <div className="navbar-brand">
-          <span className="brand-name">M2A</span>
-          <span className="brand-sub">Meeting to Architecture</span>
+        <div className={styles['navbar-brand']}>
+          <span className={styles['brand-name']}>M2A</span>
+          <span className={styles['brand-sub']}>Meeting to Architecture</span>
         </div>
       </div>
-      <Box className="navbar-right" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         {showNewButton && (
           <Button variant="primary" leadingVisual={PlusIcon} onClick={onNewClick}>New Diagram</Button>
         )}
-
+...
         {user && (
           <>
             <ActionMenu>

@@ -1,5 +1,5 @@
 import { Dialog, Box, Text, CounterLabel, Button } from '@primer/react';
-import { DiagramRequest } from '../../types';
+import { DiagramRequest } from '../../../types';
 
 interface Props {
   requests: DiagramRequest[];

@@ -3,7 +3,7 @@ import { Box, Text, Dialog, CounterLabel } from '@primer/react';
 import { TrashIcon } from '@primer/octicons-react';
 import { Diagram } from '../../types';
 import { EmptyState } from '@/shared/components/EmptyState';
-import { useTrash } from '../../hooks/useTrash';
+import { useTrash } from '../../hooks/use-trash';
 import { LoadingState } from '@/shared/components/LoadingState';
 import { ErrorState } from '@/shared/components/ErrorState';
 import { tokens } from '@/shared/styles/tokens';

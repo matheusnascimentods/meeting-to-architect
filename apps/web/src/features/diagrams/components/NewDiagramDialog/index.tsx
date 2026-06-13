@@ -4,7 +4,7 @@ import * as Icons from "@primer/octicons-react";
 import { DiagramType, Diagram } from "@/features/diagrams/types";
 import { api } from "@/shared/lib/api";
 import { normalizeDiagram } from "@/features/diagrams/utils/normalize-diagram";
-import { DIAGRAM_CATEGORIES, DIAGRAM_TYPES, TYPE_LABELS, DiagramCategory } from "./diagram-types";
+import { DIAGRAM_CATEGORIES, DIAGRAM_TYPES, TYPE_LABELS, DiagramCategory } from "./index.types";
 import { COPY } from "@/shared/constants/copy";
 
 const ALLOWED_EXTS = ['pdf', 'md', 'txt', 'vtt', 'srt'];

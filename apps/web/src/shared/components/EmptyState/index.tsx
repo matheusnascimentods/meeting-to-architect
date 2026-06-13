@@ -1,6 +1,6 @@
 import { FileCodeIcon } from "@primer/octicons-react";
 import { Button } from "@primer/react";
-import "./styles.css";
+import styles from "./index.module.css";
 
 const mutedColor = "#6E6E73";
 
@@ -18,10 +18,10 @@ export function EmptyState({
   onAction,
 }: EmptyStateProps) {
   return (
-    <div className="empty-state">
+    <div className={styles['empty-state']}>
       <Icon size={64} fill={mutedColor} />
-      <h2 className="empty-state-title">{title}</h2>
-      <p className="empty-state-description">
+      <h2 className={styles['empty-state-title']}>{title}</h2>
+      <p className={styles['empty-state-description']}>
         {description}
       </p>
       {onAction && (

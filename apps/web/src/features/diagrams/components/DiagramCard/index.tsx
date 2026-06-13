@@ -4,7 +4,7 @@ import { KebabHorizontalIcon, PencilIcon, TrashIcon, PeopleIcon, CheckIcon, Cloc
 import { Diagram } from "../../types";
 import { UserTeam } from "@/features/teams/types";
 import { EditDiagramDialog } from "../EditDiagramDialog";
-import { DeleteDiagramDialog } from "@/shared/components/DeleteDiagramDialog";
+import { DeleteDiagramDialog } from "@/features/diagrams/components/DeleteDiagramDialog";
 import { diagramService } from "../../services/diagram.service";
 import { teamService } from "@/features/teams/services/team.service";
 import { teamDiagramService } from "../../services/team-diagram.service";
@@ -12,7 +12,7 @@ import { approvalService } from "../../services/approval.service";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { COPY } from "@/shared/constants/copy";
 import { formatRelativeTime } from "@/shared/lib/date-utils";
-import "./styles.css";
+import styles from "./index.module.css";
 
 import { useToast } from "@/shared/hooks/use-toast";
 
@@ -117,7 +117,7 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete, userTeams: pr
   return (
     <>
       <div
-        className="m2a-card diagram-card"
+        className={`m2a-card ${styles['diagram-card']}`}
         onClick={onOpen}
         role="button"
         tabIndex={0}
@@ -132,10 +132,10 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete, userTeams: pr
           <Label variant={variant}>{type}</Label>
         </div>
         <div>
-          <div className="diagram-card-title">
+          <div className={styles['diagram-card-title']}>
             {title}
           </div>
-          <div className="m2a-clamp diagram-card-description">
+          <div className={`m2a-clamp ${styles['diagram-card-description']}`}>
             {description}
           </div>
           {pendingTeamIds.length > 0 && (
@@ -145,9 +145,9 @@ export function DiagramCard({ diagram, onOpen, onUpdate, onDelete, userTeams: pr
             </Box>
           )}
         </div>
-        <div className="diagram-card-divider" />
-        <div className="diagram-card-footer">
-          <span className="diagram-card-date">{date}</span>
+        <div className={styles['diagram-card-divider']} />
+        <div className={styles['diagram-card-footer']}>
+          <span className={styles['diagram-card-date']}>{date}</span>
           <span onClick={(e) => e.stopPropagation()}>
             {((!diagram.team_id && availableTeams.length > 0) || canEdit) && (
               <ActionMenu>

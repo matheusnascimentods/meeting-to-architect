@@ -1,6 +1,6 @@
 import { Dialog, Box, Text, CounterLabel } from '@primer/react';
-import { InviteItem } from './InviteItem';
-import { TeamInvite } from '../../types';
+import { InviteItem } from '../InviteItem';
+import { TeamInvite } from '../../../types';
 
 interface Props {
   invites: TeamInvite[];

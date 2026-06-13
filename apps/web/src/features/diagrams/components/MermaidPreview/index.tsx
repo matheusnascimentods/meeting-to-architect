@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import mermaid from "mermaid";
-import "./styles.css";
+import styles from "./index.module.css";
 
 let mermaidInitialized = false;
 
@@ -51,7 +51,7 @@ export function MermaidPreview({ source, id }: MermaidPreviewProps) {
 
   if (error) {
     return (
-      <div className="mermaid-error">
+      <div className={styles['mermaid-error']}>
         Preview unavailable
       </div>
     );
@@ -60,7 +60,7 @@ export function MermaidPreview({ source, id }: MermaidPreviewProps) {
   return (
     <div
       ref={ref}
-      className="m2a-mermaid mermaid-container"
+      className={`m2a-mermaid ${styles['mermaid-container']}`}
     />
   );
 }

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Box, Button, Dialog, Text, ActionMenu, ActionList, IconButton, Spinner } from "@primer/react";
 import { TrashIcon, CheckIcon } from "@primer/octicons-react";
-import { memberService } from "../../services/member.service";
-import { TeamMember } from "../../types";
+import { memberService } from "../../../services/member.service";
+import { TeamMember } from "../../../types";
 import { LoadingState } from "@/shared/components/LoadingState";
 import { useToast } from "@/shared/hooks/use-toast";
 

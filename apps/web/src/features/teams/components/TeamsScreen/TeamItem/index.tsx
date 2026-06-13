@@ -1,6 +1,6 @@
 import { Box, Text, Label, ActionMenu, ActionList, IconButton } from '@primer/react';
 import { KebabHorizontalIcon, PencilIcon, TrashIcon, PeopleIcon } from '@primer/octicons-react';
-import { UserTeam } from '../../types';
+import { UserTeam } from '../../../types';
 import { tokens } from '@/shared/styles/tokens';
 import { formatRelativeTime } from '@/shared/lib/date-utils';
 

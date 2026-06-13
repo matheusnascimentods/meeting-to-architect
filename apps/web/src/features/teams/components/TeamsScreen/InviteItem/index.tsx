@@ -1,5 +1,5 @@
 import { Box, Text, Button } from '@primer/react';
-import { TeamInvite } from '../../types';
+import { TeamInvite } from '../../../types';
 
 interface Props {
   invite: TeamInvite;

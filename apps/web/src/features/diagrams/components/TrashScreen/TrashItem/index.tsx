@@ -1,6 +1,6 @@
 import { Box, Text, Button, Label } from '@primer/react';
 import { FileCodeIcon, ReplyIcon } from '@primer/octicons-react';
-import { Diagram } from '../../types';
+import { Diagram } from '../../../types';
 import { tokens } from '@/shared/styles/tokens';
 import { COPY } from '@/shared/constants/copy';
 

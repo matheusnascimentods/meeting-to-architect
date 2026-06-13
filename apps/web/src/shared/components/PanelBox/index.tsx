@@ -1,8 +1,8 @@
-import "./styles.css";
+import styles from "./index.module.css";
 
 export function PanelBox({ children }: { children: React.ReactNode }) {
   return (
-    <div className="panel-box">
+    <div className={styles["panel-box"]}>
       {children}
     </div>
   );
