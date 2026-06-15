@@ -1,4 +1,11 @@
+import { Diagram } from "@/features/diagrams/types";
+
 export type DiagramCategory = 'structural' | 'behavioral' | 'c4'
+
+export interface NewDiagramDialogProps {
+  onClose: () => void;
+  onSuccess?: (d: Diagram) => void;
+}
 
 export interface DiagramType {
   id: string

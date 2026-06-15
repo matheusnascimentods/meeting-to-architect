@@ -1,12 +1,7 @@
 import { Box, Text, Button } from '@primer/react';
-import { TeamInvite } from '../../../types';
+import { InviteItemProps } from './index.types';
 
-interface Props {
-  invite: TeamInvite;
-  onRespond: (id: string, accept: boolean) => void;
-}
-
-export function InviteItem({ invite, onRespond }: Props) {
+export function InviteItem({ invite, onRespond }: InviteItemProps) {
   return (
     <Box sx={{
       flexDirection: "column",

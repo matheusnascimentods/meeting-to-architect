@@ -1,11 +1,8 @@
 import { useState } from 'react';
 import { Box, Text, TextInput, Button } from '@primer/react';
+import { InviteMemberProps } from './index.types';
 
-interface Props {
-  onInvite: (email: string) => void;
-}
-
-export function InviteMember({ onInvite }: Props) {
+export function InviteMember({ onInvite }: InviteMemberProps) {
   const [inviteEmail, setInviteEmail] = useState("");
 
   const handleInvite = () => {

@@ -7,20 +7,17 @@ import { TeamDetailScreen } from "@/features/diagrams/components/TeamDetailScree
 import { useTeams } from "../../hooks/use-teams";
 import { LoadingState } from "@/shared/components/LoadingState";
 import { ErrorState } from "@/shared/components/ErrorState";
-import { tokens } from "@/shared/styles/tokens";
-import { COPY } from "@/shared/constants/copy";
+import { tokens } from "@/shared/constants";
+import { COPY } from "@/shared/constants";
 import { TeamItem } from "./TeamItem";
 import { InvitationsDialog } from "./InvitationsDialog";
 import { EditTeamDialog } from "./EditTeamDialog";
 import { MembersDialog } from "./MembersDialog";
 import { DeleteTeamDialog } from "@/features/teams/components/DeleteTeamDialog";
-import { teamService } from "../../services/team.service";
+import { teamService } from "../../services";
 import { Team } from "../../types";
 import { useToast } from "@/shared/hooks/use-toast";
-
-type TeamsView =
-  | { name: 'list' }
-  | { name: 'detail'; team: { id: string; name: string } }
+import { TeamsView } from "./index.types";
 
 export function TeamsScreen() {
   const { teams, invites, loading, error, refetch, respondInvite } = useTeams();

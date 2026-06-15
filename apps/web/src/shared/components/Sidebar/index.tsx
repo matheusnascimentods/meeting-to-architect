@@ -28,7 +28,9 @@ const navItems: { page: SidebarPage; label: string; icon: React.ElementType; cou
   { page: 'trash', label: 'Trash', icon: TrashIcon },
 ];
 
-export function Sidebar({ currentPage, onNavigate, onLogout, isExpanded, onToggle }: Props) {
+import { SidebarProps } from './index.types';
+
+export function Sidebar({ currentPage, onNavigate, onLogout, isExpanded, onToggle }: SidebarProps) {
   const { user } = useAuth();
 
   return (

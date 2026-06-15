@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
 import { Box } from '@primer/react';
-import { authService } from '@/features/auth/services/auth.service';
+import { authService } from '@/features/auth/services';
 import { User } from '@/features/auth/types';
 import { EmailStep } from './EmailStep';
 import { LoginStep } from './LoginStep';
 import { SignupStep } from './SignupStep';
 
-export type AuthState = 'auth-email' | 'auth-login' | 'auth-signup' | 'app';
-
-interface AuthFlowProps {
-  onAuthenticated: (user: User) => void;
-}
+import { AuthState, AuthFlowProps } from './index.types';
 
 export function AuthFlow({ onAuthenticated }: AuthFlowProps) {
   const [step, setStep] = useState<'email' | 'login' | 'signup'>('email');

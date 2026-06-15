@@ -1,16 +1,11 @@
 import { useState } from "react";
 import { Box, Button, Dialog, FormControl, TextInput, Text } from "@primer/react";
-import { teamService } from "../../../services/team.service";
+import { teamService } from "../../../services";
 import { Team } from "../../../types";
 import { useToast } from "@/shared/hooks/use-toast";
+import { EditTeamDialogProps } from "./index.types";
 
-interface Props {
-  team: Team;
-  onClose: () => void;
-  onSuccess: () => void;
-}
-
-export function EditTeamDialog({ team, onClose, onSuccess }: Props) {
+export function EditTeamDialog({ team, onClose, onSuccess }: EditTeamDialogProps) {
   const [name, setName] = useState(team.name);
   const [description, setDescription] = useState(team.description || "");
   const [loading, setLoading] = useState(false);

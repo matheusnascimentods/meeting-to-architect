@@ -2,16 +2,14 @@ import { useState, useRef } from "react";
 import { Dialog, Box, Button, Text, FormControl, IconButton, Flash, Spinner } from "@primer/react";
 import * as Icons from "@primer/octicons-react";
 import { DiagramType, Diagram } from "@/features/diagrams/types";
-import { api } from "@/shared/lib/api";
+import { api } from "@/shared/services";
 import { normalizeDiagram } from "@/features/diagrams/utils/normalize-diagram";
-import { DIAGRAM_CATEGORIES, DIAGRAM_TYPES, TYPE_LABELS, DiagramCategory } from "./index.types";
-import { COPY } from "@/shared/constants/copy";
+import { DIAGRAM_CATEGORIES, DIAGRAM_TYPES, TYPE_LABELS, DiagramCategory, NewDiagramDialogProps } from "./index.types";
+import { COPY } from "@/shared/constants";
 
 const ALLOWED_EXTS = ['pdf', 'md', 'txt', 'vtt', 'srt'];
 
-interface Props { onClose: () => void; onSuccess?: (d: Diagram) => void }
-
-export function NewDiagramDialog({ onClose, onSuccess }: Props) {
+export function NewDiagramDialog({ onClose, onSuccess }: NewDiagramDialogProps) {
   const [file, setFile] = useState<File | null>(null);
   const [category, setCategory] = useState<DiagramCategory>("structural");
   const [selected, setSelected] = useState<DiagramType | null>(null);

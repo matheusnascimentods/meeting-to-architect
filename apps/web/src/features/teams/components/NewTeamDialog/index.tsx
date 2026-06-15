@@ -1,15 +1,11 @@
 import { useState } from "react";
 import { Dialog, Box, TextInput, FormControl, Flash, Spinner, Text } from "@primer/react";
-import { teamService } from "../../services/team.service";
+import { teamService } from "../../services";
 import { Team } from "../../types";
-import { COPY } from "@/shared/constants/copy";
+import { COPY } from "@/shared/constants";
+import { NewTeamDialogProps } from "./index.types";
 
-interface Props {
-  onClose: () => void;
-  onSuccess?: (team: Team) => void;
-}
-
-export function NewTeamDialog({ onClose, onSuccess }: Props) {
+export function NewTeamDialog({ onClose, onSuccess }: NewTeamDialogProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);

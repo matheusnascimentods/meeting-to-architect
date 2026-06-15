@@ -1,13 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import mermaid from "mermaid";
+import { MermaidPreviewProps } from "./index.types";
 import styles from "./index.module.css";
 
 let mermaidInitialized = false;
-
-interface MermaidPreviewProps {
-  source: string;
-  id: string;
-}
 
 function initMermaid() {
   if (mermaidInitialized) return;

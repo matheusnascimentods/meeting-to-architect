@@ -1,18 +1,13 @@
 import { useState, useEffect } from "react";
 import { Box, Button, Dialog, Text, ActionMenu, ActionList, IconButton, Spinner } from "@primer/react";
 import { TrashIcon, CheckIcon } from "@primer/octicons-react";
-import { memberService } from "../../../services/member.service";
+import { memberService } from "../../../services";
 import { TeamMember } from "../../../types";
 import { LoadingState } from "@/shared/components/LoadingState";
 import { useToast } from "@/shared/hooks/use-toast";
+import { MembersDialogProps } from "./index.types";
 
-interface Props {
-  teamId: string;
-  teamName: string;
-  onClose: () => void;
-}
-
-export function MembersDialog({ teamId, teamName, onClose }: Props) {
+export function MembersDialog({ teamId, teamName, onClose }: MembersDialogProps) {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

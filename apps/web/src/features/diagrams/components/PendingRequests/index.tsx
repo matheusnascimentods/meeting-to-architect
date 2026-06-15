@@ -1,16 +1,13 @@
 import { useState, useEffect } from "react";
 import { Box, Text, CounterLabel } from "@primer/react";
 import { LawIcon } from "@primer/octicons-react";
-import { approvalService } from "../../services/approval.service";
+import { approvalService } from "../../services";
+import { PendingRequestsProps } from "./index.types";
 
 export function PendingRequests({ 
   diagramId, 
   onClick 
-}: { 
-  diagramId?: string; 
-  onCancel?: () => void;
-  onClick?: () => void;
-}) {
+}: PendingRequestsProps) {
   const [requests, setRequests] = useState<any[]>([]);
 
   const fetchRequests = async () => {

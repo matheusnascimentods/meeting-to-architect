@@ -3,28 +3,19 @@ import { ActionMenu, ActionList, IconButton, Label, Dialog, Box, Select, Text } 
 import { KebabHorizontalIcon, PencilIcon, TrashIcon, PeopleIcon, CheckIcon, ClockIcon } from "@primer/octicons-react";
 import { Diagram } from "../../types";
 import { UserTeam } from "@/features/teams/types";
+import { DiagramCardProps } from "./index.types";
 import { EditDiagramDialog } from "../EditDiagramDialog";
 import { DeleteDiagramDialog } from "@/features/diagrams/components/DeleteDiagramDialog";
-import { diagramService } from "../../services/diagram.service";
-import { teamService } from "@/features/teams/services/team.service";
-import { teamDiagramService } from "../../services/team-diagram.service";
-import { approvalService } from "../../services/approval.service";
+import { diagramService } from "../../services";
+import { teamService } from "@/features/teams/services";
+import { teamDiagramService } from "../../services";
+import { approvalService } from "../../services";
 import { useAuth } from "@/features/auth/hooks/use-auth";
-import { COPY } from "@/shared/constants/copy";
-import { formatRelativeTime } from "@/shared/lib/date-utils";
+import { COPY } from "@/shared/constants";
+import { formatRelativeTime } from "@/shared/utils";
 import styles from "./index.module.css";
 
 import { useToast } from "@/shared/hooks/use-toast";
-
-interface DiagramCardProps {
-  diagram: Diagram;
-  onOpen: () => void;
-  onUpdate?: (updated: Diagram) => void;
-  onDelete?: (id: string) => void;
-  userTeams?: UserTeam[];
-  refreshKey?: number;
-  isTeamView?: boolean;
-}
 
 export function DiagramCard({ diagram, onOpen, onUpdate, onDelete, userTeams: propUserTeams, refreshKey, isTeamView = false }: DiagramCardProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);

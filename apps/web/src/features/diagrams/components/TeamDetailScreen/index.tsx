@@ -8,16 +8,12 @@ import { EmptyState } from "@/shared/components/EmptyState";
 import { useTeamDetail } from "../../hooks/use-team-detail";
 import { LoadingState } from "@/shared/components/LoadingState";
 import { ErrorState } from "@/shared/components/ErrorState";
-import { tokens } from "@/shared/styles/tokens";
+import { tokens } from "@/shared/constants";
 import { InviteMember } from "./InviteMember";
 import { RequestsDialog } from "./RequestsDialog";
+import { TeamDetailScreenProps } from "./index.types";
 
-interface Props {
-  team: { id: string; name: string };
-  onBack: () => void;
-}
-
-export function TeamDetailScreen({ team: teamSummary, onBack }: Props) {
+export function TeamDetailScreen({ team: teamSummary, onBack }: TeamDetailScreenProps) {
   const { team, role, diagrams, requests, loading, error, refetch, inviteMember, respondRequest } = useTeamDetail(teamSummary.id);
   const [selectedDiagram, setSelectedDiagram] = useState<Diagram | null>(null);
   const [isRequestsOpen, setIsRequestsOpen] = useState(false);

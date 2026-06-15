@@ -1,14 +1,8 @@
 import React from "react";
 import { Dialog, Box, Text, Button, Flash } from "@primer/react";
 import { PeopleIcon, AlertIcon } from "@primer/octicons-react";
-import { Team } from "@/features/teams/types";
-import { COPY } from "@/shared/constants/copy";
-
-interface DeleteTeamDialogProps {
-  team: Team;
-  onClose: () => void;
-  onConfirm: () => Promise<void>;
-}
+import { COPY } from "@/shared/constants";
+import { DeleteTeamDialogProps } from "./index.types";
 
 export function DeleteTeamDialog({ team, onClose, onConfirm }: DeleteTeamDialogProps) {
   const [loading, setLoading] = React.useState(false);

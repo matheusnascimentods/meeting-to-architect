@@ -1,16 +1,7 @@
 import { Button, IconButton, ActionMenu, Box, Text, ActionList, CounterLabel } from "@primer/react";
 import { ArrowLeftIcon, PlusIcon, PersonIcon, SignOutIcon, InboxIcon } from "@primer/octicons-react";
 import styles from "./index.module.css";
-import { User } from "@/features/auth/types";
-
-interface NavbarProps {
-  showBack?: boolean;
-  onBack?: () => void;
-  showNewButton?: boolean;
-  onNewClick?: () => void;
-  user?: User | null;
-  onLogout?: () => void;
-}
+import { NavbarProps } from "./index.types";
 
 export function Navbar({ showBack, onBack, showNewButton, onNewClick, user, onLogout }: NavbarProps) {
   return (

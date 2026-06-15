@@ -1,14 +1,8 @@
 import { Dialog, Box, Text, CounterLabel } from '@primer/react';
 import { InviteItem } from '../InviteItem';
-import { TeamInvite } from '../../../types';
+import { InvitationsDialogProps } from './index.types';
 
-interface Props {
-  invites: TeamInvite[];
-  onClose: () => void;
-  onRespond: (id: string, accept: boolean) => void;
-}
-
-export function InvitationsDialog({ invites, onClose, onRespond }: Props) {
+export function InvitationsDialog({ invites, onClose, onRespond }: InvitationsDialogProps) {
   return (
     <Dialog
       title={

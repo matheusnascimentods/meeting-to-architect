@@ -1,14 +1,8 @@
 import React from "react";
 import { Dialog, Box, Text, Button, Flash } from "@primer/react";
 import { RepoIcon, AlertIcon } from "@primer/octicons-react";
-import { Diagram } from "@/features/diagrams/types";
-import { COPY } from "@/shared/constants/copy";
-
-interface DeleteDiagramDialogProps {
-  diagram: Diagram;
-  onClose: () => void;
-  onConfirm: () => Promise<void>;
-}
+import { COPY } from "@/shared/constants";
+import { DeleteDiagramDialogProps } from "./index.types";
 
 export function DeleteDiagramDialog({ diagram, onClose, onConfirm }: DeleteDiagramDialogProps) {
   const [loading, setLoading] = React.useState(false);

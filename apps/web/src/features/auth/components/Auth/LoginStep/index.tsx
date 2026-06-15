@@ -1,19 +1,9 @@
 import { Box, Text, FormControl, TextInput, Button, IconButton } from '@primer/react';
 import { ArrowLeftIcon } from '@primer/octicons-react';
 import React from 'react';
-import { User } from '../../../types';
+import { LoginStepProps } from './index.types';
 
-interface Props {
-  currentUser: User | null;
-  password: string;
-  setPassword: (password: string) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  onBack: () => void;
-  loading: boolean;
-  error: string;
-}
-
-export function LoginStep({ currentUser, password, setPassword, onSubmit, onBack, loading, error }: Props) {
+export function LoginStep({ currentUser, password, setPassword, onSubmit, onBack, loading, error }: LoginStepProps) {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: 400 }}>
       <Box

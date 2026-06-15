@@ -14,10 +14,9 @@ import { useDiagrams } from "../../hooks/use-diagrams";
 import { useTeams } from "@/features/teams/hooks/use-teams";
 import { LoadingState } from "@/shared/components/LoadingState";
 import { ErrorState } from "@/shared/components/ErrorState";
-import { COPY } from "@/shared/constants/copy";
-import { tokens } from "@/shared/styles/tokens";
-
-type Screen = { name: "list" } | { name: "detail"; diagramId: string };
+import { COPY } from "@/shared/constants";
+import { tokens } from "@/shared/constants";
+import { Screen } from "./index.types";
 
 export function DiagramsScreen() {
   const { diagrams, loading: loadingDiagrams, error: errorDiagrams, refetch: refetchDiagrams } = useDiagrams();

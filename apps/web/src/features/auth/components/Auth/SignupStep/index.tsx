@@ -1,24 +1,7 @@
 import { Box, Text, FormControl, TextInput, Button, IconButton } from '@primer/react';
 import { ArrowLeftIcon } from '@primer/octicons-react';
 import React from 'react';
-
-interface Props {
-  email: string;
-  name: string;
-  setName: (name: string) => void;
-  password: string;
-  setPassword: (password: string) => void;
-  confirmPassword: string;
-  setConfirmPassword: (password: string) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  onBack: () => void;
-  loading: boolean;
-  errors: {
-    name?: string;
-    password?: string;
-    confirmPassword?: string;
-  };
-}
+import { SignupStepProps } from './index.types';
 
 export function SignupStep({
   email,
@@ -32,7 +15,7 @@ export function SignupStep({
   onBack,
   loading,
   errors
-}: Props) {
+}: SignupStepProps) {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: 400 }}>
       <Box

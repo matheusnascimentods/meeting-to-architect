@@ -1,34 +1,33 @@
-import { FileCodeIcon } from "@primer/octicons-react";
-import { Button } from "@primer/react";
-import styles from "./index.module.css";
+import React from 'react';
+import { Box, Text } from '@primer/react';
+import { EmptyStateProps } from './index.types';
 
-const mutedColor = "#6E6E73";
-
-interface EmptyStateProps {
-  onAction?: () => void;
-  title?: string;
-  description?: string;
-  icon?: React.ElementType;
-}
-
-export function EmptyState({
-  title = "No diagrams yet",
-  description = "Upload a meeting transcript to generate your first architecture diagram.",
-  icon: Icon = FileCodeIcon,
-  onAction,
-}: EmptyStateProps) {
+export const EmptyState = ({ 
+  icon: Icon, 
+  title, 
+  description, 
+  onAction 
+}: EmptyStateProps) => {
   return (
-    <div className={styles['empty-state']}>
-      <Icon size={64} fill={mutedColor} />
-      <h2 className={styles['empty-state-title']}>{title}</h2>
-      <p className={styles['empty-state-description']}>
-        {description}
-      </p>
-      {onAction && (
-        <Button variant="primary" onClick={onAction} sx={{ mt: 3 }}>
-          {title.includes("team") ? "Create Team" : "Get Started"}
-        </Button>
-      )}
-    </div>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        py: 8,
+        px: 4,
+        textAlign: 'center',
+        bg: 'canvas.default',
+        borderRadius: 2,
+        border: '1px solid',
+        borderColor: 'border.default',
+      }}
+    >
+      {Icon && <Icon size={64} fill="var(--color-fg-muted)" />}
+      <Text sx={{ fontSize: 3, fontWeight: 'bold', mt: 3, mb: 2 }}>{title}</Text>
+      <Text sx={{ color: 'fg.muted', mb: 4, maxWidth: '400px' }}>{description}</Text>
+      {onAction && <button onClick={onAction}>Action</button>}
+    </Box>
   );
-}
+};

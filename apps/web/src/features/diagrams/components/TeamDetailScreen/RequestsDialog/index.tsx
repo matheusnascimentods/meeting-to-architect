@@ -1,13 +1,7 @@
 import { Dialog, Box, Text, CounterLabel, Button } from '@primer/react';
-import { DiagramRequest } from '../../../types';
+import { RequestsDialogProps } from './index.types';
 
-interface Props {
-  requests: DiagramRequest[];
-  onClose: () => void;
-  onRespond: (id: string, approve: boolean) => void;
-}
-
-export function RequestsDialog({ requests, onClose, onRespond }: Props) {
+export function RequestsDialog({ requests, onClose, onRespond }: RequestsDialogProps) {
   return (
     <Dialog
       title={

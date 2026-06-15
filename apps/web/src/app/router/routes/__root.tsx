@@ -10,8 +10,9 @@ import { useState, useEffect } from "react";
 import { AuthFlow } from "@/features/auth/components/Auth";
 import { Landing } from "@/features/landing/components/Landing";
 import { User } from "@/features/auth/types";
-import { authService } from "@/features/auth/services/auth.service";
-import { AuthContext, AuthContextType } from "@/features/auth/hooks/use-auth";
+import { authService } from "@/features/auth/services";
+import { AuthContext } from "@/features/auth/hooks/use-auth";
+import { AuthContextType } from "@/features/auth/hooks";
 import { ToastProvider } from "@/shared/hooks/use-toast";
 
 function NotFoundComponent() {

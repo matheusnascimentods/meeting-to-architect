@@ -2,13 +2,8 @@ import { useState } from "react";
 import { Dialog, FormControl, TextInput, Textarea, SegmentedControl, Box, Text } from "@primer/react";
 import { Diagram } from "../../types";
 import { MermaidPreview } from "../MermaidPreview";
-import { COPY } from "@/shared/constants/copy";
-
-interface EditDiagramDialogProps {
-  diagram: Diagram;
-  onClose: () => void;
-  onSave: (updated: Partial<Diagram>) => void;
-}
+import { COPY } from "@/shared/constants";
+import { EditDiagramDialogProps } from "./index.types";
 
 export function EditDiagramDialog({ diagram, onClose, onSave }: EditDiagramDialogProps) {
   const [title, setTitle] = useState(diagram.title);

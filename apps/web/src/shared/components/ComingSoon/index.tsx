@@ -1,12 +1,8 @@
 import { Box } from '@primer/react';
 import { Blankslate } from '@primer/react/experimental';
+import { ComingSoonProps } from './index.types';
 
-interface Props {
-  icon: React.ElementType;
-  label: string;
-}
-
-export function ComingSoon({ icon: Icon, label }: Props) {
+export function ComingSoon({ icon: Icon, label }: ComingSoonProps) {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
       <Blankslate>

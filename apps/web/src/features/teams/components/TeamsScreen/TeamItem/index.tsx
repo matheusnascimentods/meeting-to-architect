@@ -1,18 +1,10 @@
 import { Box, Text, Label, ActionMenu, ActionList, IconButton } from '@primer/react';
 import { KebabHorizontalIcon, PencilIcon, TrashIcon, PeopleIcon } from '@primer/octicons-react';
-import { UserTeam } from '../../../types';
-import { tokens } from '@/shared/styles/tokens';
-import { formatRelativeTime } from '@/shared/lib/date-utils';
+import { tokens } from '@/shared/constants';
+import { formatRelativeTime } from '@/shared/utils';
+import { TeamItemProps } from './index.types';
 
-interface Props {
-  userTeam: UserTeam;
-  onClick: () => void;
-  onEdit?: () => void;
-  onDelete?: () => void;
-  onMembers?: () => void;
-}
-
-export function TeamItem({ userTeam, onClick, onEdit, onDelete, onMembers }: Props) {
+export function TeamItem({ userTeam, onClick, onEdit, onDelete, onMembers }: TeamItemProps) {
   const team = userTeam.Teams || userTeam.teams;
   if (!team) return null;
 

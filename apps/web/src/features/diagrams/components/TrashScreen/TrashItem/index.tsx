@@ -1,16 +1,10 @@
 import { Box, Text, Button, Label } from '@primer/react';
 import { FileCodeIcon, ReplyIcon } from '@primer/octicons-react';
-import { Diagram } from '../../../types';
-import { tokens } from '@/shared/styles/tokens';
-import { COPY } from '@/shared/constants/copy';
+import { tokens } from '@/shared/constants';
+import { COPY } from '@/shared/constants';
+import { TrashItemProps } from './index.types';
 
-interface Props {
-  diagram: Diagram;
-  onRestore: (id: string) => void;
-  onDelete: (diagram: Diagram) => void;
-}
-
-export function TrashItem({ diagram, onRestore, onDelete }: Props) {
+export function TrashItem({ diagram, onRestore, onDelete }: TrashItemProps) {
   return (
     <Box
       sx={{

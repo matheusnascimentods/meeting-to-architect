@@ -6,20 +6,16 @@ import { PanelBox } from "@/shared/components/PanelBox";
 import { PanelHeader } from "@/shared/components/PanelHeader";
 import { DeleteDiagramDialog } from "@/features/diagrams/components/DeleteDiagramDialog";
 import { EditDiagramDialog } from "../EditDiagramDialog";
-import { diagramService } from "@/features/diagrams/services/diagram.service";
+import { diagramService } from "@/features/diagrams/services";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useTeams } from "@/features/teams/hooks/use-teams";
 import { MermaidPreview } from "../MermaidPreview";
-import { tokens } from "@/shared/styles/tokens";
-import { formatRelativeTime } from "@/shared/lib/date-utils";
+import { tokens } from "@/shared/constants";
+import { formatRelativeTime } from "@/shared/utils";
 import { useToast } from "@/shared/hooks/use-toast";
 import mermaid from "mermaid";
+import { DiagramDetailProps } from "./index.types";
 import styles from "./index.module.css";
-
-interface DiagramDetailProps {
-  diagram: Diagram;
-  onDelete?: () => void;
-}
 
 export function DiagramDetail({ diagram, onDelete }: DiagramDetailProps) {
   const [source, setSource] = useState(diagram.mermaid_code);

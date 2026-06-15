@@ -1,15 +1,8 @@
 import { Box, Text, FormControl, TextInput, Button } from '@primer/react';
 import React from 'react';
+import { EmailStepProps } from './index.types';
 
-interface Props {
-  email: string;
-  setEmail: (email: string) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  loading: boolean;
-  error: string;
-}
-
-export function EmailStep({ email, setEmail, onSubmit, loading, error }: Props) {
+export function EmailStep({ email, setEmail, onSubmit, loading, error }: EmailStepProps) {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: 400 }}>
       <Box sx={{ mb: 4, textAlign: 'center' }}>

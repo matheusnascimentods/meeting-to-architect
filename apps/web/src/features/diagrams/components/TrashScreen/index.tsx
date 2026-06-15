@@ -6,17 +6,14 @@ import { EmptyState } from '@/shared/components/EmptyState';
 import { useTrash } from '../../hooks/use-trash';
 import { LoadingState } from '@/shared/components/LoadingState';
 import { ErrorState } from '@/shared/components/ErrorState';
-import { tokens } from '@/shared/styles/tokens';
-import { COPY } from '@/shared/constants/copy';
+import { tokens } from '@/shared/constants';
+import { COPY } from '@/shared/constants';
 import { TrashItem } from './TrashItem';
+import { TrashScreenProps } from './index.types';
 
 import { useToast } from '@/shared/hooks/use-toast';
 
-interface Props {
-  onNavigate?: (screen: string) => void;
-}
-
-export function TrashScreen({ onNavigate }: Props) {
+export function TrashScreen({ onNavigate }: TrashScreenProps) {
   const { items, loading, error, restore, permanentDelete } = useTrash();
   const { success } = useToast();
   const [diagramToDelete, setDiagramToDelete] = useState<Diagram | null>(null);

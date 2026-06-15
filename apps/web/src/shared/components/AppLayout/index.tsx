@@ -1,15 +1,9 @@
 import { Box } from "@primer/react";
 import { Sidebar } from "../Sidebar";
 import { useState } from "react";
+import { AppLayoutProps } from "./index.types";
 
-interface Props {
-  children: React.ReactNode;
-  currentPage: 'diagrams' | 'teams' | 'trash';
-  onNavigate: (page: 'diagrams' | 'teams' | 'trash') => void;
-  onLogout: () => void;
-}
-
-export function AppLayout({ children, currentPage, onNavigate, onLogout }: Props) {
+export function AppLayout({ children, currentPage, onNavigate, onLogout }: AppLayoutProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (

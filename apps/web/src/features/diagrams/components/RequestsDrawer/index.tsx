@@ -1,13 +1,10 @@
 import { useState, useEffect } from "react";
 import { Box, Text, IconButton, Label, NavList, SideNav, ActionList, Button } from "@primer/react";
 import { XIcon, ClockIcon, CheckCircleIcon, XCircleIcon, TrashIcon } from "@primer/octicons-react";
-import { approvalService } from "../../services/approval.service";
+import { approvalService } from "../../services";
 import { useToast } from "@/shared/hooks/use-toast";
-import { formatRelativeTime } from "@/shared/lib/date-utils";
-
-interface RequestsDrawerProps {
-  onClose: () => void;
-}
+import { formatRelativeTime } from "@/shared/utils";
+import { RequestsDrawerProps } from "./index.types";
 
 export function RequestsDrawer({ onClose }: RequestsDrawerProps) {
   const [requests, setRequests] = useState<any[]>([]);
