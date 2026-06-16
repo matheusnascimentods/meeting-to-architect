@@ -14,7 +14,7 @@ export function TrustBar() {
         gap: 12, fontSize: 13, color: mutedColor,
       }}>
         <span style={{ fontWeight: 500 }}>Built with</span>
-        {["NestJS", "React", "Supabase", "Google Gemini", "GitHub"].map((name, i) => (
+        {["NestJS", "React", "PostgreSQL", "Google Gemini", "Docker"].map((name, i) => (
           <span key={name} style={{ display: "inline-flex", alignItems: "center", gap: 12 }}>
             {i > 0 && <span style={{ width: 3, height: 3, borderRadius: "50%", background: "currentColor", opacity: 0.5 }} />}
             <svg height="16" viewBox={`0 0 ${name.length * 8 + 8} 16`} style={{ display: "block" }}>

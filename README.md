@@ -228,4 +228,4 @@ docker compose --profile db --profile api --profile web up -d --build
 Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 
 ---
-Feito com ❤️ por [Seu Nome ou Time]
+Feito com ❤️ por @matheusnascimentods
