@@ -102,6 +102,17 @@ docker compose --profile db --profile api --profile web up -d --build
 | **Backend API** | http://localhost:3000 | 3000 |
 | **PostgreSQL** | localhost:5433 | 5433 |
 
+### 4. Derrubando a stack
+Para parar todos os serviços e manter os dados do banco:
+```bash
+docker compose --profile db --profile api --profile web down
+```
+
+Para remover tudo, incluindo os volumes de dados:
+```bash
+docker compose --profile db --profile api --profile web down -v
+```
+
 ## 💻 Rodando Localmente (sem Docker)
 
 ### Pré-requisitos
@@ -118,12 +129,7 @@ docker compose --profile db --profile api --profile web up -d --build
    ```bash
    npm run --prefix apps/api prisma migrate deploy
    ```
-3. **Seed (Opcional)**:
-   Popule o banco com dados fictícios (User Admin: `admin@m2a.com` / `password123`):
-   ```bash
-   npm run --prefix apps/api prisma db seed
-   ```
-4. **Iniciando os serviços**:
+3. **Iniciando os serviços**:
    ```bash
    npm run dev:api  # Terminal 1
    npm run dev:web  # Terminal 2
