@@ -13,21 +13,53 @@
 O **M2A (Meeting to Architecture)** é uma plataforma SaaS projetada para eliminar o trabalho manual de documentação técnica. Utilizando uma arquitetura de multi-agentes inteligentes (Google Gemini + ADK), o M2A processa transcrições de reuniões (.md ou .pdf) e gera diagramas profissionais em formato Mermaid, prontos para serem integrados ao seu repositório.
 
 ```mermaid
-graph LR
-    User([Usuário]) -->|Upload .pdf/.md| API[Backend NestJS]
-    API --> Orchestrator[Software Architect Agent]
-    Orchestrator --> Analyzer[Transcript Analyzer Agent]
-    Analyzer --> Context[Technical Context]
-    Context --> Orchestrator
-    Orchestrator -->|Delegar| UML[UML Architect Agent]
-    Orchestrator -->|Delegar| C4[C4 Architect Agent]
-    UML --> Mermaid[Mermaid Code]
-    C4 --> Mermaid
-    Mermaid --> Zod{Validação Zod}
-    Zod -->|Sucesso| DB[(PostgreSQL)]
-    Zod -->|Erro| API
-    DB --> Web[Frontend React]
-    Web -->|Renderiza| MermaidJS[Mermaid.js]
+C4Context
+    title System Context diagram for M2A — Meeting to Architecture
+
+    Person(user, "Usuário (Desenvolvedor/Arquiteto)", "Interage com a plataforma para gerar documentação técnica.")
+    System(m2a, "M2A Platform", "Transforma transcrições de reuniões em diagramas de arquitetura automaticamente.")
+
+    System_Ext(gemini, "Google Gemini AI", "Processa o contexto técnico e gera código Mermaid via LLM.")
+    System_Ext(supabase, "Supabase / Postgres", "Persistência de dados, autenticação e armazenamento.")
+
+    Rel(user, m2a, "Realiza upload de transcrições e gerencia diagramas", "HTTPS/Web")
+    Rel(m2a, gemini, "Solicita análise técnica e geração de diagramas", "gRPC/REST")
+    Rel(m2a, supabase, "Armazena usuários, times e metadados", "SQL")
+
+    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
+```
+
+```mermaid
+C4Container
+    title Container diagram for M2A Platform
+
+    Person(user, "Usuário", "Desenvolvedor ou Arquiteto de Software.")
+
+    Boundary(c1, "M2A Platform") {
+        Container(web, "Web Application", "React, Vite, Primer", "Interface visual para gestão de times e visualização de diagramas.")
+        Container(api, "API Application", "NestJS, TypeScript", "Orquestra os agentes ADK, gerencia autenticação e regras de negócio.")
+        ContainerDb(db, "Database", "PostgreSQL", "Armazena metadados de diagramas, permissões de times e usuários.")
+    }
+
+    Boundary(ai_layer, "AI Intelligence Layer (ADK)") {
+        Component(orchestrator, "Software Architect", "ADK Agent", "Orquestrador principal do fluxo de geração.")
+        Component(analyzer, "Transcript Analyzer", "ADK Agent", "Extrai entidades e lógica técnica do documento.")
+        Component(architects, "UML & C4 Architects", "ADK Agents", "Especialistas em geração de sintaxe Mermaid.")
+    }
+
+    System_Ext(gemini, "Google Gemini AI", "LLM Engine que processa os prompts e retorna código estruturado.")
+
+    Rel(user, web, "Acessa via browser", "HTTPS")
+    Rel(web, api, "Chamadas de API", "JSON/HTTPS")
+    Rel(api, db, "Lê/Escreve", "Prisma/SQL")
+    
+    Rel(api, orchestrator, "Inicia processo de geração", "ADK Runner")
+    Rel(orchestrator, analyzer, "Solicita análise de transcrição", "Internal Call")
+    Rel(orchestrator, architects, "Delega geração de diagrama", "Internal Call")
+    
+    Rel(ai_layer, gemini, "Executa raciocínio e geração", "Gemini SDK")
+
+    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
 ```
 
 ## ✨ O Problema
