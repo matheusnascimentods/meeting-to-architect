@@ -1,222 +1,231 @@
-# M2A — Meeting to Architecture
+# 🏗️ M2A — Meeting to Architecture
+
+![Node.js](https://img.shields.io/badge/Node.js-20+-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)
 
 > Transforme transcrições de reuniões em diagramas de arquitetura UML e C4 automaticamente com IA.
 
-## Sobre o projeto
+O **M2A (Meeting to Architecture)** é uma plataforma SaaS projetada para eliminar o trabalho manual de documentação técnica. Utilizando uma arquitetura de multi-agentes inteligentes (Google Gemini + ADK), o M2A processa transcrições de reuniões (.md ou .pdf) e gera diagramas profissionais em formato Mermaid, prontos para serem integrados ao seu repositório.
 
-O M2A (Meeting to Architecture) é uma plataforma desenvolvida para simplificar a criação de documentação técnica. Ele utiliza Inteligência Artificial para analisar transcrições de reuniões ou documentos de requisitos e gerar automaticamente diagramas de arquitetura nos formatos Mermaid (UML e C4), permitindo que times de desenvolvimento documentem sistemas com agilidade e precisão.
+```mermaid
+graph LR
+    User([Usuário]) -->|Upload .pdf/.md| API[Backend NestJS]
+    API --> Orchestrator[Software Architect Agent]
+    Orchestrator --> Analyzer[Transcript Analyzer Agent]
+    Analyzer --> Context[Technical Context]
+    Context --> Orchestrator
+    Orchestrator -->|Delegar| UML[UML Architect Agent]
+    Orchestrator -->|Delegar| C4[C4 Architect Agent]
+    UML --> Mermaid[Mermaid Code]
+    C4 --> Mermaid
+    Mermaid --> Zod{Validação Zod}
+    Zod -->|Sucesso| DB[(PostgreSQL)]
+    Zod -->|Erro| API
+    DB --> Web[Frontend React]
+    Web -->|Renderiza| MermaidJS[Mermaid.js]
+```
 
-## Tecnologias
+## ✨ O Problema
+Documentar a arquitetura de um sistema após reuniões de design costuma ser uma tarefa lenta, sujeita a falhas humanas e frequentemente negligenciada. Transcrições de reuniões (Google Meet, Zoom, Teams) são ricas em detalhes, mas extrair essa estrutura manualmente para diagramas UML ou C4 exige tempo que os desenvolvedores prefeririam usar codificando.
 
-| Camada | Tecnologia |
-|---|---|
-| Frontend | React, Vite, TypeScript, TanStack Router, Primer React, TailwindCSS, Mermaid.js, Styled Components |
-| Backend | NestJS, TypeScript, @google/adk (Agents SDK), JWT, Multer |
-| Banco de dados | Supabase (PostgreSQL) |
-| IA | Google Gemini (via Gemini SDK e ADK) |
+## 🚀 A Solução
+O M2A automatiza esse fluxo. Ao subir uma transcrição, a IA analisa o contexto técnico, identifica entidades, fluxos e componentes, e gera o código Mermaid correspondente. O sistema permite a gestão de times, fluxos de aprovação de diagramas e versionamento dos prompts, garantindo que a documentação gerada seja precisa e auditável.
 
-## Estrutura do monorepo
+## 🎯 Diferenciais
+- **Fluxo Zero Etapas Manuais**: Upload → Seleção do tipo → Diagrama pronto.
+- **Arquitetura Multi-Agente**: Especialistas dedicados para análise, UML e C4.
+- **Gestão de Times**: Papéis inspirados no GitHub (Admin, Maintainer, Member).
+- **Fluxo de Aprovação**: Controle de qualidade antes do diagrama entrar para o acervo oficial.
+- **Segurança Enterprise**: Dados não são usados para treinamento da IA (API Gemini Enterprise), senhas com bcrypt e isolamento total por time.
+- **Circuit Breaker**: Resiliência contra falhas ou limites da API do Gemini.
 
+## 🛠️ Stack
+- **Frontend**: React 18, Vite, TypeScript, TanStack Router, Primer React (GitHub Design System), TailwindCSS, Mermaid.js.
+- **Backend**: NestJS 11, TypeScript, @google/adk (Agents SDK), JWT, Multer, Prisma ORM.
+- **Banco de dados**: PostgreSQL (via Docker ou Supabase).
+- **IA**: Google Gemini (modelos `gemini-1.5-flash` ou superiores).
+- **Infra**: Docker & Docker Compose com suporte a profiles.
+
+## 🏛️ Arquitetura de Agentes
+O projeto utiliza o **@google/adk** para orquestrar quatro agentes especializados:
+
+1.  **Software Architect (Orchestrator)**: O cérebro da operação. Recebe a solicitação, coordena o fluxo e decide qual agente especializado deve ser chamado após a análise inicial.
+2.  **Transcript Analyzer**: Responsável por ler o documento bruto e extrair o "Technical Context" — entidades, tecnologias citadas, fluxos de dados e requisitos.
+3.  **UML Architect**: Especialista em transformar o contexto técnico em sintaxe Mermaid para diagramas UML (Classe, Sequência, Estado, etc.).
+4.  **C4 Architect**: Especialista em arquitetura de sistemas em larga escala, focado nos níveis de Contexto, Container, Componente e Código do modelo C4.
+
+## 📁 Estrutura do Monorepo
 ```text
 .
-├── apps
-│   ├── api (m2a-api)      # Backend NestJS
-│   │   └── src
-│   │       └── modules    # Módulos da API (Auth, Users, Teams, Diagrams, Agents)
-│   └── web                # Frontend React + Vite
-│       └── src
-│           ├── features   # Funcionalidades principais (Auth, Teams, Diagrams)
-│           └── shared     # Componentes e hooks compartilhados
-├── package.json           # Configurações do monorepo
-└── README.md              # Este arquivo
+├── apps/
+│   ├── api/          # Backend NestJS (M2A API)
+│   │   ├── prisma/   # Schema e Migrations do banco de dados
+│   │   └── src/      # Módulos: Auth, Users, Teams, Diagrams, Agents
+│   └── web/          # Frontend React + Vite
+│       └── src/      # Features: Auth, Teams, Diagrams, Landing
+├── docker-compose.yml # Orquestração da stack completa
+└── package.json      # Scripts globais do monorepo
 ```
 
-## Como rodar com Docker
-
-Cada camada sobe de forma independente via **profiles** do Docker Compose. A API aplica as migrations do Prisma automaticamente ao subir (cria as tabelas no banco vazio; se já existirem, nada é recriado). A aplicação **não** popula dados de seed.
+## ⚡ Quick Start (recomendado: Docker)
 
 ### Pré-requisitos
-
 - Docker e Docker Compose v2+
+- Google Gemini API Key
 
-### 1. Configurar variáveis de ambiente
-
-Copie o exemplo e ajuste as chaves:
-
+### 1. Clone e configure
 ```bash
+git clone https://github.com/seu-usuario/m2a.git
+cd m2a
 cp apps/api/.env.example apps/api/.env
 ```
+Edite `apps/api/.env` e insira sua `GEMINI_API_KEY`.
 
-No `.env` da API, mantenha `DATABASE_URL` apontando para o container do Postgres:
-
-```env
-DATABASE_URL="postgresql://postgres:password@postgres:5432/diagrams_db?schema=public"
-```
-
-Para o frontend em Docker, defina a URL da API (opcional — padrão `http://localhost:3000`):
-
-```bash
-export VITE_API_URL=http://localhost:3000
-```
-
-### 2. Subir o banco de dados
-
-Cria o Postgres. As tabelas são criadas pela API (migrations do Prisma) quando ela sobe.
-
-```bash
-docker compose --profile db up -d --build
-```
-
-| Serviço   | URL / Porta                          |
-|-----------|--------------------------------------|
-| Postgres  | `localhost:5433` (user: `postgres`, senha: `password`, db: `diagrams_db`) |
-
-Acompanhe o init:
-
-```bash
-docker compose logs api
-```
-
-### 3. Subir a API
-
-Com o banco já em execução:
-
-```bash
-docker compose --profile api up -d --build
-```
-
-API disponível em http://localhost:3000
-
-### 4. Subir o frontend
-
-```bash
-docker compose --profile web up -d --build
-```
-
-Frontend disponível em http://localhost:8080
-
-### Subir tudo de uma vez
-
+### 2. Subir com Docker (Stack Completa)
 ```bash
 docker compose --profile db --profile api --profile web up -d --build
 ```
 
-> Os serviços rodam com `security_opt: apparmor=unconfined`. Isso evita o erro `cannot stop container: permission denied` ao derrubar a stack em hosts onde o perfil AppArmor `docker-default` não está carregado no kernel.
+### 3. Subir partes separadas
+- **Apenas Banco**: `docker compose --profile db up -d`
+- **Apenas API**: `docker compose --profile api up -d`
+- **Apenas Web**: `docker compose --profile web up -d`
 
-### Parar serviços
+| Serviço | URL | Porta |
+| :--- | :--- | :--- |
+| **Frontend** | http://localhost:8080 | 8080 |
+| **Backend API** | http://localhost:3000 | 3000 |
+| **PostgreSQL** | localhost:5433 | 5433 |
 
-```bash
-# Parar apenas o banco
-docker compose --profile db down
+## 💻 Rodando Localmente (sem Docker)
 
-# Parar apenas a API
-docker compose --profile api down
+### Pré-requisitos
+- Node.js v20+
+- PostgreSQL rodando localmente (ou via profile `db` do Docker)
 
-# Parar apenas o frontend
-docker compose --profile web down
+### Instalação passo a passo
+1. **Instalar dependências**:
+   ```bash
+   npm install
+   ```
+2. **Configurar o Banco**:
+   Ajuste o `DATABASE_URL` no `.env` da API e rode as migrations:
+   ```bash
+   npm run --prefix apps/api prisma migrate deploy
+   ```
+3. **Seed (Opcional)**:
+   Popule o banco com dados fictícios (User Admin: `admin@m2a.com` / `password123`):
+   ```bash
+   npm run --prefix apps/api prisma db seed
+   ```
+4. **Iniciando os serviços**:
+   ```bash
+   npm run dev:api  # Terminal 1
+   npm run dev:web  # Terminal 2
+   ```
 
-# Parar tudo (mantém volume de dados)
-docker compose --profile db --profile api --profile web down
+## 🔌 API Reference
 
-# Parar tudo e apagar dados do banco
-docker compose --profile db --profile api --profile web down -v
+### 🔐 Auth
+| Método | Rota | Descrição | Auth |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/auth/login` | Login e geração de token JWT | ❌ |
+
+**Exemplo de Request:**
+```json
+{
+  "email": "dev@example.com",
+  "password": "strongpassword"
+}
 ```
 
 ---
 
-## Como rodar localmente (sem Docker)
+### 👤 Users
+| Método | Rota | Descrição | Auth |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/user` | Cadastro de novo usuário | ❌ |
+| `GET` | `/user/me` | Dados do usuário logado | ✅ |
 
-### Pré-requisitos
+**Exemplo de Response (`GET /user/me`):**
+```json
+{
+  "id": "uuid-v4",
+  "name": "Jane Doe",
+  "email": "jane@m2a.com",
+  "isActive": true
+}
+```
 
-- Node.js (v20+)
-- Bun (recomendado) ou npm
-- Postgres local ou container do passo 2 acima
+---
 
-### Instalação
+### 👥 Teams
+| Método | Rota | Descrição | Auth |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/teams` | Lista times que o usuário participa | ✅ |
+| `POST` | `/teams` | Cria um novo time | ✅ |
+| `POST` | `/teams/:id/invite` | Convida usuário por e-mail | ✅ (Admin) |
 
-1. Instale as dependências na raiz:
+---
 
-   ```bash
-   bun install
-   ```
+### 📊 Diagrams
+| Método | Rota | Descrição | Auth |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/diagrams` | Seus diagramas pessoais | ✅ |
+| `DELETE` | `/diagrams/:id` | Soft delete (lixeira) | ✅ |
+| `POST` | `/diagrams/:id/add-to-team` | Solicita inclusão no time | ✅ |
 
-2. Configure as variáveis de ambiente (veja abaixo).
+---
 
-3. Aplique as migrations (se necessário):
+### 🤖 Agents
+| Método | Rota | Descrição | Auth |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/agents/generate` | Gera diagrama via IA (Multipart) | ✅ |
 
-   ```bash
-   cd apps/api
-   npx prisma migrate deploy
-   ```
+**Request Body (Multipart):**
+- `file`: Arquivo `.md` ou `.pdf`
+- `diagramType`: Enum (ex: `CLASS`, `C4_CONTAINER`)
 
-4. Inicie os projetos:
+---
 
-   - Backend: `cd apps/api && bun run start:dev`
-   - Frontend: `cd apps/web && bun run dev`
+## 🗂️ Variáveis de Ambiente
 
-### Variáveis de ambiente
+| Variável | Descrição | Obrigatória | Default |
+| :--- | :--- | :--- | :--- |
+| `DATABASE_URL` | String de conexão PostgreSQL | Sim | - |
+| `GEMINI_API_KEY` | Sua chave do Google AI Studio | Sim | - |
+| `GEMINI_MODEL` | Modelo utilizado | Não | `gemini-1.5-flash` |
+| `JWT_SECRET` | Segredo para tokens JWT | Sim | - |
+| `VITE_API_URL` | URL da API para o Frontend | Sim | `http://localhost:3000` |
 
-**`apps/api/.env`**
+## 🔒 Segurança
+- **Isolamento**: Cada time possui seu próprio namespace de dados.
+- **Auditabilidade**: Prompts dos agentes estão em arquivos Markdown no código.
+- **Validação**: Todas as respostas da IA passam por um parser Zod antes de chegar ao banco.
+- **Criptografia**: Senhas nunca são salvas em texto plano (bcrypt).
 
-- `SUPABASE_URL`: URL do seu projeto Supabase.
-- `SUPABASE_SERVICE_KEY`: Service Role Key do Supabase.
-- `GEMINI_API_KEY`: Chave de API do Google Gemini.
-- `GEMINI_MODEL`: Modelo do Gemini (ex: `gemini-2.5-flash`).
-- `JWT_SECRET`: Segredo para assinatura de tokens JWT.
-- `DATABASE_URL`: URL de conexão PostgreSQL (local: porta `5433`; Docker: host `postgres`).
+## 📊 Tipos de Diagrama Suportados
 
-**`apps/web/.env`** (opcional em dev)
+| Categoria | Tipos |
+| :--- | :--- |
+| **UML Structural** | CLASS, PACKAGE, OBJECT, COMPONENT, DEPLOYMENT, COMPOSITE_STRUCTURE |
+| **UML Behavioral** | ACTIVITY, SEQUENCE, COMMUNICATION, INTERACTION_OVERVIEW, TIMING, USE_CASE, STATE |
+| **C4 Model** | C4_CONTEXT, C4_CONTAINER, C4_COMPONENT, C4_CODE |
 
-- `VITE_API_URL`: URL base da API (ex: `http://localhost:3000`).
+## 🤝 Contribuindo
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -m 'Add: nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
 
-## Módulos da API
+## 📄 Licença
+Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 
-### Auth
-- `POST /auth/login`: Realiza o login do usuário.
-
-### Users
-- `POST /user`: Registra um novo usuário.
-- `GET /user/me`: Retorna os dados do usuário autenticado.
-- `GET /user/:id`: Busca um usuário por ID.
-- `GET /user/get-by-email/:email`: Busca um usuário por e-mail.
-- `PATCH /user/:id`: Atualiza dados do usuário.
-- `PATCH /user/:id/password`: Altera a senha do usuário.
-- `DELETE /user/:id`: Desativa um usuário.
-
-### Teams
-- `GET /teams`: Lista os times do usuário.
-- `POST /teams`: Cria um novo time.
-- `GET /teams/:id`: Detalhes de um time.
-- `PATCH /teams/:id`: Atualiza dados do time.
-- `DELETE /teams/:id`: Remove um time.
-- `GET /teams/invites/me`: Lista convites pendentes para o usuário.
-- `POST /teams/:id/invite`: Convida um membro para o time.
-- `PATCH /teams/invites/:inviteId/respond`: Aceita ou recusa um convite.
-
-### Diagrams
-- `GET /diagrams`: Lista diagramas criados pelo usuário.
-- `GET /diagrams/trash`: Lista diagramas na lixeira.
-- `PATCH /diagrams/:id`: Atualiza um diagrama.
-- `PATCH /diagrams/:id/restore`: Restaura um diagrama da lixeira.
-- `DELETE /diagrams/:id`: Move um diagrama para a lixeira.
-- `DELETE /diagrams/:id/permanent`: Exclui permanentemente um diagrama.
-- `GET /diagrams/team/:teamId`: Lista diagramas de um time.
-- `POST /diagrams/:id/add-to-team`: Associa ou solicita adição de diagrama a um time.
-- `GET /diagrams/team/:teamId/requests`: Lista solicitações de aprovação de diagramas.
-- `PATCH /diagrams/requests/:requestId/respond`: Responde a uma solicitação de aprovação.
-
-### Agents
-- `POST /agents/generate`: Processa um arquivo (PDF/MD) e gera um diagrama via IA.
-
-## Arquitetura de agentes
-
-O M2A utiliza uma arquitetura de multi-agentes baseada no `@google/adk`:
-
-- **Software Architect (Orchestrator)**: O agente principal que coordena o fluxo de trabalho.
-- **Transcript Analyzer**: Especialista em extrair contexto técnico e lógico de documentos brutos.
-- **UML Architect**: Especialista em gerar código Mermaid para diagramas UML (Classe, Sequência, Estado, etc.).
-- **C4 Architect**: Especialista em gerar código Mermaid para o modelo C4 (Contexto, Containers, Componentes).
-
-## Licença
-
-MIT
+---
+Feito com ❤️ por [Seu Nome ou Time]
