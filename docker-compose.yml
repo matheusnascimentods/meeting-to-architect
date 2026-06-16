@@ -4,8 +4,11 @@ services:
   postgres:
     profiles: [db]
     image: postgres:16-alpine
-    container_name: diagrams_db
     restart: unless-stopped
+    init: true
+    stop_grace_period: 10s
+    security_opt:
+      - apparmor=unconfined
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
@@ -23,47 +26,18 @@ services:
       retries: 5
       start_period: 5s
 
-  db-init:
-    profiles: [db]
-    build:
-      context: .
-      dockerfile: apps/api/prisma/Dockerfile.db-init
-    network_mode: "service:postgres"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      PGHOST: localhost
-      DATABASE_URL: postgresql://postgres:password@localhost:5432/diagrams_db?schema=public
-    restart: "no"
-
-  pgadmin:
-    profiles: [db]
-    image: dpage/pgadmin4
-    container_name: diagrams_pgadmin
-    restart: unless-stopped
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: password
-    ports:
-      - "8080:80"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - m2a-network
-
   api:
     profiles: [api]
     build:
       context: .
       dockerfile: ./apps/api/Dockerfile
-    container_name: m2a_api
     restart: unless-stopped
+    init: true
+    stop_grace_period: 10s
+    security_opt:
+      - apparmor=unconfined
     env_file: apps/api/.env
     environment:
-      # Usa a porta publicada do Postgres no host — mais confiável que postgres:5432
-      # em ambientes onde a comunicação entre containers na bridge falha.
       DATABASE_URL: postgresql://postgres:password@host.docker.internal:5433/diagrams_db?schema=public
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -83,10 +57,13 @@ services:
       dockerfile: ./apps/web/Dockerfile
       args:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:3000}
-    container_name: m2a_web
     restart: unless-stopped
+    init: true
+    stop_grace_period: 5s
+    security_opt:
+      - apparmor=unconfined
     ports:
-      - "80:80"
+      - "${WEB_PORT:-8080}:80"
     networks:
       - m2a-network
 

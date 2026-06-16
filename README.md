@@ -33,7 +33,7 @@ O M2A (Meeting to Architecture) é uma plataforma desenvolvida para simplificar 
 
 ## Como rodar com Docker
 
-Cada camada sobe de forma independente via **profiles** do Docker Compose. O banco executa migrations e seed automaticamente na primeira subida (se já existirem tabelas/dados, nada é recriado).
+Cada camada sobe de forma independente via **profiles** do Docker Compose. A API aplica as migrations do Prisma automaticamente ao subir (cria as tabelas no banco vazio; se já existirem, nada é recriado). A aplicação **não** popula dados de seed.
 
 ### Pré-requisitos
 
@@ -61,7 +61,7 @@ export VITE_API_URL=http://localhost:3000
 
 ### 2. Subir o banco de dados
 
-Cria o Postgres, aplica as migrations (tabelas) e insere os dados do `seed.sql` **somente se o banco estiver vazio**.
+Cria o Postgres. As tabelas são criadas pela API (migrations do Prisma) quando ela sobe.
 
 ```bash
 docker compose --profile db up -d --build
@@ -70,12 +70,11 @@ docker compose --profile db up -d --build
 | Serviço   | URL / Porta                          |
 |-----------|--------------------------------------|
 | Postgres  | `localhost:5433` (user: `postgres`, senha: `password`, db: `diagrams_db`) |
-| pgAdmin   | http://localhost:8080 (email: `admin@admin.com`, senha: `password`) |
 
 Acompanhe o init:
 
 ```bash
-docker compose logs db-init
+docker compose logs api
 ```
 
 ### 3. Subir a API
@@ -94,13 +93,15 @@ API disponível em http://localhost:3000
 docker compose --profile web up -d --build
 ```
 
-Frontend disponível em http://localhost
+Frontend disponível em http://localhost:8080
 
 ### Subir tudo de uma vez
 
 ```bash
 docker compose --profile db --profile api --profile web up -d --build
 ```
+
+> Os serviços rodam com `security_opt: apparmor=unconfined`. Isso evita o erro `cannot stop container: permission denied` ao derrubar a stack em hosts onde o perfil AppArmor `docker-default` não está carregado no kernel.
 
 ### Parar serviços
 
@@ -120,13 +121,6 @@ docker compose --profile db --profile api --profile web down
 # Parar tudo e apagar dados do banco
 docker compose --profile db --profile api --profile web down -v
 ```
-
-### Credenciais de teste (seed)
-
-Usuários do seed usam a senha **`psg@2026`**. Exemplo:
-
-- Email: `marquinhos@gmail.com`
-- Senha: `psg@2026`
 
 ---
 
@@ -148,12 +142,11 @@ Usuários do seed usam a senha **`psg@2026`**. Exemplo:
 
 2. Configure as variáveis de ambiente (veja abaixo).
 
-3. Aplique migrations e seed (se necessário):
+3. Aplique as migrations (se necessário):
 
    ```bash
    cd apps/api
    npx prisma migrate deploy
-   psql "postgresql://postgres:password@localhost:5433/diagrams_db" -f prisma/seed.sql
    ```
 
 4. Inicie os projetos:
